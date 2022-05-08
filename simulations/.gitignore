@@ -1,0 +1,9 @@
+# Core files
+core/
+
+# Simulation results
+*.sca
+*.vec
+*.vci
+*.elog
+*.out
