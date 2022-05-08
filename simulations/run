@@ -1,4 +1,3 @@
 #!/bin/sh
 cd `dirname $0`
-../src/iblock -n .:../src $*
-# for shared lib, use: opp_run -l ../src/iblock -n .:../src $*
+opp_run -l ../src/IBLOCK -n .:../src $*

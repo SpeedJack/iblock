@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>iblock</name>
-	<comment></comment>
+	<comment>Blockchain simulation framework for OMNeT++ 6.x</comment>
 	<projects>
 		<project>inet4.3</project>
 	</projects>

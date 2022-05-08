@@ -1,6 +1,12 @@
+# generated Makefiles
+Makefile
+
+# features file
+/iblock/features.h
+
 # Omnetpp binaries
-/iblock
-/iblock_dbg
+/IBLOCK
+/IBLOCK_dbg
 
 # {{{ C++
 # Prerequisites
