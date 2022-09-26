@@ -1,31 +1,33 @@
 package iblock.node.base;
 
-import iblock.node.common.BlockchainStorage;
-import iblock.node.common.MessageDispatcher;
+import iblock.apps.contract.IApp;
+import iblock.dispatcher.contract.IMessageDispatcher;
 
 module NodeBase
 {
 	parameters:
-		@display("bgb=1256,822");
+		int numApps = default(0);
+		@display("bgb=1000,1000");
 
 	gates:
 		inout port[];
 
 	submodules:
-		dispatcher: MessageDispatcher {
+		app[numApps]: <> like IApp {
 			parameters:
-				@display("p=125,80;is=s");
+				@display("p=375,76,row,150");
 		}
-		blockchainStorage: BlockchainStorage {
+		dispatcher: <> like IMessageDispatcher {
 			parameters:
-				@display("p=125,400;is=s");
+				@display("p=750,146;b=1000,5,,,,1");
 		}
 
 	connections:
-		blockchainStorage.blockIn <-- dispatcher.blockOut++;
-		blockchainStorage.blockOut --> dispatcher.blockIn++;
-
 		for i=0..sizeof(port)-1 {
 			port[i] <--> { @display("m=s"); } <--> dispatcher.port++;
+		}
+		for i=0..numApps-1 {
+			app[i].out --> dispatcher.in++;
+			app[i].in <-- dispatcher.out++;
 		}
 }

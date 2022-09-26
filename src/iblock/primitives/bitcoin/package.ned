@@ -1,4 +1,4 @@
-package iblock.model.bitcoin;
+package iblock.primitives.bitcoin;
 
 @namespace(iblock::bitcoin);
 @license(MIT);
