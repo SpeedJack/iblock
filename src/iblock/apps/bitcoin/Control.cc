@@ -24,17 +24,14 @@ void Control::initialize()
 
 void Control::broadcastVersion()
 {
-	std::vector<const Peer *> peers = peerListModule->getAllPeers();
-
 	VersionPacket *pckt = new VersionPacket();
 	pckt->setKind(MessageKind::VERSION);
 	pckt->setVersion(70015);
 	pckt->setTimestamp(simTime());
+
 	OutgoingMessage *msg = new OutgoingMessage();
-	msg->setPeerArraySize(peers.size());
-	for (int i = 0; i < peers.size(); ++i)
-		msg->setPeer(i, peers.at(i));
 	msg->setPayload(pckt);
+
 	send(msg, "out");
 }
 
