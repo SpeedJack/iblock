@@ -1,9 +1,5 @@
 #include "Control.h"
-#include "../../messages/bitcoin/IncomingMessage_m.h"
-#include "../../messages/bitcoin/OutgoingMessage_m.h"
-#include "../../messages/bitcoin/MessageKind_m.h"
-#include "../../messages/bitcoin/VersionPacket_m.h"
-#include "../../messages/bitcoin/VerackPacket_m.h"
+#include "../../messages/bitcoin/Protocol.h"
 
 namespace iblock
 {
