@@ -3,6 +3,7 @@
 #include "../../messages/bitcoin/OutgoingMessage_m.h"
 #include "../../messages/bitcoin/MessageKind_m.h"
 #include "../../messages/bitcoin/VersionPacket_m.h"
+#include "../../messages/bitcoin/VerackPacket_m.h"
 
 namespace iblock
 {
@@ -76,6 +77,7 @@ void Control::handleVersionMessage(const Peer *peer, const Packet *payload)
 
 void Control::handleVerackMessage(const Peer *peer, const Packet *payload)
 {
+	const VerackPacket *verack = check_and_cast<const VerackPacket *>(payload);
 	Peer *p = peerListModule->getPeerForUpdate(peer->getGateId());
 	p->setAcked(true);
 }
