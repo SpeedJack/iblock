@@ -14,7 +14,7 @@ cleanall: checkmakefiles
 	@cd src && $(MAKE) MODE=debug clean
 	@rm -f src/Makefile $(FEATURES_H)
 
-MAKEMAKE_OPTIONS := -f --deep -o IBLOCK -O out -pINET -I.
+MAKEMAKE_OPTIONS := -f --deep -o IBLOCK -O out -pINET -lcrypto -I.
 
 makefiles: makefiles-so
 
