@@ -60,6 +60,16 @@ std::vector<const Peer *> PeerList::getAllPeers()
 	return result;
 }
 
+std::vector<const Peer *> PeerList::getConnectedPeers()
+{
+	Enter_Method("getConnectedPeers()");
+	std::vector<const Peer *> result;
+	for (auto it = peers.begin(); it != peers.end(); it++)
+		if (it->second->getAcked())
+			result.push_back(it->second);
+	return result;
+}
+
 PeerList::~PeerList()
 {
 	for (auto it = peers.begin(); it != peers.end(); it++)

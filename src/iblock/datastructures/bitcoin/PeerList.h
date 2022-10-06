@@ -27,6 +27,7 @@ class PeerList: public cSimpleModule
 		bool hasPeer(int gateId);
 		const Peer *getPeer(int gateId);
 		std::vector<const Peer *> getAllPeers();
+		std::vector<const Peer *> getConnectedPeers();
 		Peer *getPeerForUpdate(int gateId)
 		{
 			return const_cast<Peer *>(getPeer(gateId));
