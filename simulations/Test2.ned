@@ -1,14 +1,20 @@
 package iblock.simulations;
-import iblock.node.bitcoin.Node;
+import iblock.bitcoin.node.PingerNode;
+
+channel Link extends ned.DatarateChannel
+{
+    delay = 10ms;
+    datarate = 10Mbps;
+}
 
 network Test2
 {
     @display("bgb=1000,1000");
     submodules:
-        node0: Node;
-        node1: Node;
-        node2: Node;
-        node3: Node;
+        node0: PingerNode;
+        node1: PingerNode;
+        node2: PingerNode;
+        node3: PingerNode;
        
     connections:
         node0.port++ <--> Link <--> node1.port++;

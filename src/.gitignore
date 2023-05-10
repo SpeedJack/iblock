@@ -11,6 +11,8 @@ Makefile
 # Omnetpp binaries
 /IBLOCK
 /IBLOCK_dbg
+/libIBLOCK.so
+/libIBLOCK_dbg.so
 
 # {{{ C++
 # Prerequisites
