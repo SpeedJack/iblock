@@ -1,7 +1,7 @@
 #ifndef __IBLOCK_BITCOIN_PAYLOADS_PAYLOAD_H_
 #define __IBLOCK_BITCOIN_PAYLOADS_PAYLOAD_H_
 
-#include "iblock/IblockCommon.h"
+#include "iblock/iblock.h"
 
 namespace iblock
 {
@@ -16,7 +16,7 @@ class IBLOCK_API Payload : public ::omnetpp::cPacket
 		void copy(const Payload& other) { }
 
 	protected:
-		static size_t compactSize(unsigned long value, unsigned char *result);
+		static size_t compactSize(unsigned long value, unsigned char *result = nullptr);
 		static unsigned long compactSizeValue(const unsigned char *result);
 
 	public:
@@ -26,6 +26,7 @@ class IBLOCK_API Payload : public ::omnetpp::cPacket
 		virtual Payload *dup() const override = 0;
 
 		virtual unsigned char *getRawBytes() const = 0;
+		std::string getRawBytesHexStr() const;
 };
 
 }

@@ -27,6 +27,23 @@ void VersionPl::copy(const VersionPl& other)
 	relay = other.relay;
 }
 
+void VersionPl::updateByteLength()
+{
+	setByteLength(4 + 8 + 8 + 8 + 16 + 2);
+	if (version < 106)
+		return;
+	addByteLength(8 + 16 + 2 + 8);
+	unsigned long uaBytes = getUserAgentBytes();
+	size_t bytesUsed = compactSize(uaBytes);
+	addByteLength(bytesUsed + uaBytes);
+	if (version < 209)
+		return;
+	addByteLength(4);
+	if (version < 70001)
+		return;
+	addByteLength(1);
+}
+
 unsigned char *VersionPl::getRawBytes() const
 {
 	unsigned char *rawBytes = new unsigned char[getByteLength()];
@@ -50,13 +67,17 @@ unsigned char *VersionPl::getRawBytes() const
 	uint16_t port = __builtin_bswap16(addrRecvPort);
 	std::memcpy(ptr, &port, sizeof(port));
 	ptr += sizeof(port);
+
+	if (version < 106)
+		return rawBytes;
+	std::memcpy(ptr, &services, sizeof(services));
+	ptr += sizeof(services);
 	hi = __builtin_bswap64(getAddrTransIp().getHi());
 	lo = __builtin_bswap64(getAddrTransIp().getLo());
 	std::memcpy(ptr, &hi, sizeof(hi));
 	ptr += sizeof(hi);
 	std::memcpy(ptr, &lo, sizeof(lo));
 	ptr += sizeof(lo);
-	ptr += 16;
 	port = __builtin_bswap16(addrTransPort);
 	std::memcpy(ptr, &port, sizeof(port));
 	ptr += sizeof(port);
@@ -67,8 +88,10 @@ unsigned char *VersionPl::getRawBytes() const
 	size_t bytesUsed = compactSize(uaBytes, compSize);
 	std::memcpy(ptr, compSize, bytesUsed);
 	ptr += bytesUsed;
-	std::strncpy((char *)ptr, userAgent.c_str(), uaBytes);
-	ptr += uaBytes;
+	if (uaBytes > 0) {
+		std::strncpy((char *)ptr, userAgent.c_str(), uaBytes);
+		ptr += uaBytes;
+	}
 
 	if (version < 209)
 		return rawBytes;

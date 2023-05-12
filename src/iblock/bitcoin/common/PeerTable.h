@@ -1,7 +1,6 @@
 #ifndef __IBLOCK_BITCOIN_PEERTABLE_H_
 #define __IBLOCK_BITCOIN_PEERTABLE_H_
 
-#include "iblock/IblockCommon.h"
 #include <unordered_map>
 #include "Peer_m.h"
 #include "IPAddress.h"

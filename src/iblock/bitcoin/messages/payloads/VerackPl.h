@@ -16,7 +16,7 @@ class IBLOCK_API VerackPl : public VerackPl_Base
 	private:
 		void copy(const VerackPl& other) {}
 	public:
-		VerackPl() : VerackPl_Base() { setKind(MessageKind::VERACK); setName("verack"); }
+		VerackPl() : VerackPl_Base() { setKind(MessageKind::VERACK); setName("verack"); setByteLength(0); }
 		VerackPl(const VerackPl& other) : VerackPl_Base(other) { copy(other); }
 		VerackPl& operator=(const VerackPl& other) { if (this == &other) return *this; VerackPl_Base::operator=(other); copy(other); return *this; }
 

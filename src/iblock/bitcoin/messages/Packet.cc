@@ -56,7 +56,7 @@ uint32_t Packet::computeChecksum()
 	delete[] rawBytes;
 	unsigned char *second = sha256hash(first, SHA256_DIGEST_LENGTH);
 	delete[] first;
-	computedChecksum = *(uint32_t *)second;
+	computedChecksum = __builtin_bswap32(*(uint32_t *)second);
 	delete[] second;
 
 	return computedChecksum;

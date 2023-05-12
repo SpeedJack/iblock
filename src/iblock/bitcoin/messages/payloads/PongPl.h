@@ -14,16 +14,16 @@ namespace payloads
 class IBLOCK_API PongPl : public PongPl_Base
 {
 	private:
-		void copy(const PongPl& other) {}
+		void copy(const PongPl& other) { nonce = other.nonce; }
 	public:
-		PongPl() : PongPl_Base() { setKind(MessageKind::PONG); setName("pong"); }
+		PongPl() : PongPl_Base() { setKind(MessageKind::PONG); setName("pong"); setByteLength(8); }
 		PongPl(uint64_t nonce) : PongPl() { setNonce(nonce); }
 		PongPl(const PongPl& other) : PongPl_Base(other) { copy(other); }
 		PongPl& operator=(const PongPl& other) { if (this == &other) return *this; PongPl_Base::operator=(other); copy(other); return *this; }
 
 		virtual PongPl *dup() const override { return new PongPl(*this); }
 
-		virtual unsigned char *getRawBytes() const override { return nullptr; }
+		virtual unsigned char *getRawBytes() const override;
 
 		virtual std::string str() const override
 		{
