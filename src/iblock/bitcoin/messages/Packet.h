@@ -8,7 +8,7 @@ namespace iblock
 namespace bitcoin
 {
 
-class Packet : public Packet_Base
+class IBLOCK_API Packet : public Packet_Base
 {
 	private:
 		void copy(const Packet& other);

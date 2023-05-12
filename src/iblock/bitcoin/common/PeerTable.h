@@ -1,7 +1,7 @@
 #ifndef __IBLOCK_BITCOIN_PEERTABLE_H_
 #define __IBLOCK_BITCOIN_PEERTABLE_H_
 
-#include <omnetpp.h>
+#include "iblock/IblockCommon.h"
 #include <unordered_map>
 #include "Peer_m.h"
 #include "IPAddress.h"
@@ -11,7 +11,7 @@ namespace iblock
 namespace bitcoin
 {
 
-class PeerTable : public ::omnetpp::cSimpleModule
+class IBLOCK_API PeerTable : public ::omnetpp::cSimpleModule
 {
 	protected:
 		struct PeerIP

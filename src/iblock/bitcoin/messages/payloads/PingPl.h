@@ -11,7 +11,7 @@ namespace bitcoin
 namespace payloads
 {
 
-class PingPl : public PingPl_Base
+class IBLOCK_API PingPl : public PingPl_Base
 {
 	private:
 		void copy(const PingPl& other) {}

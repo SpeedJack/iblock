@@ -8,7 +8,7 @@ namespace iblock
 namespace bitcoin
 {
 
-class Pinger : public AppBase
+class IBLOCK_API Pinger : public AppBase
 {
 	protected:
 		::omnetpp::cMessage *timer;

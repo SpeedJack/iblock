@@ -9,7 +9,7 @@ namespace iblock
 namespace bitcoin
 {
 
-class ConnectionManager : public AppBase, public IConnectionManager
+class IBLOCK_API ConnectionManager : public AppBase, public IConnectionManager
 {
 	protected:
 		std::unordered_map<unsigned int, std::vector<std::function<void(bool)>>> notifyMap;

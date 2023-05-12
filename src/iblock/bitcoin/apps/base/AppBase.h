@@ -1,7 +1,6 @@
 #ifndef __IBLOCK_BITCOIN_APPBASE_H_
 #define __IBLOCK_BITCOIN_APPBASE_H_
 
-#include <omnetpp.h>
 #include "iblock/bitcoin/apps/contract/IConnectionManager.h"
 #include "iblock/bitcoin/common/dispatcher/Dispatcher.h"
 #include "iblock/bitcoin/messages/IncomingMessage_m.h"
@@ -12,7 +11,7 @@ namespace iblock
 namespace bitcoin
 {
 
-class AppBase : public ::omnetpp::cSimpleModule
+class IBLOCK_API AppBase : public ::omnetpp::cSimpleModule
 {
 	protected:
 		PeerTable *peerTable;

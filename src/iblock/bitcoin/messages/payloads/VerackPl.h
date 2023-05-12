@@ -11,7 +11,7 @@ namespace bitcoin
 namespace payloads
 {
 
-class VerackPl : public VerackPl_Base
+class IBLOCK_API VerackPl : public VerackPl_Base
 {
 	private:
 		void copy(const VerackPl& other) {}

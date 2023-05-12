@@ -1,7 +1,7 @@
 #ifndef __IBLOCK_BITCOIN_PAYLOADS_PAYLOAD_H_
 #define __IBLOCK_BITCOIN_PAYLOADS_PAYLOAD_H_
 
-#include <omnetpp.h>
+#include "iblock/IblockCommon.h"
 
 namespace iblock
 {
@@ -10,7 +10,7 @@ namespace bitcoin
 namespace payloads
 {
 
-class Payload : public ::omnetpp::cPacket
+class IBLOCK_API Payload : public ::omnetpp::cPacket
 {
 	private:
 		void copy(const Payload& other) { }

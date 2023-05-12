@@ -1,6 +1,7 @@
 #ifndef __IBLOCK_BITCOIN_IPADDRESS_H_
 #define __IBLOCK_BITCOIN_IPADDRESS_H_
 
+#include "iblock/IblockCommon.h"
 #include <cstdint>
 #include <string>
 
@@ -9,7 +10,7 @@ namespace iblock
 namespace bitcoin
 {
 
-class IPAddress
+class IBLOCK_API IPAddress
 {
 	private:
 		uint64_t hi;

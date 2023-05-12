@@ -11,7 +11,7 @@ namespace bitcoin
 namespace payloads
 {
 
-class VersionPl : public VersionPl_Base
+class IBLOCK_API VersionPl : public VersionPl_Base
 {
 	private:
 		void copy(const VersionPl& other);

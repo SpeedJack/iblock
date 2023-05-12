@@ -1,14 +1,14 @@
 #ifndef __IBLOCK_BITCOIN_PORTQUEUE_H_
 #define __IBLOCK_BITCOIN_PORTQUEUE_H_
 
-#include <omnetpp.h>
+#include "iblock/IblockCommon.h"
 
 namespace iblock
 {
 namespace bitcoin
 {
 
-class PortQueue : public ::omnetpp::cSimpleModule
+class IBLOCK_API PortQueue : public ::omnetpp::cSimpleModule
 {
 	protected:
 		::omnetpp::cMessage *timer;

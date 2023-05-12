@@ -8,7 +8,7 @@ namespace iblock
 namespace bitcoin
 {
 
-class IConnectionManager
+class IBLOCK_API IConnectionManager
 {
 	public:
 		virtual void connect(Peer *peer, std::function<void(bool)> callback) = 0;
