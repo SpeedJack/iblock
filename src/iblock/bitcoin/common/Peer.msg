@@ -1,5 +1,6 @@
 import iblock.bitcoin.common.Network;
 import iblock.bitcoin.common.IPAddress;
+import iblock.bitcoin.common.Service;
 
 cplusplus {{
 	#include <functional>
@@ -44,6 +45,11 @@ cplusplus(Peer) {{
 		virtual void setUnconnected() { setState(ConnectionState::UNCONNECTED); }
 		virtual void setHalfConnected() { setState(ConnectionState::HALF_CONNECTED); }
 		virtual void setVersionSent() { if (isUnconnected()) setHalfConnected(); }
+		virtual bool hasService(Service service) const { return (services & service) != 0; }
+		virtual void addService(Service service) { services |= service; }
+		virtual void removeService(Service service) { services &= ~service; }
+		virtual bool isRelay() const { return relay; }
+		virtual bool isFullNode() const { return services > 0; }
 
 		virtual int getGateId() const { return gate->getId(); }
 		virtual void setUpdateCallback(std::function<void(::omnetpp::cGate *, IPAddress, uint16_t)> cb) { updateCb = cb; }

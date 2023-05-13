@@ -1,5 +1,6 @@
 import iblock.bitcoin.messages.payloads.Payload;
 import iblock.bitcoin.common.IPAddress;
+import iblock.bitcoin.common.Service;
 
 namespace iblock::bitcoin::payloads;
 
@@ -8,7 +9,7 @@ packet VersionPl extends Payload
 	@customize;
 	@toString(.str());
 	int32_t version = 70015;
-	uint64_t services = 0x01;
+	uint64_t services = Service::NODE_NETWORK;
 	simtime_t timestamp;
 	uint64_t addrRecvServices = 0;
 	IPAddress addrRecvIp = "::ffff:127.0.0.1" @byValue;
