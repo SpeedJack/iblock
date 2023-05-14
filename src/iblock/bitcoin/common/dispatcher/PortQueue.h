@@ -1,7 +1,7 @@
 #ifndef __IBLOCK_BITCOIN_PORTQUEUE_H_
 #define __IBLOCK_BITCOIN_PORTQUEUE_H_
 
-#include "iblock/iblock.h"
+#include "iblock/bitcoin/bitcoin.h"
 
 namespace iblock
 {

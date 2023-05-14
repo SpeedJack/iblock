@@ -1,5 +1,5 @@
-#ifndef __IBLOCK_COMMON_IBLOCK_H_
-#define __IBLOCK_COMMON_IBLOCK_H_
+#ifndef __IBLOCK_IBLOCK_H_
+#define __IBLOCK_IBLOCK_H_
 
 #include <omnetpp.h>
 #include "features.h"

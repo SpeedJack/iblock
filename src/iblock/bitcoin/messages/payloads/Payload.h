@@ -1,7 +1,7 @@
 #ifndef __IBLOCK_BITCOIN_PAYLOADS_PAYLOAD_H_
 #define __IBLOCK_BITCOIN_PAYLOADS_PAYLOAD_H_
 
-#include "iblock/iblock.h"
+#include "iblock/bitcoin/bitcoin.h"
 
 namespace iblock
 {
@@ -16,7 +16,7 @@ class IBLOCK_API Payload : public ::omnetpp::cPacket
 		void copy(const Payload& other) { }
 
 	protected:
-		static size_t compactSize(unsigned long value, unsigned char *result = nullptr);
+		static size_t compactSize(const unsigned long value, unsigned char *result = nullptr);
 		static unsigned long compactSizeValue(const unsigned char *result);
 
 	public:

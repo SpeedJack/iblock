@@ -10,7 +10,7 @@ namespace payloads
 
 Register_Abstract_Class(Payload)
 
-size_t Payload::compactSize(unsigned long value, unsigned char *result)
+size_t Payload::compactSize(const unsigned long value, unsigned char *result)
 {
 	if (value < 253) {
 		if (result != nullptr) *result = (uint8_t)value;
@@ -39,6 +39,8 @@ size_t Payload::compactSize(unsigned long value, unsigned char *result)
 
 unsigned long Payload::compactSizeValue(const unsigned char *result)
 {
+	if (result == nullptr)
+		return 0;
 	if (result[0] == 0xFD)
 		return (uint16_t)result[1];
 	if (result[0] == 0xFE)
