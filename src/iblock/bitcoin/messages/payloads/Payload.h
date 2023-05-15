@@ -15,10 +15,6 @@ class IBLOCK_API Payload : public ::omnetpp::cPacket
 	private:
 		void copy(const Payload& other) { }
 
-	protected:
-		static size_t compactSize(const unsigned long value, unsigned char *result = nullptr);
-		static unsigned long compactSizeValue(const unsigned char *result);
-
 	public:
 		Payload(const char *name = nullptr, short kind = 0) : cPacket(name, kind) { }
 		Payload(const Payload& other) : cPacket(other) { }
