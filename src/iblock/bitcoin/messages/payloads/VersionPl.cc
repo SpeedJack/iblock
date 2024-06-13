@@ -9,7 +9,7 @@ namespace bitcoin
 namespace payloads
 {
 
-Register_Class(VersionPl);
+Register_Class(VersionPl)
 
 void VersionPl::copy(const VersionPl& other)
 {

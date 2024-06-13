@@ -6,6 +6,8 @@ namespace iblock
 namespace bitcoin
 {
 
+Register_Class(Hash);
+
 void Hash::copy(const Hash& other)
 {
 	if (other.compact) {

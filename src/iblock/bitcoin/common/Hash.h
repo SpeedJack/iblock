@@ -1,15 +1,18 @@
 #ifndef __IBLOCK_BITCOIN_HASH_H_
 #define __IBLOCK_BITCOIN_HASH_H_
 
-#include "iblock/iblock.h"
+#include "iblock/bitcoin/bitcoin.h"
 
 namespace iblock
 {
 namespace bitcoin
 {
 
-class IBLOCK_API Hash
+class IBLOCK_API Hash : public ::omnetpp::cObject
 {
+	private:
+		void copy(const Hash& other);
+
 	protected:
 		union hash_t
 		{
@@ -22,7 +25,6 @@ class IBLOCK_API Hash
 
 		Hash(const unsigned char *bytes);
 		void expand();
-		void copy(const Hash& other);
 
 		static char hexNibble(const char& c)
 		{ return (c >= '0' && c <= '9') ? c - '0' : (c >= 'a' && c <= 'f') ? c - 'a' + 0xA : (c >= 'A' && c <= 'F') ? c - 'A' + 0xA : -1; }
@@ -31,7 +33,7 @@ class IBLOCK_API Hash
 		Hash(uint32_t mantissa, unsigned char exponent);
 		Hash(const uint32_t nBits) : Hash(nBits & 0xFFFFFF, nBits >> 24) { }
 		Hash() : Hash(0, 0) { }
-		Hash(const Hash &other) { copy(other); }
+		Hash(const Hash& other) { copy(other); }
 
 		~Hash() { if (!compact) delete[] storedHash.bytes; }
 

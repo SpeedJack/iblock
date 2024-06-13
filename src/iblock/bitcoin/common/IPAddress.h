@@ -2,15 +2,13 @@
 #define __IBLOCK_BITCOIN_IPADDRESS_H_
 
 #include "iblock/bitcoin/bitcoin.h"
-#include <cstdint>
-#include <string>
 
 namespace iblock
 {
 namespace bitcoin
 {
 
-class IBLOCK_API IPAddress
+class IBLOCK_API IPAddress : public ::omnetpp::cObject
 {
 	private:
 		uint64_t hi;
@@ -19,7 +17,7 @@ class IBLOCK_API IPAddress
 	protected:
 		static int parseIpv6Groups(const char *& s, uint16_t *groups);
 		static int parseIpv4Groups(const char *& s, uint8_t *groups);
-		static void findGap(uint16_t *groups, int &start, int &end);
+		static void findGap(uint16_t *groups, int& start, int& end);
 
 	public:
 		IPAddress() : hi(0), lo(0) { }
@@ -34,14 +32,14 @@ class IBLOCK_API IPAddress
 		bool tryParseIpv4(const char *addr);
 		bool tryParse(const char *addr);
 
-		bool operator==(const IPAddress &other) const { return hi == other.hi && lo == other.lo; }
-		bool operator!=(const IPAddress &other) const { return !operator==(other); }
-		bool operator<(const IPAddress &other) const { return compare(other) < 0; }
-		bool operator<=(const IPAddress &other) const { return compare(other) <= 0; }
-		bool operator>(const IPAddress &other) const { return compare(other) > 0; }
-		bool operator>=(const IPAddress &other) const { return compare(other) >= 0; }
+		bool operator==(const IPAddress& other) const { return hi == other.hi && lo == other.lo; }
+		bool operator!=(const IPAddress& other) const { return !operator==(other); }
+		bool operator<(const IPAddress& other) const { return compare(other) < 0; }
+		bool operator<=(const IPAddress& other) const { return compare(other) <= 0; }
+		bool operator>(const IPAddress& other) const { return compare(other) > 0; }
+		bool operator>=(const IPAddress& other) const { return compare(other) >= 0; }
 
-		int compare(const IPAddress &other) const
+		int compare(const IPAddress& other) const
 		{
 			return (hi < other.hi) ? -1 :
 				(hi > other.hi) ? 1 :

@@ -3,7 +3,7 @@
 	<name>iblock</name>
 	<comment>Blockchain simulation framework for OMNeT++ 6.x</comment>
 	<projects>
-		<project>inet4.4</project>
+		<project>inet</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

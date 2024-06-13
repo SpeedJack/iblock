@@ -4,7 +4,7 @@ cplusplus {{
 
 namespace iblock::bitcoin;
 
-class IPAddress
+class IPAddress extends cObject
 {
 	@existingClass;
 	@opaque;

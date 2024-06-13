@@ -4,7 +4,7 @@ cplusplus {{
 
 namespace iblock::bitcoin;
 
-class Hash
+class Hash extends cObject
 {
 	@existingClass;
 	@opaque;

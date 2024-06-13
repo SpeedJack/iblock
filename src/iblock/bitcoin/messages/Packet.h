@@ -52,7 +52,7 @@ class IBLOCK_API Packet : public Packet_Base
 namespace omnetpp
 {
 
-template<> inline iblock::bitcoin::Packet *fromAnyPtr(any_ptr ptr) { return check_and_cast<iblock::bitcoin::Packet*>(ptr.get<cObject>()); }
+template<> inline iblock::bitcoin::Packet *fromAnyPtr(any_ptr ptr) { return check_and_cast<iblock::bitcoin::Packet *>(ptr.get<cObject>()); }
 
 }
 

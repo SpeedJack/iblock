@@ -1,10 +1,11 @@
 #include "IPAddress.h"
-#include <omnetpp.h>
 
 namespace iblock
 {
 namespace bitcoin
 {
+
+Register_Class(IPAddress)
 
 int IPAddress::parseIpv6Groups(const char *& s, uint16_t *groups)
 {
@@ -114,7 +115,7 @@ void IPAddress::set(const char *addr)
 		throw ::omnetpp::cRuntimeError("IPAddress: cannot interpret address string `%s'", addr);
 }
 
-void IPAddress::findGap(uint16_t *groups, int &start, int &end)
+void IPAddress::findGap(uint16_t *groups, int& start, int& end)
 {
 	start = end = 0;
 	int beg = -1;

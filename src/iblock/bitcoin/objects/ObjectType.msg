@@ -1,0 +1,16 @@
+namespace iblock::bitcoin;
+
+cplusplus {{
+	const uint32_t MSG_WITNESS_FLAG = 1 << 30;
+}}
+
+enum ObjectType
+{
+	MSG_TX = 0x01;
+	MSG_BLOCK = 0x02;
+	MSG_FILTERED_BLOCK = 0x03;
+	MSG_CMPCT_BLOCK = 0x04;
+	MSG_WITNESS_TX = 0x40000001;
+	MSG_WITNESS_BLOCK = 0x40000002;
+	MSG_FILTERED_WITNESS_BLOCK = 0x40000003;
+}

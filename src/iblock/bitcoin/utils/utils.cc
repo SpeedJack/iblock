@@ -1,6 +1,11 @@
 #include "utils.h"
 
-std::size_t compactSize(const unsigned long value, unsigned char *result = nullptr)
+namespace iblock
+{
+namespace bitcoin
+{
+
+std::size_t compactSize(const unsigned long value, unsigned char *result)
 {
 	if (value < 253) {
 		if (result != nullptr) *result = (uint8_t)value;
@@ -38,4 +43,7 @@ unsigned long compactSizeValue(const unsigned char *result)
 	if (result[0] == 0xFF)
 		return (uint64_t)result[1];
 	return (uint8_t)result[0];
+}
+
+}
 }

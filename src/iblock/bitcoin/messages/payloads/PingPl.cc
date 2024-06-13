@@ -9,7 +9,7 @@ namespace bitcoin
 namespace payloads
 {
 
-Register_Class(PingPl);
+Register_Class(PingPl)
 
 unsigned char *PingPl::getRawBytes() const
 {

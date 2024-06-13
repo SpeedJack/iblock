@@ -1,0 +1,41 @@
+#ifndef __IBLOCK_BITCOIN_TRANSACTIONOUTPUT_H_
+#define __IBLOCK_BITCOIN_TRANSACTIONOUTPUT_H_
+
+#include "TransactionOutput_m.h"
+
+namespace iblock
+{
+namespace bitcoin
+{
+
+class IBLOCK_API TransactionOutput : public TransactionOutput_Base
+{
+	private:
+		void copy(const TransactionOutput& other);
+
+	public:
+		TransactionOutput(const char *name = "TxOut") : TransactionOutput_Base(name) { }
+		TransactionOutput(BitcoinAddress *address, int64_t value) : TransactionOutput() { this->address = address; this->value = value; }
+		TransactionOutput(const TransactionOutput& other) : TransactionOutput_Base(other) { copy(other); }
+		TransactionOutput & operator=(const TransactionOutput& other) { if (this == &other) return *this; TransactionOutput_Base::operator=(other); copy(other); return *this; }
+
+		virtual TransactionOutput *dup() const override { return new TransactionOutput(*this); }
+
+		virtual unsigned int getPkScriptBytes() const override { return strlen(getPkScript()); }
+
+		virtual const char *getPkScript() const override { return ""; }
+
+		virtual std::string str() const override;
+};
+
+}
+}
+
+namespace omnetpp
+{
+
+template<> inline iblock::bitcoin::TransactionOutput *fromAnyPtr(any_ptr ptr) { return check_and_cast<iblock::bitcoin::TransactionOutput *>(ptr.get<cObject>()); }
+
+}
+
+#endif

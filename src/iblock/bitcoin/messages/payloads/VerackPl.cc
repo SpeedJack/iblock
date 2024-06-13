@@ -9,7 +9,7 @@ namespace bitcoin
 namespace payloads
 {
 
-Register_Class(VerackPl);
+Register_Class(VerackPl)
 
 }
 }

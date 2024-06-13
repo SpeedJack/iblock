@@ -49,6 +49,21 @@ void AppBase::handleIncomingMessage(IncomingMessage *msg)
 		case MessageKind::VERACK:
 			handleVerackPacket(peer, pkt);
 			break;
+		case MessageKind::BLOCK:
+			handleBlockPacket(peer, pkt);
+			break;
+		case MessageKind::GETDATA:
+			handleGetDataPacket(peer, pkt);
+			break;
+		case MessageKind::GETBLOCKS:
+			handleGetBlocksPacket(peer, pkt);
+			break;
+		case MessageKind::GETHEADERS:
+			handleGetHeadersPacket(peer, pkt);
+			break;
+		case MessageKind::INV:
+			handleInvPacket(peer, pkt);
+			break;
 		default:
 			handleUnknownPacket(peer, pkt);
 	}

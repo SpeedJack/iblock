@@ -1,0 +1,25 @@
+import iblock.bitcoin.common.Hash;
+import iblock.bitcoin.objects.TransactionOutput;
+
+cplusplus {{
+	#include "TransactionOutput.h"
+}}
+
+namespace iblock::bitcoin;
+
+struct Outpoint
+{
+	Hash txHash;
+	uint32_t index;
+}
+
+class TransactionInput extends cOwnedObject
+{
+	@customize;
+	@toString(.str());
+	TransactionOutput *prevOutput;
+	abstract const Outpoint prevOutpoint;
+	abstract const unsigned int scriptBytes;
+	abstract const string signatureScript;
+	uint32_t sequence = 0xFFFFFFFF;
+}

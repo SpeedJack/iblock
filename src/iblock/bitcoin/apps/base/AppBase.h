@@ -57,6 +57,24 @@ class IBLOCK_API AppBase : public ::omnetpp::cSimpleModule
 		virtual void handleVerackPacket(Peer *peer, Packet *pkt) { handleVerackPacket(peer, ::omnetpp::check_and_cast<payloads::VerackPl *>(pkt->decapsulate())); }
 		virtual void handleVerackPacket(Peer *peer, payloads::VerackPl *verack) { delete verack; }
 
+		virtual void handleBlockPacket(Peer *peer, Packet *pkt) { handleBlockPacket(peer, ::omnetpp::check_and_cast<payloads::BlockPl *>(pkt->decapsulate())); }
+		virtual void handleBlockPacket(Peer *peer, payloads::BlockPl *block) { delete block; }
+
+		virtual void handleInvPacket(Peer *peer, Packet *pkt) { handleInvPacket(peer, ::omnetpp::check_and_cast<payloads::InvPl *>(pkt->decapsulate())); }
+		virtual void handleInvPacket(Peer *peer, payloads::InvPl *inv) { delete inv; }
+
+		virtual void handleGetDataPacket(Peer *peer, Packet *pkt) { handleGetDataPacket(peer, ::omnetpp::check_and_cast<payloads::GetDataPl *>(pkt->decapsulate())); }
+		virtual void handleGetDataPacket(Peer *peer, payloads::GetDataPl *getdata) { delete getdata; }
+
+		virtual void handleGetBlocksPacket(Peer *peer, Packet *pkt) { handleGetBlocksPacket(peer, ::omnetpp::check_and_cast<payloads::GetBlocksPl *>(pkt->decapsulate())); }
+		virtual void handleGetBlocksPacket(Peer *peer, payloads::GetBlocksPl *getblocks) { delete getblocks; }
+
+		virtual void handleGetHeadersPacket(Peer *peer, Packet *pkt) { handleGetHeadersPacket(peer, ::omnetpp::check_and_cast<payloads::GetHeadersPl *>(pkt->decapsulate())); }
+		virtual void handleGetHeadersPacket(Peer *peer, payloads::GetHeadersPl *getheaders) { delete getheaders; }
+
+		virtual void handleHeadersPacket(Peer *peer, Packet *pkt) { handleHeadersPacket(peer, ::omnetpp::check_and_cast<payloads::HeadersPl *>(pkt->decapsulate())); }
+		virtual void handleHeadersPacket(Peer *peer, payloads::HeadersPl *headers) { delete headers; }
+
 		virtual void handleUnknownPacket(Peer *peer, Packet *pkt) { delete pkt; }
 
 		virtual ~AppBase() override;

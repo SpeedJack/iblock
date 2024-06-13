@@ -1,6 +1,6 @@
 FEATURETOOL = opp_featuretool
 FEATURES_H = src/iblock/features.h
-INET_PROJ = ../../inet4.4
+INET_PROJ = ../../inet
 
 .PHONY: all clean cleanall makefiles makefiles-so makefiles-lib makefiles-exe checkmakefiles
 
@@ -15,7 +15,7 @@ cleanall: checkmakefiles
 	@cd src && $(MAKE) MODE=debug clean
 	@rm -f src/Makefile $(FEATURES_H)
 
-MAKEMAKE_OPTIONS := -f --deep -o IBLOCK -O out -pIBLOCK -KINET4_4_PROJ=$(INET_PROJ) -DINET_IMPORT -I. -I$$\(INET_PROJ\)/src -L$$\(INET_PROJ\)/src -lcrypto -lINET$$\(D\)
+MAKEMAKE_OPTIONS := -f --deep -o IBLOCK -O out -pIBLOCK -KINET_PROJ=$(INET_PROJ) -DINET_IMPORT -I. -I$$\(INET_PROJ\)/src -L$$\(INET_PROJ\)/src -lcrypto -lINET$$\(D\)
 
 makefiles: makefiles-so
 

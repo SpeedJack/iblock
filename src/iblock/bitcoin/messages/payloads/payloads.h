@@ -6,5 +6,11 @@
 #include "PongPl.h"
 #include "VersionPl.h"
 #include "VerackPl.h"
+#include "BlockPl.h"
+#include "InvPl.h"
+#include "GetDataPl.h"
+#include "GetBlocksPl.h"
+#include "GetHeadersPl.h"
+#include "HeadersPl.h"
 
 #endif
