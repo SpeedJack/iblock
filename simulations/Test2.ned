@@ -1,5 +1,6 @@
 package iblock.simulations;
 import iblock.bitcoin.node.PingerNode;
+import iblock.bitcoin.global.NodeManager;
 
 channel Link extends ned.DatarateChannel
 {
@@ -15,6 +16,7 @@ network Test2
         node1: PingerNode;
         node2: PingerNode;
         node3: PingerNode;
+	nodeManager: NodeManager;
        
     connections:
         node0.port++ <--> Link <--> node1.port++;

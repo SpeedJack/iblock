@@ -30,7 +30,7 @@ class IBLOCK_API CoinbaseInput : public CoinbaseInput_Base
 		virtual CoinbaseInput *dup() const override { return new CoinbaseInput(*this); }
 
 		virtual const char *getCoinbaseScript() const override { return getSignatureScript(); }
-		virtual void setCoinbaseScript(const char *coinbaseScript) override { setSignatureScript(coinbaseScript); }
+		//virtual void setCoinbaseScript(const char *coinbaseScript) override { setSignatureScript(coinbaseScript); }
 };
 
 }

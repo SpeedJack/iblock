@@ -1,5 +1,5 @@
 package iblock.bitcoin.global;
 
-simple GBM
+simple NodeManager
 {
 }

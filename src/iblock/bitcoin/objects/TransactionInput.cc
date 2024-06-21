@@ -13,7 +13,7 @@ Register_Class(TransactionInput)
 void TransactionInput::copy(const TransactionInput& other)
 {
 	this->prevOutput = other.prevOutput; // FIXME: ownership? delete?
-	this->signatureScript = other.signatureScript; // FIXME: delete?
+	//this->signatureScript = other.signatureScript; // FIXME: delete?
 	this->sequence = other.sequence;
 }
 

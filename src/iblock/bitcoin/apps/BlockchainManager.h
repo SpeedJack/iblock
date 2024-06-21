@@ -3,6 +3,7 @@
 
 #include "iblock/bitcoin/apps/base/AppBase.h"
 #include "iblock/bitcoin/objects/Block.h"
+#include "iblock/bitcoin/global/NodeManager.h"
 #include "iblock/bitcoin/global/GBM.h"
 
 namespace iblock
@@ -13,7 +14,8 @@ namespace bitcoin
 class IBLOCK_API BlockchainManager : public AppBase
 {
 	protected:
-		GBM *gbm;
+		//GBM *gbm;
+		NodeManager *nodeManager;
 
 		virtual void initialize() override;
 
@@ -23,7 +25,8 @@ class IBLOCK_API BlockchainManager : public AppBase
 		virtual void handleGetHeadersPacket(Peer *peer, payloads::GetHeadersPl *getheaders) override;
 
 	public:
-		BlockchainManager() : AppBase() { gbm = nullptr; }
+		//BlockchainManager() : AppBase() { gbm = nullptr; }
+		BlockchainManager() : AppBase() { }
 
 		virtual Block *getCurrentBlock() const;
 		virtual uint32_t getCurrentHeight() const { return getCurrentBlock()->getHeight(); }

@@ -37,4 +37,11 @@ class IBLOCK_API Block : public Block_Base
 }
 }
 
+namespace omnetpp
+{
+
+template<> inline iblock::bitcoin::Block *fromAnyPtr(any_ptr ptr) { return check_and_cast<iblock::bitcoin::Block *>(ptr.get<cObject>()); }
+
+}
+
 #endif

@@ -17,6 +17,7 @@ class IBLOCK_API BlockPl : public BlockPl_Base
 		void copy(const BlockPl& other) { }
 	public:
 		BlockPl() : BlockPl_Base() { setKind(MessageKind::BLOCK); setName("block"); setByteLength(0); }
+		BlockPl(::iblock::bitcoin::Block *block) : BlockPl() { setBlock(block); }
 		BlockPl(const BlockPl& other) : BlockPl_Base(other) { copy(other); }
 		BlockPl& operator=(const BlockPl& other) { if (this == &other) return *this; BlockPl_Base::operator=(other); copy(other); return *this; }
 
