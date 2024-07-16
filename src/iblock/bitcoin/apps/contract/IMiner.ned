@@ -6,6 +6,4 @@ moduleinterface IMiner extends IApp
 {
 	parameters:
 		double hashRate;
-	gates:
-		input blockmining;
 }

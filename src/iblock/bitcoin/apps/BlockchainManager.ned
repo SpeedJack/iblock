@@ -6,7 +6,7 @@ simple BlockchainManager like IApp
 {
 	parameters:
 		string dispatcherModule = default("^.packetDispatcher.dispatcher");
-		string nodeManagerModule = default("Network.nodeManager");
+		string nodeManagerModule = default("nodeManager");
 		string peerTableModule = default("^.peerTable");
 		string connectionManagerModule = default("^.connectionManager");
 	gates:

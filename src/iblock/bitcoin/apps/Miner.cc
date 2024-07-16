@@ -19,12 +19,14 @@ Miner::Miner() : AppBase()
 void Miner::initialize()
 {
 	nextBlockMsg = new cMessage("nextBlockMsg");
-	hashRate = par("hashRate").doubleValue();
-	networkHashRate = par("networkHashRate").doubleValue();
+	hashRate = par("hashRate").doubleValue() * 1000000000;
+	//networkHashRate = par("networkHashRate").doubleValue();
 	highestTarget = Hash(par("highestTarget").intValue());
 	walletAddress = new BitcoinAddress(par("walletAddress").stringValue()); //TODO
 	blockchainManager = check_and_cast<BlockchainManager *>(getModuleByPath(par("blockchainStoreModule").stringValue()));
-	scheduleAt(simTime() + getTimeToBlock(), nextBlockMsg);
+	double ttb = getTimeToBlock();
+	EV << "Time to block: " << ttb << endl;
+	scheduleAt(simTime() + ttb, nextBlockMsg);
 }
 
 double Miner::getTimeToBlock()
@@ -57,12 +59,19 @@ int64_t Miner::getCurrentBlockReward()
 void Miner::mineBlock()
 {
 	const BlockHeader *curHeader = blockchainManager->getCurrentBlockHeader();
-
-	Coinbase *coinbaseTx = new Coinbase(
-		walletAddress,
-		getCurrentBlockReward(),
-		curHeader->getHeight() + 1
-	);
+	Coinbase *coinbaseTx;
+	if (curHeader)
+		coinbaseTx = new Coinbase(
+			walletAddress,
+			getCurrentBlockReward(),
+			curHeader->getHeight() + 1
+		);
+	else
+		coinbaseTx = new Coinbase(
+			walletAddress,
+			getCurrentBlockReward(),
+			0
+		);
 
 	BlockHeader *header = new BlockHeader();
 	header->setVersion(70015); // TODO: get version

@@ -42,7 +42,7 @@ void BlockchainManager::handleGetHeadersPacket(Peer *peer, GetHeadersPl *gethead
 	delete getheaders;
 }
 
-void handleOtherMessage(cMessage *msg)
+void BlockchainManager::handleOtherMessage(cMessage *msg)
 {
 	EV << "Received a new block" << endl;
 	delete msg;
@@ -50,13 +50,42 @@ void handleOtherMessage(cMessage *msg)
 
 Block *BlockchainManager::getCurrentBlock() const
 {
+	return currentBlock;
+}
+
+const BlockHeader *BlockchainManager::getCurrentBlockHeader() const
+{
+	Block *cb = this->getCurrentBlock();
+	if (cb)
+		return cb->getHeader();
 	return nullptr;
+}
+
+Hash BlockchainManager::getCurrentTargetNBits() const
+{
+	const BlockHeader *bh = this->getCurrentBlockHeader();
+	if (bh)
+		return bh->getNBits();
+	return Hash(0x1d00ffff);
+}
+
+uint32_t BlockchainManager::getCurrentHeight() const
+{
+	Block *cb = this->getCurrentBlock();
+	if (cb)
+		return cb->getHeight();
+	return 0;
+}
+
+Hash BlockchainManager::getNextTargetNBits() const
+{
+	return this->getCurrentTargetNBits();
 }
 
 void BlockchainManager::addBlock(Block *block)
 {
 	Enter_Method("addBlock()");
-	//gbm->addBlock(block);
+	currentBlock = block;
 	std::vector<cModule *> nodes = nodeManager->getNodes();
 	for (auto node : nodes) {
 		if (node->getId() == this->getId())

@@ -21,6 +21,8 @@ module NodeBase
 		}
 		connectionManager: <default("iblock.bitcoin.apps.ConnectionManager")> like IConnectionManager {
 		}
+		blockchainManager: <default("iblock.bitcoin.apps.BlockchainManager")> like IApp {
+		}
 		app[numApps]: <> like IApp {
 			parameters:
 				@display("p=375,76,row,150");
@@ -31,6 +33,8 @@ module NodeBase
 		}
 		connectionManager.out --> packetDispatcher.in++;
 		connectionManager.in <-- packetDispatcher.out++;
+		blockchainManager.out --> packetDispatcher.in++;
+		blockchainManager.in <-- packetDispatcher.out++;
 		for i=0..numApps-1 {
 			app[i].out --> packetDispatcher.in++;
 			app[i].in <-- packetDispatcher.out++;

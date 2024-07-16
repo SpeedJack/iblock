@@ -8,7 +8,7 @@ simple Pinger like IApp
 		string dispatcherModule = default("^.packetDispatcher.dispatcher");
 		string peerTableModule = default("^.peerTable");
 		string connectionManagerModule = default("^.connectionManager");
-		volatile double pingInterval @unit(s) = default(exponential(5s));
+		volatile double pingInterval @unit(s) = default(exponential(50s));
 	gates:
 		input in;
 		output out;

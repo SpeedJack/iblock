@@ -16,6 +16,7 @@ class IBLOCK_API BlockchainManager : public AppBase
 	protected:
 		//GBM *gbm;
 		NodeManager *nodeManager;
+		Block *currentBlock;
 
 		virtual void initialize() override;
 
@@ -23,15 +24,16 @@ class IBLOCK_API BlockchainManager : public AppBase
 		virtual void handleGetDataPacket(Peer *peer, payloads::GetDataPl *getdata) override;
 		virtual void handleGetBlocksPacket(Peer *peer, payloads::GetBlocksPl *getblocks) override;
 		virtual void handleGetHeadersPacket(Peer *peer, payloads::GetHeadersPl *getheaders) override;
+		virtual void handleOtherMessage(::omnetpp::cMessage *msg) override;
 
 	public:
 		//BlockchainManager() : AppBase() { gbm = nullptr; }
-		BlockchainManager() : AppBase() { }
+		BlockchainManager() : AppBase() { nodeManager = nullptr; currentBlock = nullptr; }
 
 		virtual Block *getCurrentBlock() const;
-		virtual uint32_t getCurrentHeight() const { return getCurrentBlock()->getHeight(); }
-		virtual const BlockHeader *getCurrentBlockHeader() const { return getCurrentBlock()->getHeader(); }
-		virtual Hash getCurrentTargetNBits() const { return getCurrentBlockHeader()->getNBits(); }
+		virtual uint32_t getCurrentHeight() const;
+		virtual const BlockHeader *getCurrentBlockHeader() const;
+		virtual Hash getCurrentTargetNBits() const;
 		virtual Hash getNextTargetNBits() const;
 		virtual void addBlock(Block *block);
 };

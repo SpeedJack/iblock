@@ -11,9 +11,9 @@ namespace bitcoin
 class IBLOCK_API NodeManager : public ::omnetpp::cSimpleModule
 {
 	protected:
-		std::vector<cModule *> nodes;
+		std::vector<cModule *> nodes = std::vector<cModule *>();
 
-		virtual void initialize() override;
+		virtual void initialize() override { }
 
 	public:
 		NodeManager() : cSimpleModule() { nodes.clear(); }
