@@ -20,6 +20,7 @@ class IBLOCK_API AppBase : public ::omnetpp::cSimpleModule
 		std::unordered_map<::omnetpp::msgid_t, OutgoingMessage *> queue;
 
 		AppBase() : ::omnetpp::cSimpleModule() { peerTable = nullptr; dispatcher = nullptr; connectionManager = nullptr; }
+		virtual void initialize(int stage) override { if (stage == 0) initialize(); }
 		virtual void initialize() override;
 		virtual void handleMessage(::omnetpp::cMessage *msg) override;
 		virtual void handleSelfMessage(::omnetpp::cMessage *msg);

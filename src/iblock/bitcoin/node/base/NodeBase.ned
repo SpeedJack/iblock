@@ -23,6 +23,8 @@ module NodeBase
 		}
 		blockchainManager: <default("iblock.bitcoin.apps.BlockchainManager")> like IApp {
 		}
+		mempoolManager: <default("iblock.bitcoin.apps.MempoolManager")> like IApp {
+		}
 		app[numApps]: <> like IApp {
 			parameters:
 				@display("p=375,76,row,150");
@@ -35,6 +37,8 @@ module NodeBase
 		connectionManager.in <-- packetDispatcher.out++;
 		blockchainManager.out --> packetDispatcher.in++;
 		blockchainManager.in <-- packetDispatcher.out++;
+		mempoolManager.out --> packetDispatcher.in++;
+		mempoolManager.in <-- packetDispatcher.out++;
 		for i=0..numApps-1 {
 			app[i].out --> packetDispatcher.in++;
 			app[i].in <-- packetDispatcher.out++;

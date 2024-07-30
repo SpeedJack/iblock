@@ -25,6 +25,9 @@ class IBLOCK_API Transaction : public Transaction_Base
 		virtual unsigned long getTxInCount() const override { return getTxInArraySize(); }
 		virtual unsigned long getTxOutCount() const override { return getTxOutArraySize(); }
 
+		virtual unsigned long getTotalOutputValue() const;
+		virtual unsigned long getSerializedSize() const override;
+
 		virtual std::string str() const override;
 };
 

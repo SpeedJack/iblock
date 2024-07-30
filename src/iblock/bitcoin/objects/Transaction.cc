@@ -35,5 +35,21 @@ std::string Transaction::str() const
 	return out.str();
 }
 
+unsigned long Transaction::getTotalOutputValue() const
+{
+	unsigned long value = 0;
+	unsigned long count = getTxOutCount();
+	for (unsigned long i = 0; i < count; i++) {
+		const TransactionOutput *txout = getTxOut(i);
+		value += txout->getValue();
+	}
+	return value;
+}
+
+unsigned long Transaction::getSerializedSize() const
+{
+	return 226;
+}
+
 }
 }

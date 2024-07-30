@@ -18,6 +18,7 @@ class IBLOCK_API Coinbase : public Coinbase_Base
 	public:
 		Coinbase(const char *name = "Coinbase") : Coinbase_Base(name) { }
 		Coinbase(BitcoinAddress *address, int64_t reward, uint32_t height);
+		Coinbase(CoinbaseInput *txin, TransactionOutput *txout) : Coinbase() { appendTxIn(txin); appendTxOut(txout); }
 		Coinbase(const Coinbase& other) : Coinbase_Base(other) { copy(other); }
 		Coinbase& operator=(const Coinbase& other) { if (this == &other) return *this; Coinbase_Base::operator=(other); copy(other); return *this; }
 

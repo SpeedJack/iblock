@@ -22,8 +22,8 @@ class IBLOCK_API CoinbaseInput : public CoinbaseInput_Base
 		}
 
 	public:
-		CoinbaseInput(const char *name = "CoinbaseInput") : CoinbaseInput_Base(name) { }
-		CoinbaseInput(uint32_t height) : CoinbaseInput() { setHeight(height); }
+		CoinbaseInput(const char *name = "CoinbaseInput", const uint32_t height = 0) : CoinbaseInput_Base(name) { setHeight(height); }
+		CoinbaseInput(uint32_t height) : CoinbaseInput("CoinbaseInput", height) { }
 		CoinbaseInput(const CoinbaseInput& other) : CoinbaseInput_Base(other) { copy(other); }
 		CoinbaseInput& operator=(const CoinbaseInput& other) { if (this == &other) return *this; CoinbaseInput_Base::operator=(other); copy(other); return *this; }
 

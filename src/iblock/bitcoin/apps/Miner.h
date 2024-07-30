@@ -19,10 +19,12 @@ class IBLOCK_API Miner : public AppBase
 		Hash highestTarget;
 		BitcoinAddress *walletAddress;
 		BlockchainManager *blockchainManager;
+		MempoolManager *mempoolManager;
 		::omnetpp::cMessage *nextBlockMsg;
 
 		virtual int64_t satoshi(double amount);
-		virtual void initialize() override;
+		virtual void initialize(int stage) override;
+		virtual int numInitStages() const override { return 2; }
 		virtual void handleSelfMessage(::omnetpp::cMessage *msg) override;
 		virtual int64_t getCurrentBlockReward();
 		virtual double getTimeToBlock();

@@ -8,6 +8,8 @@ namespace iblock
 namespace bitcoin
 {
 
+class Block;
+
 class IBLOCK_API BlockHeader : public BlockHeader_Base
 {
 	private:
@@ -24,6 +26,8 @@ class IBLOCK_API BlockHeader : public BlockHeader_Base
 		virtual const Hash& getPrevBlockHeaderHash() const override { return getPrevBlockHeader()->getHash(); }
 		virtual const Hash& getHash() const override { return *hash; } //TODO computeHash
 		virtual uint32_t getHeight() const override;
+		virtual const Block *getBlock() const;
+		virtual const Block *getPrevBlock() const { return getPrevBlockHeader()->getBlock(); }
 
 		virtual std::string str() const override;
 };

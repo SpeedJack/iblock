@@ -16,7 +16,7 @@ class IBLOCK_API Block : public Block_Base
 
 	public:
 		Block(const char *name = "Block") : Block_Base(name) { }
-		Block(BlockHeader *header) : Block() { this->header = header; }
+		Block(BlockHeader *header) : Block() { setHeader(header); }
 		Block(const Block& other) : Block_Base(other) { copy(other); }
 		Block& operator=(const Block& other) { if (this == &other) return *this; Block_Base::operator=(other); copy(other); return *this; }
 
@@ -31,6 +31,8 @@ class IBLOCK_API Block : public Block_Base
 		virtual uint32_t getHeight() const override { return ::omnetpp::check_and_cast<const Coinbase *>(getCoinbaseTx())->getHeight(); }
 
 		virtual std::string str() const override;
+
+		virtual const Block *getPrevBlock() const { return getHeader()->getPrevBlock(); }
 };
 
 

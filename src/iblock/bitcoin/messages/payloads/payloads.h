@@ -12,5 +12,6 @@
 #include "GetBlocksPl.h"
 #include "GetHeadersPl.h"
 #include "HeadersPl.h"
+#include "TxPl.h"
 
 #endif

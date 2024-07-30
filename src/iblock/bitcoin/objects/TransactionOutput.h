@@ -15,7 +15,7 @@ class IBLOCK_API TransactionOutput : public TransactionOutput_Base
 
 	public:
 		TransactionOutput(const char *name = "TxOut") : TransactionOutput_Base(name) { }
-		TransactionOutput(BitcoinAddress *address, int64_t value) : TransactionOutput() { this->address = address; this->value = value; }
+		TransactionOutput(BitcoinAddress *address, int64_t value) : TransactionOutput() { setAddress(address); setValue(value); }
 		TransactionOutput(const TransactionOutput& other) : TransactionOutput_Base(other) { copy(other); }
 		TransactionOutput & operator=(const TransactionOutput& other) { if (this == &other) return *this; TransactionOutput_Base::operator=(other); copy(other); return *this; }
 

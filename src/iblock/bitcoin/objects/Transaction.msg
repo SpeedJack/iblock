@@ -20,4 +20,5 @@ class Transaction extends ChainObject
 	abstract const unsigned long txOutCount;
 	TransactionOutput *txOut[] @owned;
 	uint32_t lockTime = 0;
+	abstract const unsigned long serializedSize;
 }
