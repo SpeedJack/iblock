@@ -18,7 +18,7 @@ enum ConnectionState
 class Peer extends cObject
 {
 	unsigned int id;
-	::omnetpp::cGate *gate = nullptr;
+	::omnetpp::cGate* gate = nullptr;
 	Network network = Network::Mainnet;
 	ConnectionState state = ConnectionState::UNCONNECTED;
 	int32_t version = -1;
@@ -32,10 +32,10 @@ class Peer extends cObject
 
 cplusplus(Peer) {{
 	private:
-		std::function<void(::omnetpp::cGate *, IPAddress, uint16_t)> updateCb;
+		std::function<void(::omnetpp::cGate*, IPAddress, uint16_t)> updateCb;
 	public:
-		Peer(::omnetpp::cGate *gate, Network network = Network::Mainnet, IPAddress address = "::ffff:127.0.0.1", uint16_t port = 8333) : gate(gate), network(network), address(address), port(port) { }
-		Peer(::omnetpp::cGate *gate, IPAddress address, uint16_t port = 8333) : Peer(gate, Network::Mainnet, address, port) { }
+		Peer(::omnetpp::cGate* gate, Network network = Network::Mainnet, IPAddress address = "::ffff:127.0.0.1", uint16_t port = 8333) : gate(gate), network(network), address(address), port(port) { }
+		Peer(::omnetpp::cGate* gate, IPAddress address, uint16_t port = 8333) : Peer(gate, Network::Mainnet, address, port) { }
 
 		virtual bool isUnconnected() const { return state == ConnectionState::UNCONNECTED; }
 		virtual bool isHalfConnected() const { return state == ConnectionState::HALF_CONNECTED; }
@@ -52,7 +52,7 @@ cplusplus(Peer) {{
 		virtual bool isFullNode() const { return services > 0; }
 
 		virtual int getGateId() const { return gate->getId(); }
-		virtual void setUpdateCallback(std::function<void(::omnetpp::cGate *, IPAddress, uint16_t)> cb) { updateCb = cb; }
+		virtual void setUpdateCallback(std::function<void(::omnetpp::cGate*, IPAddress, uint16_t)> cb) { updateCb = cb; }
 }}
 
 cplusplus(Peer::setGate) {{

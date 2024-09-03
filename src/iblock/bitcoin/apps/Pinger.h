@@ -11,12 +11,12 @@ namespace bitcoin
 class IBLOCK_API Pinger : public AppBase
 {
 	protected:
-		::omnetpp::cMessage *timer;
+		::omnetpp::cMessage* timer;
 
 		virtual void initialize() override;
-		virtual void handlePingPacket(Peer *peer, payloads::PingPl *ping) override;
-		virtual void handlePongPacket(Peer *peer, payloads::PongPl *pong) override;
-		virtual void handleSelfMessage(::omnetpp::cMessage *timer) override;
+		virtual void handlePingPacket(Peer* peer, payloads::PingPl* ping) override;
+		virtual void handlePongPacket(Peer* peer, payloads::PongPl* pong) override;
+		virtual void handleSelfMessage(::omnetpp::cMessage* timer) override;
 
 	public:
 		Pinger() : AppBase() { timer = nullptr; }

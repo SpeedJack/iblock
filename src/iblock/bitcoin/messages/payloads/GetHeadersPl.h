@@ -20,9 +20,9 @@ class IBLOCK_API GetHeadersPl : public GetHeadersPl_Base
 		GetHeadersPl(const GetHeadersPl& other) : GetHeadersPl_Base(other) { copy(other); }
 		GetHeadersPl& operator=(const GetHeadersPl& other) { if (this == &other) return *this; GetHeadersPl_Base::operator=(other); copy(other); return *this; }
 
-		virtual GetHeadersPl *dup() const override { return new GetHeadersPl(*this); }
+		virtual GetHeadersPl* dup() const override { return new GetHeadersPl(*this); }
 
-		virtual unsigned char *getRawBytes() const override;
+		virtual unsigned char* getRawBytes() const override;
 
 		virtual std::string str() const override
 		{
@@ -36,6 +36,13 @@ class IBLOCK_API GetHeadersPl : public GetHeadersPl_Base
 
 }
 }
+}
+
+namespace omnetpp
+{
+
+template<> inline iblock::bitcoin::payloads::GetHeadersPl* fromAnyPtr(any_ptr ptr) { return ptr.get<iblock::bitcoin::payloads::GetHeadersPl>(); }
+
 }
 
 #endif

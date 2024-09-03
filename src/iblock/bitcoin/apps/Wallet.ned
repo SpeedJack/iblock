@@ -8,6 +8,9 @@ simple Wallet like IApp
 		string dispatcherModule = default("^.packetDispatcher.dispatcher");
 		string peerTableModule = default("^.peerTable");
 		string connectionManagerModule = default("^.connectionManager");
+		string blockchainManagerModule = default("^.blockchainManager");
+		string mempoolManagerModule = default("^.mempoolManager");
+		string nodeManagerModule = default("nodeManager");
 	gates:
 		input in;
 		output out;

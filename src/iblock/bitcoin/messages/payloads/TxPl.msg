@@ -11,5 +11,5 @@ packet TxPl extends Payload
 {
 	@customize;
 	@toString(.str());
-	Transaction *transaction;
+	Transaction* transaction;
 }

@@ -16,24 +16,24 @@ void Dispatcher::initialize(int stage)
 	if (stage == 0)
 		return;
 
-	peerTable = check_and_cast<PeerTable *>(getModuleByPath(par("peerTableModule").stringValue()));
+	peerTable = check_and_cast<PeerTable*>(getModuleByPath(par("peerTableModule").stringValue()));
 
 	if (par("performDiscovery").boolValue())
 		for (unsigned int i = 0; i < gateSize("port$i"); ++i)
 			peerTable->addPeer(new Peer(gate("port$i", i)));
 }
 
-void Dispatcher::handleMessage(cMessage *msg)
+void Dispatcher::handleMessage(cMessage* msg)
 {
 	if (msg->getArrivalGate()->getBaseId() == gateBaseId("port$i"))
-		handleIncomingPacket(check_and_cast<Packet *>(msg));
+		handleIncomingPacket(check_and_cast<Packet*>(msg));
 	else
-		handleOutgoingMessage(check_and_cast<OutgoingMessage *>(msg));
+		handleOutgoingMessage(check_and_cast<OutgoingMessage*>(msg));
 }
 
-void Dispatcher::handleIncomingPacket(Packet *pkt)
+void Dispatcher::handleIncomingPacket(Packet* pkt)
 {
-	Peer *peer = peerTable->getPeer(pkt->getArrivalGate());
+	Peer* peer = peerTable->getPeer(pkt->getArrivalGate());
 	if (!peer) {
 		EV_WARN << "Can not get sending peer from peer table" << std::endl;
 		delete pkt;
@@ -47,13 +47,13 @@ void Dispatcher::handleIncomingPacket(Packet *pkt)
 		return;
 	}
 
-	IncomingMessage *msg = new IncomingMessage(peer, pkt);
+	IncomingMessage* msg = new IncomingMessage(peer, pkt);
 
 	for (auto it = entry->second.begin(); it != entry->second.end(); it++)
 		send(std::next(it) == entry->second.end() ? msg : msg->dup(), *it);
 }
 
-void Dispatcher::handleOutgoingMessage(OutgoingMessage *msg)
+void Dispatcher::handleOutgoingMessage(OutgoingMessage* msg)
 {
 	size_t count = msg->getPeerArraySize();
 	if (count == 0) {
@@ -62,23 +62,23 @@ void Dispatcher::handleOutgoingMessage(OutgoingMessage *msg)
 		return;
 	}
 
-	Packet *pkt = msg->removeNetworkPacket();
+	Packet* pkt = msg->removeNetworkPacket();
 	for (size_t i = 0; i < count; i++)
-		send(i == count-1 ? pkt : pkt->dup(), const_cast<cGate *>(msg->getPeer(i)->getGate()->getOtherHalf()));
+		send(i == count-1 ? pkt : pkt->dup(), const_cast<cGate*>(msg->getPeer(i)->getGate()->getOtherHalf()));
 	delete msg;
 }
 
-void Dispatcher::registerListener(AppBase *app, short kind)
+void Dispatcher::registerListener(AppBase* app, short kind)
 {
 	Enter_Method("registerListener(%s, %hi)", app->getFullPath().c_str(), kind);
 
-	cGate *appGate = app->gate("in")->getPathStartGate();
+	cGate* appGate = app->gate("in")->getPathStartGate();
 	if (!appGate || appGate->getOwnerModule() != this)
 		error("AppBase::registerListener(): App %s is not connected to the dispatcher", app->getFullPath().c_str());
 
 	auto entry = listeners.find(kind);
 	if (entry == listeners.end()) {
-		std::set<cGate *> gates;
+		std::set<cGate*> gates;
 		gates.insert(appGate);
 		listeners.insert(std::make_pair(kind, gates));
 	} else {

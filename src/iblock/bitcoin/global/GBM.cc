@@ -9,7 +9,7 @@ namespace bitcoin
 
 Define_Module(GBM);
 
-void GBM::addBlock(Block *block)
+void GBM::addBlock(Block* block)
 {
 	Enter_Method("addBlock()");
 	blocks->add(block);

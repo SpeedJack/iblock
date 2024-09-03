@@ -16,14 +16,14 @@ class IBLOCK_API Hash : public ::omnetpp::cObject
 	protected:
 		union hash_t
 		{
-			unsigned char *bytes;
+			unsigned char* bytes;
 			uint32_t compact;
 		};
 
 		bool compact;
 		hash_t storedHash;
 
-		Hash(const unsigned char *bytes);
+		Hash(const unsigned char* bytes);
 		void expand();
 
 		static char hexNibble(const char& c)
@@ -37,14 +37,14 @@ class IBLOCK_API Hash : public ::omnetpp::cObject
 
 		~Hash() { if (!compact) delete[] storedHash.bytes; }
 
-		static Hash fromBytes(const unsigned char *bytes, size_t size = 0x20);
-		static Hash fromBytes(const char *bytes, size_t size = 0x20) { return fromBytes(reinterpret_cast<const unsigned char *>(bytes)); }
+		static Hash fromBytes(const unsigned char* bytes, size_t size = 0x20);
+		static Hash fromBytes(const char* bytes, size_t size = 0x20) { return fromBytes(reinterpret_cast<const unsigned char*>(bytes)); }
 		static Hash fromHex(const std::string hex) { return fromHex(hex.c_str()); }
-		static Hash fromHex(const char *hex);
+		static Hash fromHex(const char* hex);
 
-		const unsigned char *bytes() { if (compact) expand(); return storedHash.bytes; }
-		unsigned char *bytesPtr() { if (compact) expand(); return storedHash.bytes; }
-		unsigned char *bytesCopy() const;
+		const unsigned char* bytes() { if (compact) expand(); return storedHash.bytes; }
+		unsigned char* bytesPtr() { if (compact) expand(); return storedHash.bytes; }
+		unsigned char* bytesCopy() const;
 		uint32_t m() const;
 		uint32_t mantissa() const { return m(); }
 		unsigned char e() const;
@@ -63,8 +63,8 @@ class IBLOCK_API Hash : public ::omnetpp::cObject
 
 		Hash& operator=(const Hash& other) { if (this == &other) return *this; copy(other); return *this; }
 		Hash& operator=(const uint32_t& nBits) { return *this = Hash(nBits); }
-		Hash& operator=(const unsigned char *bytes) { return *this = Hash::fromBytes(bytes); }
-		Hash& operator=(const char *bytes) { return *this = Hash::fromBytes(bytes); }
+		Hash& operator=(const unsigned char* bytes) { return *this = Hash::fromBytes(bytes); }
+		Hash& operator=(const char* bytes) { return *this = Hash::fromBytes(bytes); }
 
 		bool operator==(const Hash& other) const { return compare(other) == 0; }
 		bool operator!=(const Hash& other) const { return compare(other) != 0; }

@@ -11,4 +11,5 @@ class Coinbase extends Transaction
 	@customize;
 	@toString(.str());
 	abstract const uint32_t height;
+	abstract const int64_t reward;
 }

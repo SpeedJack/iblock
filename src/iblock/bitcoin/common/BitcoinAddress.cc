@@ -11,29 +11,30 @@ namespace bitcoin
 
 Register_Class(BitcoinAddress)
 
-BitcoinAddress::BitcoinAddress(const char *address)
+BitcoinAddress::BitcoinAddress(const char* address)
 {
 	wallet = nullptr;
 	index = 0;
 }
 
-BitcoinAddress::BitcoinAddress(const Hash& address)
+BitcoinAddress::BitcoinAddress(const Hash& pubkHash)
 {
 	wallet = nullptr;
 	index = 0;
 }
 
-Hash BitcoinAddress::getHash() const
+Hash BitcoinAddress::getPubKHash() const
 {
-	return Hash(0, 0);
+	return Hash(this->wallet->getId(), this->index);
 }
 
 std::string BitcoinAddress::str() const
 {
+	//const unsigned char* hash = getPubKHash().bytes();
 	return "TODO";
 }
 
-bool BitcoinAddress::isWallet(const Wallet *wallet) const
+bool BitcoinAddress::isWallet(const Wallet* wallet) const
 {
 	return this->wallet->getId() == wallet->getId();
 }

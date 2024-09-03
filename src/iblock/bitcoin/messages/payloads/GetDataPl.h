@@ -20,9 +20,9 @@ class IBLOCK_API GetDataPl : public GetDataPl_Base
 		GetDataPl(const GetDataPl& other) : GetDataPl_Base(other) { copy(other); }
 		GetDataPl& operator=(const GetDataPl& other) { if (this == &other) return *this; GetDataPl_Base::operator=(other); copy(other); return *this; }
 
-		virtual GetDataPl *dup() const override { return new GetDataPl(*this); }
+		virtual GetDataPl* dup() const override { return new GetDataPl(*this); }
 
-		virtual unsigned char *getRawBytes() const override;
+		virtual unsigned char* getRawBytes() const override;
 
 		virtual std::string str() const override
 		{
@@ -36,6 +36,13 @@ class IBLOCK_API GetDataPl : public GetDataPl_Base
 
 }
 }
+} 
+
+namespace omnetpp
+{
+
+template<> inline iblock::bitcoin::payloads::GetDataPl* fromAnyPtr(any_ptr ptr) { return ptr.get<iblock::bitcoin::payloads::GetDataPl>(); }
+
 }
 
 #endif

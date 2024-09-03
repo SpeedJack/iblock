@@ -9,7 +9,7 @@ namespace bitcoin
 
 Define_Module(PeerTable);
 
-void PeerTable::addPeer(Peer *peer)
+void PeerTable::addPeer(Peer* peer)
 {
 	Enter_Method("addPeer(..)");
 	if (peer == nullptr)
@@ -25,13 +25,13 @@ void PeerTable::addPeer(Peer *peer)
 	IPMap.insert({{peer->getAddress(), peer->getPort()}, peer});
 
 	peer->setId(nextId++);
-	peer->setUpdateCallback([this, peer](cGate *gate, IPAddress address, uint16_t port){ this->updatePeer(peer, gate, address, port); });
+	peer->setUpdateCallback([this, peer](cGate* gate, IPAddress address, uint16_t port){ this->updatePeer(peer, gate, address, port); });
 }
 
-std::vector<Peer *> PeerTable::getAllPeers(bool connected) const
+std::vector<Peer*> PeerTable::getAllPeers(bool connected) const
 {
 	Enter_Method("getAllPeers(%s)", connected ? "true" : "false");
-	std::vector<Peer *> result;
+	std::vector<Peer*> result;
 	for (auto& peer : peers)
 		if (!connected || peer.second->isConnected())
 			result.push_back(peer.second);
@@ -41,17 +41,17 @@ std::vector<Peer *> PeerTable::getAllPeers(bool connected) const
 std::vector<Peer *> PeerTable::getPeers(Network network, bool connected) const
 {
 	Enter_Method("getPeers(%x, %s)", network, connected ? "true" : "false");
-	std::vector<Peer *> result;
+	std::vector<Peer*> result;
 	for (auto& peer : peers)
 		if (peer.second->getNetwork() == network && (!connected || peer.second->isConnected()))
 			result.push_back(peer.second);
 	return result;
 }
 
-std::vector<Peer *> PeerTable::getPeers(int gateId, Network network, bool connected) const
+std::vector<Peer*> PeerTable::getPeers(int gateId, Network network, bool connected) const
 {
 	Enter_Method("getPeers(%d, %x, %s)", gateId, network, connected ? "true" : "false");
-	std::vector<Peer *> result;
+	std::vector<Peer*> result;
 	auto range = gateMap.equal_range(gateId);
 	for (auto it = range.first; it != range.second; ++it)
 		if (it->second->getNetwork() == network && (!connected || it->second->isConnected()))
@@ -59,7 +59,7 @@ std::vector<Peer *> PeerTable::getPeers(int gateId, Network network, bool connec
 	return result;
 }
 
-Peer *PeerTable::getPeer(int gateId, IPAddress address, uint16_t port) const
+Peer* PeerTable::getPeer(int gateId, IPAddress address, uint16_t port) const
 {
 	Enter_Method("getPeer(%d, %s, %u)", gateId, address.str().c_str(), port);
 	try {
@@ -70,7 +70,7 @@ Peer *PeerTable::getPeer(int gateId, IPAddress address, uint16_t port) const
 	}
 }
 
-Peer *PeerTable::getPeer(int gateId) const
+Peer* PeerTable::getPeer(int gateId) const
 {
 	Enter_Method("getPeer(%d)", gateId);
 	auto it = gateMap.find(gateId);
@@ -81,7 +81,7 @@ Peer *PeerTable::getPeer(int gateId) const
 	return it->second;
 }
 
-Peer *PeerTable::getPeer(IPAddress address, uint16_t port) const
+Peer* PeerTable::getPeer(IPAddress address, uint16_t port) const
 {
 	Enter_Method("getPeer(%s, %u)", address.str().c_str(), port);
 	auto it = IPMap.find({address, port});
@@ -92,7 +92,7 @@ Peer *PeerTable::getPeer(IPAddress address, uint16_t port) const
 	return it->second;
 }
 
-Peer *PeerTable::getPeerAtIndex(unsigned int index) const
+Peer* PeerTable::getPeerAtIndex(unsigned int index) const
 {
 	Enter_Method("getPeerAtIndex(%u)", index);
 	for (auto& peer : peers)
@@ -101,7 +101,7 @@ Peer *PeerTable::getPeerAtIndex(unsigned int index) const
 	return nullptr;
 }
 
-void PeerTable::removeGateMap(const Peer *peer)
+void PeerTable::removeGateMap(const Peer* peer)
 {
 	auto range = gateMap.equal_range(peer->getGateId());
 	for (auto it = range.first; it != range.second; ++it)
@@ -111,7 +111,7 @@ void PeerTable::removeGateMap(const Peer *peer)
 		}
 }
 
-void PeerTable::removeIPMap(const Peer *peer)
+void PeerTable::removeIPMap(const Peer* peer)
 {
 	auto range = IPMap.equal_range({peer->getAddress(), peer->getPort()});
 	for (auto it = range.first; it != range.second; ++it)
@@ -121,7 +121,7 @@ void PeerTable::removeIPMap(const Peer *peer)
 		}
 }
 
-Peer *PeerTable::removePeer(Peer *peer)
+Peer* PeerTable::removePeer(Peer* peer)
 {
 	Enter_Method("removePeer(peerid:%u)", peer->getId());
 	if (peer == nullptr)
@@ -158,7 +158,7 @@ PeerTable::~PeerTable()
 		delete peer.second;
 }
 
-void PeerTable::updatePeer(Peer *peer, int gateId, IPAddress address, uint16_t port)
+void PeerTable::updatePeer(Peer* peer, int gateId, IPAddress address, uint16_t port)
 {
 	if (peer == nullptr || (peer->getGateId() == gateId && peer->getAddress() == address && peer->getPort() == port))
 		return;

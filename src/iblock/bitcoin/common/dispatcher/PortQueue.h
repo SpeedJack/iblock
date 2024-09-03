@@ -11,11 +11,11 @@ namespace bitcoin
 class IBLOCK_API PortQueue : public ::omnetpp::cSimpleModule
 {
 	protected:
-		::omnetpp::cMessage *timer;
-		::omnetpp::cQueue *queue;
+		::omnetpp::cMessage* timer;
+		::omnetpp::cQueue* queue;
 
 		virtual void initialize() override;
-		virtual void handleMessage(::omnetpp::cMessage *msg) override;
+		virtual void handleMessage(::omnetpp::cMessage* msg) override;
 		void handleTimer();
 
 	public:

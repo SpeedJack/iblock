@@ -20,9 +20,9 @@ class IBLOCK_API InvPl : public InvPl_Base
 		InvPl(const InvPl& other) : InvPl_Base(other) { copy(other); }
 		InvPl& operator=(const InvPl& other) { if (this == &other) return *this; InvPl_Base::operator=(other); copy(other); return *this; }
 
-		virtual InvPl *dup() const override { return new InvPl(*this); }
+		virtual InvPl* dup() const override { return new InvPl(*this); }
 
-		virtual unsigned char *getRawBytes() const override;
+		virtual unsigned char* getRawBytes() const override;
 
 		virtual std::string str() const override
 		{
@@ -36,6 +36,13 @@ class IBLOCK_API InvPl : public InvPl_Base
 
 }
 }
+}
+
+namespace omnetpp
+{
+
+template<> inline iblock::bitcoin::payloads::InvPl* fromAnyPtr(any_ptr ptr) { return ptr.get<iblock::bitcoin::payloads::InvPl>(); }
+
 }
 
 #endif

@@ -11,13 +11,14 @@ namespace bitcoin
 class IBLOCK_API TransactionGenerator : public AppBase
 {
 	protected:
-		MempoolManager *mempoolManager;
-		::omnetpp::cMessage *createTransactionMsg;
+		MempoolManager* mempoolManager;
+		NodeManager* nodeManager;
+		Wallet* wallet;
+		::omnetpp::cMessage* createTransactionMsg;
 
 		virtual void initialize() override;
-		virtual void handleSelfMessage(::omnetpp::cMessage *msg) override;
+		virtual void handleSelfMessage(::omnetpp::cMessage* msg) override;
 		virtual void createTransaction();
-		int64_t satoshi(double amount) const;
 
 	public:
 		TransactionGenerator() : AppBase() { mempoolManager = nullptr; createTransactionMsg = nullptr; }

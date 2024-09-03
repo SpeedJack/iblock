@@ -21,9 +21,9 @@ class IBLOCK_API PongPl : public PongPl_Base
 		PongPl(const PongPl& other) : PongPl_Base(other) { copy(other); }
 		PongPl& operator=(const PongPl& other) { if (this == &other) return *this; PongPl_Base::operator=(other); copy(other); return *this; }
 
-		virtual PongPl *dup() const override { return new PongPl(*this); }
+		virtual PongPl* dup() const override { return new PongPl(*this); }
 
-		virtual unsigned char *getRawBytes() const override;
+		virtual unsigned char* getRawBytes() const override;
 
 		virtual std::string str() const override
 		{
@@ -38,6 +38,13 @@ class IBLOCK_API PongPl : public PongPl_Base
 
 }
 }
+}
+
+namespace omnetpp
+{
+
+template<> inline iblock::bitcoin::payloads::PongPl* fromAnyPtr(any_ptr ptr) { return ptr.get<iblock::bitcoin::payloads::PongPl>(); }
+
 }
 
 #endif

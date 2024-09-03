@@ -1,7 +1,9 @@
+import iblock.bitcoin.objects.HeavyObject;
 import iblock.bitcoin.common.Hash;
 import iblock.bitcoin.objects.TransactionOutput;
 
 cplusplus {{
+	#include "HeavyObject.h"
 	#include "TransactionOutput.h"
 }}
 
@@ -13,12 +15,13 @@ struct Outpoint
 	uint32_t index;
 }
 
-class TransactionInput extends cOwnedObject
+class TransactionInput extends HeavyObject
 {
 	@customize;
 	@toString(.str());
-	TransactionOutput *prevOutput;
+	TransactionOutput* prevOutput;
 	abstract const Outpoint prevOutpoint;
+	abstract const int64_t value;
 	abstract const unsigned int scriptBytes;
 	abstract const string signatureScript;
 	uint32_t sequence = 0xFFFFFFFF;

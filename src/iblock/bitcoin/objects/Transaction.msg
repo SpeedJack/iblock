@@ -16,9 +16,12 @@ class Transaction extends ChainObject
 	@toString(.str());
 	int32_t version = 70015;
 	abstract const unsigned long txInCount;
-	TransactionInput *txIn[] @owned;
+	TransactionInput* txIn[] @owned;
 	abstract const unsigned long txOutCount;
-	TransactionOutput *txOut[] @owned;
+	TransactionOutput* txOut[] @owned;
 	uint32_t lockTime = 0;
-	abstract const unsigned long serializedSize;
+	abstract const int64_t inputValue;
+	abstract const int64_t outputValue;
+	abstract const int64_t fee;
+	abstract const double feeRate;
 }

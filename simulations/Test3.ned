@@ -40,14 +40,14 @@ network Test3
 		node27: CustomNode;
 		node28: CustomNode;
 		node29: CustomNode;
-		node30: RelayNode;
-		node31: RelayNode;
-		node32: RelayNode;
-		node33: RelayNode;
-		node34: RelayNode;
-		node35: RelayNode;
-		node36: RelayNode;
-		node37: RelayNode;
-		node38: RelayNode;
-		node39: RelayNode;
+		node30: UserNode;
+		node31: UserNode;
+		node32: UserNode;
+		node33: UserNode;
+		node34: UserNode;
+		node35: UserNode;
+		node36: UserNode;
+		node37: UserNode;
+		node38: UserNode;
+		node39: UserNode;
 }

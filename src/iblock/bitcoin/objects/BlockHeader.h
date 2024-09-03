@@ -14,20 +14,22 @@ class IBLOCK_API BlockHeader : public BlockHeader_Base
 {
 	private:
 		void copy(const BlockHeader& other);
-		Hash *hash;
+		Hash* hash;
 
 	public:
-		BlockHeader(const char *name = "BlockHeader") : BlockHeader_Base(name) { setTime(::omnetpp::simTime()); }
+		BlockHeader(const char* name = "BlockHeader") : BlockHeader_Base(name) { setTime(::omnetpp::simTime()); setByteLength(80); }
 		BlockHeader(const BlockHeader& other) : BlockHeader_Base(other) { copy(other); }
 		BlockHeader& operator=(const BlockHeader& other) { if (this == &other) return *this; BlockHeader_Base::operator=(other); copy(other); return *this; }
 
-		virtual BlockHeader *dup() const override { return new BlockHeader(*this); }
+		virtual BlockHeader* dup() const override { return new BlockHeader(*this); }
+
+		virtual ObjectType getType() const override { return ObjectType::MSG_BLOCK; }
 
 		virtual const Hash& getPrevBlockHeaderHash() const override { return getPrevBlockHeader()->getHash(); }
 		virtual const Hash& getHash() const override { return *hash; } //TODO computeHash
 		virtual uint32_t getHeight() const override;
-		virtual const Block *getBlock() const;
-		virtual const Block *getPrevBlock() const { return getPrevBlockHeader()->getBlock(); }
+		virtual const Block* getBlock() const;
+		virtual const Block* getPrevBlock() const { const BlockHeader* h = getPrevBlockHeader(); if (h) return h->getBlock(); else return nullptr; }
 
 		virtual std::string str() const override;
 };
@@ -38,7 +40,7 @@ class IBLOCK_API BlockHeader : public BlockHeader_Base
 namespace omnetpp
 {
 
-template<> inline iblock::bitcoin::BlockHeader *fromAnyPtr(any_ptr ptr) { return check_and_cast<iblock::bitcoin::BlockHeader *>(ptr.get<cObject>()); }
+template<> inline iblock::bitcoin::BlockHeader* fromAnyPtr(any_ptr ptr) { return ptr.get<iblock::bitcoin::BlockHeader>(); }
 
 }
 

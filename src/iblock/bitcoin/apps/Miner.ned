@@ -10,9 +10,9 @@ simple Miner like IMiner
 		string connectionManagerModule = default("^.connectionManager");
 		string blockchainStoreModule = default("^.blockchainManager");
 		string mempoolManagerModule = default("^.mempoolManager");
-		string walletAddress = default("76a914033abd090cda7389a58d936af25e7edc17da235b88ac");
+		string walletModule = default("^.app[0]");
 		int highestTarget = default(0x1d00ffff);
-		double hashRate @unit(Ghps) = default(1Ghps);
+		double hashRate @unit(Ghps) = default(0.0003579139413333334Ghps);
 	gates:
 		input in;
 		output out;

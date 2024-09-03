@@ -19,10 +19,10 @@ void Blockchain::initialize()
 	orphanForks->setTakeOwnership(false);
 }
 
-void Blockchain::addBlock(Block *block)
+void Blockchain::addBlock(Block* block)
 {
-	// const BlockHeader *header = block->getHeader();
-	// const BlockHeader *parentHeader = header->getPrevBlockHeader();
+	// const BlockHeader* header = block->getHeader();
+	// const BlockHeader* parentHeader = header->getPrevBlockHeader();
 	// if (parentHeader == forks->get(bestChainIndex)) {
 	// 	// block extends the best chain
 	// 	forks->add(block);

@@ -16,12 +16,12 @@ class IBLOCK_API Payload : public ::omnetpp::cPacket
 		void copy(const Payload& other) { }
 
 	public:
-		Payload(const char *name = nullptr, short kind = 0) : cPacket(name, kind) { }
+		Payload(const char* name = nullptr, short kind = 0) : cPacket(name, kind) { }
 		Payload(const Payload& other) : cPacket(other) { }
 		Payload& operator=(const Payload& other) { if (this == &other) return *this; cPacket::operator=(other); copy(other); return *this; }
-		virtual Payload *dup() const override = 0;
+		virtual Payload* dup() const override = 0;
 
-		virtual unsigned char *getRawBytes() const = 0;
+		virtual unsigned char* getRawBytes() const = 0;
 		std::string getRawBytesHexStr() const;
 };
 

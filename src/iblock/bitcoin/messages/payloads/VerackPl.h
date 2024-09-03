@@ -20,9 +20,9 @@ class IBLOCK_API VerackPl : public VerackPl_Base
 		VerackPl(const VerackPl& other) : VerackPl_Base(other) { copy(other); }
 		VerackPl& operator=(const VerackPl& other) { if (this == &other) return *this; VerackPl_Base::operator=(other); copy(other); return *this; }
 
-		virtual VerackPl *dup() const override { return new VerackPl(*this); }
+		virtual VerackPl* dup() const override { return new VerackPl(*this); }
 
-		virtual unsigned char *getRawBytes() const override { return nullptr; }
+		virtual unsigned char* getRawBytes() const override { return nullptr; }
 
 		virtual std::string str() const override
 		{
@@ -37,6 +37,13 @@ class IBLOCK_API VerackPl : public VerackPl_Base
 
 }
 }
+}
+
+namespace omnetpp
+{
+
+template<> inline iblock::bitcoin::payloads::VerackPl* fromAnyPtr(any_ptr ptr) { return ptr.get<iblock::bitcoin::payloads::VerackPl>(); }
+
 }
 
 #endif

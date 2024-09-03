@@ -20,7 +20,7 @@ void TransactionInput::copy(const TransactionInput& other)
 void TransactionInput::updateOutpoint()
 {
 	prevOutpoint = new Outpoint();
-	Transaction *tx = check_and_cast<Transaction *>(getOwner());
+	Transaction* tx = check_and_cast<Transaction*>(getOwner());
 	prevOutpoint->txHash = tx->getHash();
 	size_t count = tx->getTxOutCount();
 	for (size_t i = 0; i < count; ++i)

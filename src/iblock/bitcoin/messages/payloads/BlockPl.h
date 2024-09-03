@@ -17,13 +17,13 @@ class IBLOCK_API BlockPl : public BlockPl_Base
 		void copy(const BlockPl& other) { }
 	public:
 		BlockPl() : BlockPl_Base() { setKind(MessageKind::BLOCK); setName("block"); setByteLength(0); }
-		BlockPl(::iblock::bitcoin::Block *block) : BlockPl() { setBlock(block); }
+		BlockPl(::iblock::bitcoin::Block* block) : BlockPl() { setBlock(block); }
 		BlockPl(const BlockPl& other) : BlockPl_Base(other) { copy(other); }
 		BlockPl& operator=(const BlockPl& other) { if (this == &other) return *this; BlockPl_Base::operator=(other); copy(other); return *this; }
 
-		virtual BlockPl *dup() const override { return new BlockPl(*this); }
+		virtual BlockPl* dup() const override { return new BlockPl(*this); }
 
-		virtual unsigned char *getRawBytes() const override;
+		virtual unsigned char* getRawBytes() const override;
 
 		virtual std::string str() const override
 		{
@@ -37,6 +37,13 @@ class IBLOCK_API BlockPl : public BlockPl_Base
 
 }
 }
+}
+
+namespace omnetpp
+{
+
+template<> inline iblock::bitcoin::payloads::BlockPl* fromAnyPtr(any_ptr ptr) { return ptr.get<iblock::bitcoin::payloads::BlockPl>(); }
+
 }
 
 #endif

@@ -10,23 +10,23 @@ namespace bitcoin
 
 void AppBase::initialize()
 {
-	peerTable = check_and_cast<PeerTable *>(getModuleByPath(par("peerTableModule").stringValue()));
-	dispatcher = check_and_cast<Dispatcher *>(getModuleByPath(par("dispatcherModule").stringValue()));
-	connectionManager = check_and_cast<IConnectionManager *>(getModuleByPath(par("connectionManagerModule").stringValue()));
+	peerTable = check_and_cast<PeerTable*>(getModuleByPath(par("peerTableModule").stringValue()));
+	dispatcher = check_and_cast<Dispatcher*>(getModuleByPath(par("dispatcherModule").stringValue()));
+	connectionManager = check_and_cast<IConnectionManager*>(getModuleByPath(par("connectionManagerModule").stringValue()));
 	queue.clear();
 }
 
-void AppBase::handleMessage(cMessage *msg)
+void AppBase::handleMessage(cMessage* msg)
 {
 	if (msg->isSelfMessage())
 		handleSelfMessage(msg);
 	else if (msg->arrivedOn("in"))
-		handleIncomingMessage(check_and_cast<IncomingMessage *>(msg));
+		handleIncomingMessage(check_and_cast<IncomingMessage*>(msg));
 	else
 		handleOtherMessage(msg);
 }
 
-void AppBase::handleSelfMessage(cMessage *msg)
+void AppBase::handleSelfMessage(cMessage* msg)
 {
 	EV_WARN << "Self message " << msg << " not handled by " << getFullPath() << endl;
 	delete msg;
@@ -34,8 +34,8 @@ void AppBase::handleSelfMessage(cMessage *msg)
 
 void AppBase::handleIncomingMessage(IncomingMessage *msg)
 {
-	Peer *peer = getPeer(msg);
-	Packet *pkt = msg->removeNetworkPacket();
+	Peer* peer = getPeer(msg);
+	Packet* pkt = msg->removeNetworkPacket();
 	switch (pkt->getKind()) {
 		case MessageKind::PING:
 			handlePingPacket(peer, pkt);
@@ -71,13 +71,13 @@ void AppBase::handleIncomingMessage(IncomingMessage *msg)
 	delete msg;
 }
 
-void AppBase::handleOtherMessage(cMessage *msg)
+void AppBase::handleOtherMessage(cMessage* msg)
 {
 	EV_WARN << "Message " << msg << " not handled by " << getFullPath() << endl;
 	delete msg;
 }
 
-void AppBase::sendPacket(OutgoingMessage *msg, bool connect)
+void AppBase::sendPacket(OutgoingMessage* msg, bool connect)
 {
 	if (!connect) {
 		send(msg, "out");
@@ -85,18 +85,18 @@ void AppBase::sendPacket(OutgoingMessage *msg, bool connect)
 	}
 
 	if (msg->getPeerArraySize() == 0) {
-		std::vector<Peer *> peers = peerTable->getAllPeers();
-		for (Peer *peer : peers)
+		std::vector<Peer*> peers = peerTable->getAllPeers();
+		for (Peer* peer : peers)
 			msg->appendPeer(peer);
 	}
 
 	bool allConnected = true;
 	msgid_t msgid = msg->getId();
 	for (size_t i = 0; i < msg->getPeerArraySize(); ++i) {
-		const Peer *constPeer = check_and_cast<const Peer *>(msg->getPeer(i));
+		const Peer* constPeer = check_and_cast<const Peer*>(msg->getPeer(i));
 		if (!constPeer->isConnected()) {
 			allConnected = false;
-			Peer *peer = const_cast<Peer *>(constPeer);
+			Peer* peer = const_cast<Peer*>(constPeer);
 			connectionManager->connect(peer, [this, msgid](bool success){ this->onPeerConnected(success, msgid); });
 		}
 	}
@@ -107,18 +107,18 @@ void AppBase::sendPacket(OutgoingMessage *msg, bool connect)
 		queue[msgid] = msg;
 }
 
-void AppBase::sendPacket(Packet *packet, std::initializer_list<Peer *> peers, bool connect, bool waitAll)
+void AppBase::sendPacket(Packet* packet, std::initializer_list<Peer*> peers, bool connect, bool waitAll)
 {
-	OutgoingMessage *msg = new OutgoingMessage(packet);
+	OutgoingMessage* msg = new OutgoingMessage(packet);
 	if (!connect || waitAll) {
-		for (Peer *peer : peers)
+		for (Peer* peer : peers)
 			msg->appendPeer(peer);
 		sendPacket(msg, connect);
 		return;
 	}
 
 	if (peers.size() > 0) {
-		for (Peer *peer : peers)
+		for (Peer* peer : peers)
 			if (peer->isConnected())
 				msg->appendPeer(peer);
 			else
@@ -127,8 +127,8 @@ void AppBase::sendPacket(Packet *packet, std::initializer_list<Peer *> peers, bo
 		return;
 	}
 
-	std::vector<Peer *> allPeers = peerTable->getAllPeers();
-	for (Peer *peer : allPeers)
+	std::vector<Peer*> allPeers = peerTable->getAllPeers();
+	for (Peer* peer : allPeers)
 		if (peer->isConnected())
 			msg->appendPeer(peer);
 		else
@@ -145,9 +145,9 @@ void AppBase::onPeerConnected(bool success, msgid_t msgid)
 	if (it == queue.end())
 		return; // TODO: handle
 
-	OutgoingMessage *msg = it->second;
+	OutgoingMessage* msg = it->second;
 	for (size_t i = msg->getPeerArraySize(); i > 0; --i) {
-		const Peer *peer = check_and_cast<const Peer *>(msg->getPeer(i - 1));
+		const Peer* peer = check_and_cast<const Peer*>(msg->getPeer(i - 1));
 		if (!peer->isConnected())
 			return;
 	}

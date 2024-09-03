@@ -4,6 +4,7 @@
 #include "iblock/bitcoin/apps/base/AppBase.h"
 #include "iblock/bitcoin/global/NodeManager.h"
 #include "iblock/bitcoin/objects/Block.h"
+#include <cppcoro/generator.hpp>
 
 namespace iblock
 {
@@ -12,27 +13,30 @@ namespace bitcoin
 
 struct TransactionCmp
 {
-	bool operator()(const Transaction *lhs, const Transaction *rhs) const
+	bool operator()(const Transaction* lhs, const Transaction* rhs) const
 	{
-		return lhs->getTotalOutputValue() < rhs->getTotalOutputValue();
+		return lhs->getFeeRate() > rhs->getFeeRate();
 	}
 };
 
 class IBLOCK_API MempoolManager : public AppBase
 {
 	protected:
-		NodeManager *nodeManager;
-		std::set<const Transaction *, TransactionCmp> mempool;
+		NodeManager* nodeManager;
+		std::set<const Transaction*, TransactionCmp> mempool;
+		std::vector<Wallet *> wallets = std::vector<Wallet *>();
 
 		virtual void initialize() override;
-		virtual void handleOtherMessage(::omnetpp::cMessage *msg) override;
-		virtual void removeTransaction(const Transaction *transaction) { mempool.erase(transaction); }
-		virtual void appendTransaction(const Transaction *transaction) { mempool.insert(transaction); }
+		virtual void handleOtherMessage(::omnetpp::cMessage* msg) override;
+		virtual void removeTransaction(const Transaction* transaction) { if(transaction) mempool.erase(transaction); }
+		virtual void appendTransaction(const Transaction* transaction);
 	public:
 		MempoolManager() : AppBase() { nodeManager = nullptr; };
-		virtual void addTransaction(Transaction *transaction);
-		virtual void removeTransactions(const Block *block);
-		virtual const std::vector<Transaction *> getTransactions(int64_t maxBytes = 1000*1000) const;
+		virtual void addTransaction(Transaction* transaction);
+		virtual void addBlockTransactions(const Block* block);
+		virtual void removeBlockTransactions(const Block* block);
+		virtual cppcoro::generator<const Transaction*> transactions() const;
+		void registerWallet(Wallet* wallet) { Enter_Method_Silent("registerWallet()"); wallets.push_back(wallet); }
 };
 
 }

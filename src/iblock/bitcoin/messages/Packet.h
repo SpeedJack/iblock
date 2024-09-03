@@ -16,20 +16,20 @@ class IBLOCK_API Packet : public Packet_Base
 	protected:
 		uint32_t computedChecksum = 0;
 
-		static unsigned char *sha256hash(const unsigned char *input, size_t len);
+		static unsigned char* sha256hash(const unsigned char* input, size_t len);
 
 	public:
-		Packet(const char *commandName, short kind = 0) : Packet_Base(commandName, kind) { setByteLength(24); }
-		Packet(Network network = Network::Mainnet, const char *commandName = nullptr) : Packet(commandName, 0) { this->startString = network; }
-		Packet(payloads::Payload *payload, Network network = Network::Mainnet) : Packet(network) { encapsulate(payload); }
+		Packet(const char* commandName, short kind = 0) : Packet_Base(commandName, kind) { setByteLength(24); }
+		Packet(Network network = Network::Mainnet, const char* commandName = nullptr) : Packet(commandName, 0) { this->startString = network; }
+		Packet(payloads::Payload* payload, Network network = Network::Mainnet) : Packet(network) { encapsulate(payload); }
 		Packet(const Packet& other) : Packet_Base(other) { copy(other); }
 		Packet& operator=(const Packet& other) { if (this == &other) return *this; Packet_Base::operator=(other); copy(other); return *this; }
-		virtual Packet *dup() const override { return new Packet(*this); }
+		virtual Packet* dup() const override { return new Packet(*this); }
 
 		virtual Network getNetwork() const { return getStartString(); }
 		virtual void setNetwork(Network network) { setStartString(network); }
 
-		virtual const char *getCommandName() const override { return getName(); }
+		virtual const char* getCommandName() const override { return getName(); }
 		virtual uint32_t getPayloadSize() const override { return getByteLength() - 24; }
 		virtual uint32_t getComputedChecksum() const override { return computedChecksum; }
 		virtual uint32_t computeChecksum();
@@ -38,10 +38,10 @@ class IBLOCK_API Packet : public Packet_Base
 		virtual void setChecksumValid(bool valid = true) { setChecksum(computeChecksum()); if (!valid) setChecksum(~getComputedChecksum()); }
 		virtual void setChecksumInvalid() { setChecksumValid(false); }
 
-		virtual void encapsulate(cPacket *packet) override;
-		virtual payloads::Payload *decapsulate() override;
-		virtual payloads::Payload *getEncapsulatedPacket() const override { return static_cast<payloads::Payload *>(Packet_Base::getEncapsulatedPacket()); }
-		virtual payloads::Payload *getPayload() const { return getEncapsulatedPacket(); }
+		virtual void encapsulate(cPacket* packet) override;
+		virtual payloads::Payload* decapsulate() override;
+		virtual payloads::Payload* getEncapsulatedPacket() const override { return static_cast<payloads::Payload*>(Packet_Base::getEncapsulatedPacket()); }
+		virtual payloads::Payload* getPayload() const { return getEncapsulatedPacket(); }
 
 		virtual std::string str() const override;
 };
@@ -52,7 +52,7 @@ class IBLOCK_API Packet : public Packet_Base
 namespace omnetpp
 {
 
-template<> inline iblock::bitcoin::Packet *fromAnyPtr(any_ptr ptr) { return check_and_cast<iblock::bitcoin::Packet *>(ptr.get<cObject>()); }
+template<> inline iblock::bitcoin::Packet* fromAnyPtr(any_ptr ptr) { return ptr.get<iblock::bitcoin::Packet>(); }
 
 }
 

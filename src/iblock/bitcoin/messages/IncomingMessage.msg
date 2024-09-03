@@ -9,19 +9,19 @@ namespace iblock::bitcoin;
 
 message IncomingMessage
 {
-	const Peer *peer;
-	Packet *networkPacket @owned;
+	const Peer* peer;
+	Packet* networkPacket @owned;
 }
 
 cplusplus(IncomingMessage) {{
 	public:
-		IncomingMessage(Peer *peer, Packet *networkPacket) : cMessage() { setPeer(peer); setNetworkPacket(networkPacket); }
+		IncomingMessage(Peer* peer, Packet* networkPacket) : cMessage() { setPeer(peer); setNetworkPacket(networkPacket); }
 }}
 
 cplusplus(IncomingMessage::setNetworkPacket) {{
 	if (networkPacket != nullptr && this->networkPacket == nullptr) {
-		const char *pktname = networkPacket->getName();
-		char *name = new char[strlen(pktname)+17];
+		const char* pktname = networkPacket->getName();
+		char* name = new char[strlen(pktname)+17];
 		strcpy(name, "IncomingMessage:");
 		strcat(name, pktname);
 		setName(name);

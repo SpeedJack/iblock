@@ -11,7 +11,7 @@ namespace payloads
 
 Register_Class(HeadersPl)
 
-unsigned char *HeadersPl::getRawBytes() const
+unsigned char* HeadersPl::getRawBytes() const
 {
 	return nullptr;
 }

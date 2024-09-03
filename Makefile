@@ -1,11 +1,12 @@
-FEATURETOOL = opp_featuretool
-FEATURES_H = src/iblock/features.h
-INET_PROJ = ../../inet
+FEATURETOOL=opp_featuretool
+FEATURES_H=src/iblock/features.h
+INET_PROJ=../../inet
+CXXFLAGS=-std=c++23
 
 .PHONY: all clean cleanall makefiles makefiles-so makefiles-lib makefiles-exe checkmakefiles
 
 all: checkmakefiles $(FEATURES_H)
-	@cd src && $(MAKE)
+	@cd src && $(MAKE) CXXFLAGS=$(CXXFLAGS)
 
 clean: checkmakefiles
 	@cd src && $(MAKE) clean

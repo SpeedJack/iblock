@@ -12,10 +12,10 @@ class IBLOCK_API ChainObject : public ChainObject_Base
 {
 	private:
 		void copy(const ChainObject& other) { }
-		Hash *hash;
+		Hash* hash;
 
 	protected:
-		ChainObject(const char *name=nullptr) : ChainObject_Base(name) { }
+		ChainObject(const char* name=nullptr) : ChainObject_Base(name) { }
 		ChainObject(const ChainObject& other) : ChainObject_Base(other) { copy(other); }
 		ChainObject& operator=(const ChainObject& other) { if (this == &other) return *this; ChainObject_Base::operator=(other); copy(other); return *this; }
 
@@ -36,6 +36,13 @@ class IBLOCK_API ChainObject : public ChainObject_Base
 };
 
 }
+}
+
+namespace omnetpp
+{
+
+template<> inline iblock::bitcoin::ChainObject* fromAnyPtr(any_ptr ptr) { return ptr.get<iblock::bitcoin::ChainObject>(); }
+
 }
 
 #endif

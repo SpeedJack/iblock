@@ -21,9 +21,9 @@ class IBLOCK_API PingPl : public PingPl_Base
 		PingPl(const PingPl& other) : PingPl_Base(other) { copy(other); }
 		PingPl& operator=(const PingPl& other) { if (this == &other) return *this; PingPl_Base::operator=(other); copy(other); return *this; }
 
-		virtual PingPl *dup() const override { return new PingPl(*this); }
+		virtual PingPl* dup() const override { return new PingPl(*this); }
 
-		virtual unsigned char *getRawBytes() const override;
+		virtual unsigned char* getRawBytes() const override;
 
 		virtual std::string str() const override
 		{
@@ -38,6 +38,13 @@ class IBLOCK_API PingPl : public PingPl_Base
 
 }
 }
+}
+
+namespace omnetpp
+{
+
+template<> inline iblock::bitcoin::payloads::PingPl* fromAnyPtr(any_ptr ptr) { return ptr.get<iblock::bitcoin::payloads::PingPl>(); }
+
 }
 
 #endif

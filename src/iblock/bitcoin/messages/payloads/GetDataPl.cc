@@ -11,7 +11,7 @@ namespace payloads
 
 Register_Class(GetDataPl)
 
-unsigned char *GetDataPl::getRawBytes() const
+unsigned char* GetDataPl::getRawBytes() const
 {
 	return nullptr;
 }

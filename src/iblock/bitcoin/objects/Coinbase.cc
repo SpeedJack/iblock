@@ -10,11 +10,11 @@ namespace bitcoin
 
 Register_Class(Coinbase)
 
-Coinbase::Coinbase(BitcoinAddress *address, int64_t reward, uint32_t height) : Coinbase()
+Coinbase::Coinbase(BitcoinAddress* address, int64_t reward, uint32_t height) : Coinbase()
 {
-	CoinbaseInput *input = new CoinbaseInput(height);
+	CoinbaseInput* input = new CoinbaseInput(height);
 	this->appendTxIn(input);
-	TransactionOutput *output = new TransactionOutput(address, reward);
+	TransactionOutput* output = new TransactionOutput(address, reward);
 	this->appendTxOut(output);
 }
 

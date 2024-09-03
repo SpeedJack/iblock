@@ -24,13 +24,13 @@ uint32_t BlockHeader::getHeight() const
 {
 	if (prevBlockHeader == nullptr)
 		return 0;
-	const Block *block = getBlock();
+	const Block* block = getBlock();
 	return block->getHeight();
 }
 
-const Block *BlockHeader::getBlock() const
+const Block* BlockHeader::getBlock() const
 {
-	return check_and_cast<const Block *>(getOwner());
+	return check_and_cast<const Block*>(getOwner());
 }
 
 std::string BlockHeader::str() const

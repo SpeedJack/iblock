@@ -19,7 +19,7 @@ void ConnectionManager::initialize()
 	dispatcher->registerListener(this, MessageKind::VERACK);
 }
 
-void ConnectionManager::handleVersionPacket(Peer *peer, VersionPl *version)
+void ConnectionManager::handleVersionPacket(Peer* peer, VersionPl* version)
 {
 	peer->setVersion(version->getVersion());
 	peer->setServices(version->getServices());
@@ -37,7 +37,7 @@ void ConnectionManager::handleVersionPacket(Peer *peer, VersionPl *version)
 	delete version;
 }
 
-void ConnectionManager::handleVerackPacket(Peer *peer, VerackPl *verack)
+void ConnectionManager::handleVerackPacket(Peer* peer, VerackPl* verack)
 {
 	peer->setConnected();
 	notifyApps(peer);
@@ -45,7 +45,7 @@ void ConnectionManager::handleVerackPacket(Peer *peer, VerackPl *verack)
 	delete verack;
 }
 
-void ConnectionManager::connect(Peer *peer, std::function<void(bool)> callback)
+void ConnectionManager::connect(Peer* peer, std::function<void(bool)> callback)
 {
 	Enter_Method("connect(peerid:%d, <callback>)", peer->getId());
 	if (peer->isConnected()) {
@@ -63,9 +63,9 @@ void ConnectionManager::connect(Peer *peer, std::function<void(bool)> callback)
 		startHandshake(peer);
 }
 
-void ConnectionManager::startHandshake(Peer *peer)
+void ConnectionManager::startHandshake(Peer* peer)
 {
-	VersionPl *version = new VersionPl();
+	VersionPl* version = new VersionPl();
 	version->setAddrRecvServices(peer->getServices());
 	version->setAddrRecvIp(peer->getAddress());
 	version->setAddrRecvPort(peer->getPort());
@@ -74,9 +74,9 @@ void ConnectionManager::startHandshake(Peer *peer)
 	peer->setVersionSent();
 }
 
-void ConnectionManager::completeHandshake(Peer *peer)
+void ConnectionManager::completeHandshake(Peer* peer)
 {
-	VerackPl *verack = new VerackPl();
+	VerackPl* verack = new VerackPl();
 	sendPacket(verack, peer, false);
 }
 

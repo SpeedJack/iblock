@@ -11,15 +11,15 @@ namespace payloads
 
 Register_Class(TxPl)
 
-unsigned char *TxPl::getRawBytes() const
+unsigned char* TxPl::getRawBytes() const
 {
 	return nullptr;
 }
 
-void TxPl::setTransaction(::iblock::bitcoin::Transaction *tx)
+void TxPl::setTransaction(::iblock::bitcoin::Transaction* tx)
 {
 	TxPl_Base::setTransaction(tx);
-	setByteLength(tx->getSerializedSize());
+	setByteLength(tx->getByteLength());
 }
 
 }

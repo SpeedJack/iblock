@@ -11,7 +11,7 @@ namespace payloads
 
 Register_Class(BlockPl)
 
-unsigned char *BlockPl::getRawBytes() const
+unsigned char* BlockPl::getRawBytes() const
 {
 	return nullptr;
 }

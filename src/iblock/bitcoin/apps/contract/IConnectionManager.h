@@ -11,12 +11,12 @@ namespace bitcoin
 class IBLOCK_API IConnectionManager
 {
 	public:
-		virtual void connect(Peer *peer, std::function<void(bool)> callback) = 0;
-		void connect(Peer *peer, std::function<void(void)> callback)
+		virtual void connect(Peer* peer, std::function<void(bool)> callback) = 0;
+		void connect(Peer* peer, std::function<void(void)> callback)
 		{ connect(peer, [callback](bool success){ if (success) callback(); }); }
-		void connect(Peer *peer, std::function<void(bool, Peer *)> callback)
+		void connect(Peer* peer, std::function<void(bool, Peer*)> callback)
 		{ connect(peer, [callback, peer](bool success){ callback(success, peer); }); }
-		void connect(Peer *peer, std::function<void(bool, Peer)> callback)
+		void connect(Peer* peer, std::function<void(bool, Peer)> callback)
 		{ connect(peer, [callback, peer](bool success){ callback(success, *peer); }); }
 };
 

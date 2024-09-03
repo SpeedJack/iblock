@@ -1,4 +1,5 @@
 #include "Miner.h"
+#include "Wallet.h"
 #include "iblock/bitcoin/objects/Block.h"
 
 using namespace omnetpp;
@@ -26,12 +27,19 @@ void Miner::initialize(int stage)
 		hashRate = par("hashRate").doubleValue() * 1000000000;
 		//networkHashRate = par("networkHashRate").doubleValue();
 		highestTarget = Hash(par("highestTarget").intValue());
-		walletAddress = new BitcoinAddress(par("walletAddress").stringValue()); //TODO
-		blockchainManager = check_and_cast<BlockchainManager *>(getModuleByPath(par("blockchainStoreModule").stringValue()));
-		mempoolManager = check_and_cast<MempoolManager *>(getModuleByPath(par("mempoolManagerModule").stringValue()));
+		blockchainManager = check_and_cast<BlockchainManager*>(getModuleByPath(par("blockchainStoreModule").stringValue()));
+		mempoolManager = check_and_cast<MempoolManager*>(getModuleByPath(par("mempoolManagerModule").stringValue()));
 		break;
 	case 1:
 		AppBase::initialize(1);
+		break;
+	case 2:
+		AppBase::initialize(2);
+		break;
+	case 3:
+		AppBase::initialize(3);
+		Wallet* wallet = check_and_cast<Wallet*>(getModuleByPath(par("walletModule").stringValue()));
+		walletAddress = wallet->getNewAddress();
 		double ttb = getTimeToBlock();
 		EV << "Time to block: " << ttb << endl;
 		scheduleAt(simTime() + ttb, nextBlockMsg);
@@ -47,49 +55,50 @@ double Miner::getTimeToBlock()
 	return exponential(1/lambda);
 }
 
-void Miner::handleSelfMessage(cMessage *msg)
+void Miner::handleSelfMessage(cMessage* msg)
 {
 	mineBlock();
 	scheduleAt(simTime() + getTimeToBlock(), nextBlockMsg);
 }
 
-int64_t Miner::satoshi(double amount)
-{
-	if (amount < 0)
-		return 0;
-	return static_cast<int64_t>(std::ceil(amount * 100000000));
-}
-
-int64_t Miner::getCurrentBlockReward()
-{
-	return satoshi(50);
-}
-
 void Miner::mineBlock()
 {
-	const BlockHeader *curHeader = blockchainManager->getCurrentBlockHeader();
-	Coinbase *coinbaseTx = new Coinbase(
+	const BlockHeader* curHeader = blockchainManager->getCurrentBlockHeader();
+	Coinbase* coinbaseTx = new Coinbase(
 		walletAddress,
-		getCurrentBlockReward(),
+		0,
 		curHeader->getHeight() + 1
 	);
 
-	BlockHeader *header = new BlockHeader();
+	BlockHeader* header = new BlockHeader();
 	header->setVersion(70015); // TODO: get version
 	header->setPrevBlockHeader(curHeader);
 	header->setMerkleRootHash(Hash(0, 0));
 	header->setNBits(blockchainManager->getNextTargetNBits());
 	header->setNonce(5678);
 
-	Block *block = new Block(header);
-	block->appendTxn(coinbaseTx);
+	Block* block = new Block(header);
 
-	const std::vector<Transaction *> txns = mempoolManager->getTransactions();
-	for (Transaction *txn : txns)
-		block->appendTxn(txn);
+	uint32_t curBytes = block->getByteLength() + coinbaseTx->getByteLength();
+	int64_t fees = 0;
+	std::vector<const Transaction*> txns;
+	for (const Transaction* txn : mempoolManager->transactions()) {
+		uint32_t newBytes = curBytes + txn->getByteLength() + COMPACT_SIZE(txns.size() + 2) - COMPACT_SIZE(txns.size() + 1);
+		if (newBytes > 1000*1000*1000)
+			break; // or continue?
+		txns.push_back(txn);
+		fees += txn->getFee();
+		curBytes = newBytes;
+	}
+	coinbaseTx->setOutputValue(getNextSubsidy() + fees);
+	txns.insert(txns.begin(), coinbaseTx);
+	block->setTxnArraySize(txns.size());
+	size_t i = 0;
+	for (const Transaction* txn : txns)
+		block->setTxn(i++, const_cast<Transaction*>(txn));
 
-	char text[32];
-	sprintf(text, "Block mined! (%lu txns)", txns.size());
+	char text[13];
+	sprintf(text, "Block mined!");
 	bubble(text);
 	blockchainManager->addBlock(block);
 }

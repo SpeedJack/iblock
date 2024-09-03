@@ -11,7 +11,7 @@ namespace payloads
 
 Register_Class(InvPl)
 
-unsigned char *InvPl::getRawBytes() const
+unsigned char* InvPl::getRawBytes() const
 {
 	return nullptr;
 }

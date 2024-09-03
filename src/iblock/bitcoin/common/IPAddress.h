@@ -15,22 +15,22 @@ class IBLOCK_API IPAddress : public ::omnetpp::cObject
 		uint64_t lo;
 
 	protected:
-		static int parseIpv6Groups(const char *& s, uint16_t *groups);
-		static int parseIpv4Groups(const char *& s, uint8_t *groups);
-		static void findGap(uint16_t *groups, int& start, int& end);
+		static int parseIpv6Groups(const char*& s, uint16_t*groups);
+		static int parseIpv4Groups(const char*& s, uint8_t* groups);
+		static void findGap(uint16_t* groups, int& start, int& end);
 
 	public:
 		IPAddress() : hi(0), lo(0) { }
 		IPAddress(uint64_t hi, uint64_t lo) : hi(hi), lo(lo) { }
-		IPAddress(const char *addr) { set(addr); }
+		IPAddress(const char* addr) { set(addr); }
 
 		uint64_t getHi() const { return hi; }
 		uint64_t getLo() const { return lo; }
 
-		void set(const char *addr);
-		bool tryParseIpv6(const char *addr);
-		bool tryParseIpv4(const char *addr);
-		bool tryParse(const char *addr);
+		void set(const char* addr);
+		bool tryParseIpv6(const char* addr);
+		bool tryParseIpv4(const char* addr);
+		bool tryParse(const char* addr);
 
 		bool operator==(const IPAddress& other) const { return hi == other.hi && lo == other.lo; }
 		bool operator!=(const IPAddress& other) const { return !operator==(other); }

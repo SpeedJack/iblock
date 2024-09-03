@@ -11,5 +11,5 @@ packet BlockPl extends Payload
 {
 	@customize;
 	@toString(.str());
-	Block *block;
+	Block* block;
 }

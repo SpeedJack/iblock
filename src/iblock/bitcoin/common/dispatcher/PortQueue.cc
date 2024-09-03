@@ -16,15 +16,15 @@ void PortQueue::initialize()
 	queue->setTakeOwnership(true);
 }
 
-void PortQueue::handleMessage(cMessage *msg)
+void PortQueue::handleMessage(cMessage* msg)
 {
 	if (msg == timer) {
 		handleTimer();
 		return;
 	}
 
-	cGate *outGate = gate("out");
-	cChannel *channel = outGate->getTransmissionChannel();
+	cGate* outGate = gate("out");
+	cChannel* channel = outGate->getTransmissionChannel();
 	if (!channel->isBusy()) {
 		send(msg, outGate);
 		return;
@@ -40,14 +40,14 @@ void PortQueue::handleTimer()
 	if (queue->isEmpty())
 		return;
 
-	cGate *outGate = gate("out");
-	cChannel *channel = outGate->getTransmissionChannel();
+	cGate* outGate = gate("out");
+	cChannel* channel = outGate->getTransmissionChannel();
 	if (channel->isBusy()) {
 		scheduleAt(channel->getTransmissionFinishTime(), timer);
 		return;
 	}
 
-	cMessage *pkt = check_and_cast<cMessage *>(queue->pop());
+	cMessage* pkt = check_and_cast<cMessage*>(queue->pop());
 	send(pkt, outGate);
 
 	if(!queue->isEmpty())

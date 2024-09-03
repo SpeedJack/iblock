@@ -8,6 +8,9 @@ namespace iblock
 namespace bitcoin
 {
 
+class IBLOCK_API Block;
+class IBLOCK_API Coinbase;
+
 class IBLOCK_API CoinbaseInput : public CoinbaseInput_Base
 {
 	private:
@@ -22,18 +25,27 @@ class IBLOCK_API CoinbaseInput : public CoinbaseInput_Base
 		}
 
 	public:
-		CoinbaseInput(const char *name = "CoinbaseInput", const uint32_t height = 0) : CoinbaseInput_Base(name) { setHeight(height); }
+		CoinbaseInput(const char* name = "CoinbaseInput", const uint32_t height = 0) : CoinbaseInput_Base(name) { setHeight(height); setByteLength(36 + 1 + 4 + 0 + 4); }
 		CoinbaseInput(uint32_t height) : CoinbaseInput("CoinbaseInput", height) { }
 		CoinbaseInput(const CoinbaseInput& other) : CoinbaseInput_Base(other) { copy(other); }
 		CoinbaseInput& operator=(const CoinbaseInput& other) { if (this == &other) return *this; CoinbaseInput_Base::operator=(other); copy(other); return *this; }
 
-		virtual CoinbaseInput *dup() const override { return new CoinbaseInput(*this); }
+		virtual CoinbaseInput* dup() const override { return new CoinbaseInput(*this); }
 
-		virtual const char *getCoinbaseScript() const override { return getSignatureScript(); }
-		//virtual void setCoinbaseScript(const char *coinbaseScript) override { setSignatureScript(coinbaseScript); }
+		virtual const char* getCoinbaseScript() const override { return getSignatureScript(); }
+		//virtual void setCoinbaseScript(const char* coinbaseScript) override { setSignatureScript(coinbaseScript); }
+		virtual const Coinbase* getTransaction() const;
+		virtual int64_t getValue() const override;
 };
 
 }
+}
+
+namespace omnetpp
+{
+
+template<> inline iblock::bitcoin::CoinbaseInput* fromAnyPtr(any_ptr ptr) { return ptr.get<iblock::bitcoin::CoinbaseInput>(); }
+
 }
 
 #endif

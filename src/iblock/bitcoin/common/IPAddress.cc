@@ -7,11 +7,11 @@ namespace bitcoin
 
 Register_Class(IPAddress)
 
-int IPAddress::parseIpv6Groups(const char *& s, uint16_t *groups)
+int IPAddress::parseIpv6Groups(const char*& s, uint16_t* groups)
 {
 	int k = 0;
 	while (true) {
-		char *e;
+		char* e;
 		unsigned long g = strtoul(s, &e, 16);
 		if (e == s) {
 			if (k != 0)
@@ -30,11 +30,11 @@ int IPAddress::parseIpv6Groups(const char *& s, uint16_t *groups)
 	return k;
 }
 
-int IPAddress::parseIpv4Groups(const char *& s, uint8_t *groups)
+int IPAddress::parseIpv4Groups(const char*& s, uint8_t* groups)
 {
 	int k = 0;
 	while (true) {
-		char *e;
+		char* e;
 		unsigned long g = strtoul(s, &e, 10);
 		if (e == s) {
 			if (k != 0)
@@ -53,7 +53,7 @@ int IPAddress::parseIpv4Groups(const char *& s, uint8_t *groups)
 	return k;
 }
 
-bool IPAddress::tryParseIpv4(const char *addr)
+bool IPAddress::tryParseIpv4(const char* addr)
 {
 	uint8_t groups[4];
 	if (parseIpv4Groups(addr, groups) != 4)
@@ -63,7 +63,7 @@ bool IPAddress::tryParseIpv4(const char *addr)
 	return true;
 }
 
-bool IPAddress::tryParseIpv6(const char *addr)
+bool IPAddress::tryParseIpv6(const char* addr)
 {
 	if (!addr || *addr == '\0')
 		return false;
@@ -92,7 +92,7 @@ bool IPAddress::tryParseIpv6(const char *addr)
 	return true;
 }
 
-bool IPAddress::tryParse(const char *addr)
+bool IPAddress::tryParse(const char* addr)
 {
 	if (!addr || *addr == '\0')
 		return false;
@@ -109,13 +109,13 @@ bool IPAddress::tryParse(const char *addr)
 	return tryParseIpv6(addr);
 }
 
-void IPAddress::set(const char *addr)
+void IPAddress::set(const char* addr)
 {
 	if (!tryParse(addr))
 		throw ::omnetpp::cRuntimeError("IPAddress: cannot interpret address string `%s'", addr);
 }
 
-void IPAddress::findGap(uint16_t *groups, int& start, int& end)
+void IPAddress::findGap(uint16_t* groups, int& start, int& end)
 {
 	start = end = 0;
 	int beg = -1;

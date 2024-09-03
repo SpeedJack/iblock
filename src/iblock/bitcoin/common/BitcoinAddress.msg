@@ -14,6 +14,7 @@ class BitcoinAddress extends cObject
 	@toValue(.str());
 	@fromValue(BitcoinAddress($));
 	abstract const Hash hash;
-	const cModule *wallet;
+	abstract const string address;
+	const cModule* wallet;
 	const uint32_t index;
 }

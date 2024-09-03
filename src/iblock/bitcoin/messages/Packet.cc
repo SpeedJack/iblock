@@ -21,9 +21,9 @@ void Packet::copy(const Packet& other)
 	computedChecksum = other.computedChecksum;
 }
 
-unsigned char *Packet::sha256hash(const unsigned char *input, size_t len)
+unsigned char* Packet::sha256hash(const unsigned char* input, size_t len)
 {
-	unsigned char *hash = new unsigned char[SHA256_DIGEST_LENGTH];
+	unsigned char* hash = new unsigned char[SHA256_DIGEST_LENGTH];
 
 	SHA256_CTX ctx;
 	SHA256_Init(&ctx);
@@ -44,19 +44,19 @@ uint32_t Packet::computeChecksum()
 		return computedChecksum;
 	}
 
-	Payload *payload = getPayload();
+	Payload* payload = getPayload();
 	if (payload == nullptr)
 		throw cRuntimeError("There is no payload but payloadSize is greater than zero");
 
-	unsigned char *rawBytes = getPayload()->getRawBytes();
+	unsigned char* rawBytes = getPayload()->getRawBytes();
 	if (rawBytes == nullptr)
 		throw cRuntimeError("Payload is empty but payloadSize is greater than zero");
 
-	unsigned char *first = sha256hash(rawBytes, payloadSize);
+	unsigned char* first = sha256hash(rawBytes, payloadSize);
 	delete[] rawBytes;
-	unsigned char *second = sha256hash(first, SHA256_DIGEST_LENGTH);
+	unsigned char* second = sha256hash(first, SHA256_DIGEST_LENGTH);
 	delete[] first;
-	computedChecksum = __builtin_bswap32(*(uint32_t *)second);
+	computedChecksum = __builtin_bswap32(*(uint32_t*)second);
 	delete[] second;
 
 	return computedChecksum;
@@ -65,9 +65,9 @@ uint32_t Packet::computeChecksum()
 #define ENUM_NAME(type)			opp_typename(typeid(type))
 #define ENUM_ITEM_NAME(type, value)	cEnum::get(ENUM_NAME(type))->getStringFor(value)
 
-void Packet::encapsulate(cPacket *packet)
+void Packet::encapsulate(cPacket* packet)
 {
-	Payload *payload = dynamic_cast<Payload *>(packet);
+	Payload* payload = dynamic_cast<Payload *>(packet);
 	if (!payload)
 		throw cRuntimeError("Packet class can encapsulate only Payload packets");
 
@@ -78,11 +78,11 @@ void Packet::encapsulate(cPacket *packet)
 	Packet_Base::encapsulate(packet);
 }
 
-Payload *Packet::decapsulate()
+Payload* Packet::decapsulate()
 {
 	setName("<empty-Packet>");
 	setKind(0);
-	return static_cast<Payload *>(Packet_Base::decapsulate());
+	return static_cast<Payload*>(Packet_Base::decapsulate());
 }
 
 std::string Packet::str() const

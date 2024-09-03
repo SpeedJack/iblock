@@ -37,14 +37,14 @@ Hash::Hash(uint32_t mantissa, unsigned char exponent)
 	compact = true;
 }
 
-Hash::Hash(const unsigned char *bytes)
+Hash::Hash(const unsigned char* bytes)
 {
 	storedHash.bytes = new unsigned char[0x20];
 	std::memcpy(storedHash.bytes, bytes, 0x20);
 	compact = false;
 }
 
-Hash Hash::fromBytes(const unsigned char *bytes, size_t size)
+Hash Hash::fromBytes(const unsigned char* bytes, size_t size)
 {
 	if (size > 0x20)
 		size = 0x20;
@@ -55,7 +55,7 @@ Hash Hash::fromBytes(const unsigned char *bytes, size_t size)
 	return Hash(hash);
 }
 
-Hash Hash::fromHex(const char *hex)
+Hash Hash::fromHex(const char* hex)
 {
 	unsigned char hash[0x20] = { 0 };
 	size_t size = 0;
@@ -68,7 +68,7 @@ Hash Hash::fromHex(const char *hex)
 		hex++;
 		size++;
 	}
-	for (const char *p = hex; *p != '\0' && size < 0x20; p += 2) {
+	for (const char* p = hex; *p != '\0' && size < 0x20; p += 2) {
 		char hi = hexNibble(p[0]);
 		hash[size] = hexNibble(p[1]);
 		if (hi < 0 || hash[size] < 0)
@@ -79,9 +79,9 @@ Hash Hash::fromHex(const char *hex)
 	return fromBytes(hash, size);
 }
 
-unsigned char *Hash::bytesCopy() const
+unsigned char* Hash::bytesCopy() const
 {
-	unsigned char *bytes = new unsigned char[0x20];
+	unsigned char* bytes = new unsigned char[0x20];
 	if (!compact) {
 		std::memcpy(bytes, storedHash.bytes, 0x20);
 		return bytes;
@@ -191,8 +191,8 @@ int32_t Hash::compare(const Hash& other) const
 	if (exp == otherExp && (man != otherMan || (compact && other.compact)))
 		return man - otherMan;
 
-	unsigned char *bytes = compact ? bytesCopy() : storedHash.bytes;
-	unsigned char *otherBytes = other.compact ? other.bytesCopy() : other.storedHash.bytes;
+	unsigned char* bytes = compact ? bytesCopy() : storedHash.bytes;
+	unsigned char* otherBytes = other.compact ? other.bytesCopy() : other.storedHash.bytes;
 	int32_t result = 0;
 	for (size_t i = 0; i < 0x20; ++i)
 		if (bytes[i] - otherBytes[i] != 0) {
@@ -210,7 +210,7 @@ int32_t Hash::compare(const Hash& other) const
 std::string Hash::hex() const
 {
 	std::stringstream ss;
-	unsigned char *bytes = compact ? bytesCopy() : storedHash.bytes;
+	unsigned char* bytes = compact ? bytesCopy() : storedHash.bytes;
 	ss << "0x" << std::hex << std::setfill('0');
 	for (size_t i = 0; i < 0x20; ++i)
 		ss << std::setw(2) << static_cast<unsigned int>(bytes[i]);
