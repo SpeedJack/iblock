@@ -12,13 +12,17 @@ class IBLOCK_API GBM : public ::omnetpp::cSimpleModule
 {
 	protected:
 		::omnetpp::cArray* blocks;
+		unsigned long long totalTx;
+		Coinbase* coinbaseTx;
 
-		virtual void initialize() override { blocks = new ::omnetpp::cArray("blockchain"); }
+		virtual void initialize(int stage) override;
+		virtual int numInitStages() const override { return 3; }
 		virtual void handleMessage(::omnetpp::cMessage* msg) override { delete msg; }
-		virtual ~GBM() override { delete blocks; }
+		virtual Hash computeInitialNBits() const;
+		virtual ~GBM() override { delete coinbaseTx; delete blocks; }
 
 	public:
-		GBM() : ::omnetpp::cSimpleModule() { blocks = nullptr; }
+		GBM() : ::omnetpp::cSimpleModule() { blocks = nullptr; coinbaseTx = nullptr; }
 		virtual void addBlock(Block* block);
 };
 

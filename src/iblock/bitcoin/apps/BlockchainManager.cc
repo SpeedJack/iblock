@@ -18,7 +18,7 @@ void BlockchainManager::initialize(int stage)
 		AppBase::initialize(0);
 
 		nodeManager = check_and_cast<NodeManager* >(getModuleByPath(par("nodeManagerModule").stringValue()));
-		nodeManager->registerBlockchainManager(this);
+		gbm = check_and_cast<GBM*>(getModuleByPath(par("gbmModule").stringValue()));
 
 		mempoolManager = check_and_cast<MempoolManager* >(getModuleByPath(par("mempoolManagerModule").stringValue()));
 
@@ -36,9 +36,6 @@ void BlockchainManager::initialize(int stage)
 		break;
 	case 3:
 		AppBase::initialize(3);
-
-		mainBranch = nodeManager->getGenesisBlock();
-		branches.insert(mainBranch);
 	}
 }
 
@@ -63,7 +60,7 @@ void BlockchainManager::handleGetHeadersPacket(Peer* peer, GetHeadersPl* gethead
 void BlockchainManager::handleOtherMessage(cMessage* msg)
 {
 	const Block* block = check_and_cast<BlockPl*>(msg)->getBlock();
-	EV << "Received a new block (" << block->getTxnCount() << " txns)" << endl;
+	// EV_INFO << "Received a new block (" << block->getTxnCount() << " txns)" << endl;
 	appendBlock(block);
 	delete msg;
 }
@@ -90,7 +87,7 @@ uint32_t BlockchainManager::getCurrentHeight() const
 
 Hash BlockchainManager::getNextTargetNBits() const
 {
-	return this->getCurrentTargetNBits();
+	return this->getCurrentTargetNBits(); // TODO
 }
 
 const Block* BlockchainManager::findForkBlock(const Block* a, const Block* b) const
@@ -129,13 +126,15 @@ void BlockchainManager::confirmWalletUtxos(const Block* block) const
 void BlockchainManager::appendBlock(const Block* block)
 {
 	const Block* prevBlock = block->getPrevBlock();
+	if (!prevBlock)
+		throw cRuntimeError("Block has no previous block");
 	const auto& it = branches.find(prevBlock);
 
 	uint32_t height = block->getHeight();
 	if (it != branches.end()) {
 		branches.erase(it);
 		branches.insert(block);
-		unsigned int type = 0;
+		unsigned char type = 0;
 		if (height > mainBranch->getHeight())
 			type |= 0x01;
 		if (prevBlock != mainBranch)
@@ -184,9 +183,14 @@ void BlockchainManager::appendBlock(const Block* block)
 		throw cRuntimeError("Genesis block already exists");
 
 	for (const auto& branch : branches)
-		for (const Block* cur = branch; height <= cur->getHeight(); cur = cur->getPrevBlock())
+		for (const Block* cur = branch; cur->getHeight() >= height; cur = cur->getPrevBlock()) {
 			if (cur == block)
 				return; // duplicate block
+			if (cur->getPrevBlock() == block->getPrevBlock()) { // block creates a new branch
+				branches.insert(block);
+				return;
+			}
+		}
 
 	orphans.insert(block);
 
@@ -196,14 +200,15 @@ void BlockchainManager::addBlock(Block* block)
 {
 	Enter_Method("addBlock()");
 
+	gbm->addBlock(block);
 	appendBlock(block);
 
-	std::vector<BlockchainManager*> nodes = nodeManager->getBlockchainManagers();
-	for (auto node : nodes) {
-		if (node->getId() == this->getId())
+	for (auto node : nodeManager->nodes()) {
+		if (node->getId() == this->getParentModule()->getId())
 			continue;
-		cGate* nodeGate = node->gate("dIn");
-		sendDirect(new BlockPl(block), nodeGate);
+		cGate* nodeGate = node->gate("blockchainManagerIn");
+		// sendDirect(new BlockPl(block), nodeGate);
+		sendDirect(new BlockPl(block), exponential(0.42), block->getBitLength() / ((double)1000*1000), nodeGate);
 	}
 }
 

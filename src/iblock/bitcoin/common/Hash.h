@@ -41,6 +41,7 @@ class IBLOCK_API Hash : public ::omnetpp::cObject
 		static Hash fromBytes(const char* bytes, size_t size = 0x20) { return fromBytes(reinterpret_cast<const unsigned char*>(bytes)); }
 		static Hash fromHex(const std::string hex) { return fromHex(hex.c_str()); }
 		static Hash fromHex(const char* hex);
+		static Hash fromBigDouble(const double value);
 
 		const unsigned char* bytes() { if (compact) expand(); return storedHash.bytes; }
 		unsigned char* bytesPtr() { if (compact) expand(); return storedHash.bytes; }

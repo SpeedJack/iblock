@@ -1,6 +1,7 @@
 import iblock.bitcoin.objects.HeavyObject;
 import iblock.bitcoin.common.Hash;
 import iblock.bitcoin.objects.TransactionOutput;
+import iblock.bitcoin.common.BTCValue;
 
 cplusplus {{
 	#include "HeavyObject.h"
@@ -21,7 +22,7 @@ class TransactionInput extends HeavyObject
 	@toString(.str());
 	TransactionOutput* prevOutput;
 	abstract const Outpoint prevOutpoint;
-	abstract const int64_t value;
+	abstract const BTCValue value @byValue;
 	abstract const unsigned int scriptBytes;
 	abstract const string signatureScript;
 	uint32_t sequence = 0xFFFFFFFF;

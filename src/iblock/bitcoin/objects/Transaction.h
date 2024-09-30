@@ -13,6 +13,12 @@ class IBLOCK_API Transaction : public Transaction_Base
 	private:
 		void copy(const Transaction& other);
 
+	protected:
+		unsigned long long outputValueCache = 0;
+		unsigned long long inputValueCache = 0;
+		unsigned long long fee = 0;
+		double feeRate = -1;
+
 	public:
 		Transaction(const char* name = "Transaction") : Transaction_Base(name) { setByteLength(4 + 1 + 0 + 1 + 0 + 4); }
 		Transaction(const Transaction& other) : Transaction_Base(other) { copy(other); }
@@ -21,6 +27,8 @@ class IBLOCK_API Transaction : public Transaction_Base
 		virtual Transaction* dup() const override { return new Transaction(*this); }
 
 		virtual ObjectType getType() const override { return ObjectType::MSG_TX; }
+
+		virtual bool isCoinbase() const { return getTxInCount() == 1 && getTxIn(0)->isCoinbase(); }
 
 		virtual unsigned long getTxInCount() const override { return getTxInArraySize(); }
 		virtual unsigned long getTxOutCount() const override { return getTxOutArraySize(); }
@@ -37,11 +45,15 @@ class IBLOCK_API Transaction : public Transaction_Base
 		virtual void insertTxOut(size_t k, TransactionOutput* txOut) override;
 		virtual void eraseTxOut(size_t k) override;
 
-		virtual int64_t getOutputValue() const override;
-		virtual int64_t getInputValue() const override;
-		virtual int64_t getFee() const override { return getInputValue() - getOutputValue(); }
-		virtual double getFeeRate() const override { return getFee() / (double) getWeight(); }
+		virtual satoshi_t getOutputValue() const override;
+		virtual satoshi_t getInputValue() const override;
+		virtual satoshi_t getFee() const override { if (fee > 0) return fee; return getInputValue() - getOutputValue(); }
+		virtual double getFeeRate() const override { if (feeRate >= 0) return feeRate; return getFee() / (double)getWeight(); }
 		virtual unsigned long getWeight() const { return getByteLength(); }
+
+		virtual void invalidateCache() { inputValueCache = 0; outputValueCache = 0; fee = 0; feeRate = -1; }
+		virtual void updateCache() { inputValueCache = getInputValue().sat(); outputValueCache = getOutputValue().sat(); fee = getFee().sat(); feeRate = getFeeRate(); }
+		virtual void buildCache() { if (feeRate < 0) updateCache(); }
 
 		virtual std::string str() const override;
 };

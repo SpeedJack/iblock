@@ -8,6 +8,8 @@ namespace iblock
 namespace bitcoin
 {
 
+class Transaction;
+
 class IBLOCK_API TransactionOutput : public TransactionOutput_Base
 {
 	private:
@@ -15,11 +17,14 @@ class IBLOCK_API TransactionOutput : public TransactionOutput_Base
 
 	public:
 		TransactionOutput(const char* name = "TxOut") : TransactionOutput_Base(name) { setByteLength(8 + compactSize(getPkScriptBytes()) + getPkScriptBytes()); }
-		TransactionOutput(BitcoinAddress* address, int64_t value) : TransactionOutput() { setAddress(address); setValue(value); }
+		TransactionOutput(BitcoinAddress* address, satoshi_t value) : TransactionOutput() { setAddress(address); setValue(value); }
 		TransactionOutput(const TransactionOutput& other) : TransactionOutput_Base(other) { copy(other); }
 		TransactionOutput & operator=(const TransactionOutput& other) { if (this == &other) return *this; TransactionOutput_Base::operator=(other); copy(other); return *this; }
 
 		virtual TransactionOutput* dup() const override { return new TransactionOutput(*this); }
+
+		virtual const Transaction* getTransaction() const;
+		virtual bool isCoinbase() const;
 
 		virtual unsigned int getPkScriptBytes() const override { return strlen(getPkScript()); }
 

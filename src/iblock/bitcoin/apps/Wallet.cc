@@ -17,9 +17,6 @@ void Wallet::initialize()
 
 	nextAddressIndex = 0;
 
-	nodeManager = check_and_cast<NodeManager *>(getModuleByPath(par("nodeManagerModule").stringValue()));
-	nodeManager->registerWallet(this);
-
 	mempoolManager = check_and_cast<MempoolManager*>(getModuleByPath(par("mempoolManagerModule").stringValue()));
 	mempoolManager->registerWallet(this);
 
@@ -32,21 +29,27 @@ void Wallet::initialize()
 BitcoinAddress* Wallet::getNewAddress()
 {
 	Enter_Method("getNewAddress()");
-	return new BitcoinAddress(this, nextAddressIndex++);
+	return new BitcoinAddress(this, nextAddressIndex++); // FIXME: memory leak
 }
 
 void Wallet::addUtxo(const TransactionOutput* utxo)
 {
 	utxos[utxo] = 0;
+	totalBalance += utxo->getValue().sat();
 }
 
 void Wallet::confirmUtxo(const TransactionOutput* utxo)
 {
 	auto it = utxos.find(utxo);
-	if (it == utxos.end())
+	if (it == utxos.end()) {
 		utxos[utxo] = 1;
-	else
+		confirmedBalance += utxo->getValue().sat();
+		totalBalance += utxo->getValue().sat();
+	} else {
+		if (it->second == 0)
+			confirmedBalance += utxo->getValue().sat();
 		it->second++;
+	}
 }
 
 void Wallet::unconfirmUtxo(const TransactionOutput* utxo)
@@ -54,35 +57,53 @@ void Wallet::unconfirmUtxo(const TransactionOutput* utxo)
 	auto it = utxos.find(utxo);
 	if (it == utxos.end())
 		return;
-	if (it->second <= 1)
+	if (it->second <= 1) {
 		utxos.erase(it);
-	else
+		confirmedBalance -= utxo->getValue().sat();
+		totalBalance -= utxo->getValue().sat();
+	} else {
 		it->second--;
+	}
 }
 
-std::vector<const TransactionOutput *> Wallet::unspentOutputs(int64_t minValue, uint32_t minConfirmations) const
+void Wallet::removeUtxo(const TransactionOutput* utxo)
+{
+	auto it = utxos.find(utxo);
+	if (it == utxos.end())
+		return;
+	utxos.erase(it);
+	confirmedBalance -= utxo->getValue().sat();
+	totalBalance -= utxo->getValue().sat();
+}
+
+std::vector<const TransactionOutput*> Wallet::unspentOutputs(uint32_t minConfirmations) const
 {
 	Enter_Method("unspentOutputs()");
 
-	std::vector<const TransactionOutput *> result;
-	int64_t value = 0;
-	for (const auto& utxo : utxos) {
-		if (utxo.second < minConfirmations)
+	std::vector<const TransactionOutput*> result;
+	for (const auto& elem : utxos) {
+		if (elem.second < minConfirmations)
 			continue;
-		result.push_back(utxo.first);
-		value += utxo.first->getValue();
-		if (value >= minValue)
-			break;
+		const TransactionOutput *utxo = elem.first;
+		result.push_back(utxo);
 	}
 	return result;
 }
 
-int64_t Wallet::balance(uint32_t minConfirmations) const
+satoshi_t Wallet::balance(uint32_t minConfirmations) const
 {
-	int64_t result = 0;
-	for (const auto& utxo : utxos)
-		if (utxo.second >= minConfirmations)
-			result += utxo.first->getValue();
+	Enter_Method("balance()");
+	if (minConfirmations == 0)
+		return totalBalance;
+	if (minConfirmations == 1)
+		return confirmedBalance;
+
+	satoshi_t result = 0;
+	for (const auto& utxo : utxos) {
+		if (utxo.second < minConfirmations)
+			continue;
+		result += utxo.first->getValue();
+	}
 	return result;
 }
 

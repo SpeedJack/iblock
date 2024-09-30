@@ -1,0 +1,4 @@
+#!/bin/sh
+cd `dirname $0`
+#opp_run_dbg -u Cmdenv -l ../src/IBLOCK -n .:../src --debug-on-errors=true --debugger-attach-on-error=true --debugger-attach-command="gdb -p %u" $*
+opp_run_dbg -u Cmdenv -l ../src/IBLOCK -n .:../src $*

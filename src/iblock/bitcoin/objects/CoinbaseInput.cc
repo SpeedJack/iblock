@@ -10,14 +10,9 @@ namespace bitcoin
 
 Register_Class(CoinbaseInput)
 
-const Coinbase* CoinbaseInput::getTransaction() const
+satoshi_t CoinbaseInput::getValue() const
 {
-	return check_and_cast<const Coinbase*>(getOwner());
-}
-
-int64_t CoinbaseInput::getValue() const
-{
-	const Coinbase* cb = getTransaction();
+	const Coinbase* cb = check_and_cast_nullable<const Coinbase*>(getTransaction());
 	if (cb)
 		return cb->getReward();
 	else

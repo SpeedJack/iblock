@@ -1,6 +1,7 @@
 import iblock.bitcoin.objects.ChainObject;
 import iblock.bitcoin.objects.TransactionInput;
 import iblock.bitcoin.objects.TransactionOutput;
+import iblock.bitcoin.common.BTCValue;
 
 cplusplus {{
 	#include "ChainObject.h"
@@ -20,8 +21,8 @@ class Transaction extends ChainObject
 	abstract const unsigned long txOutCount;
 	TransactionOutput* txOut[] @owned;
 	uint32_t lockTime = 0;
-	abstract const int64_t inputValue;
-	abstract const int64_t outputValue;
-	abstract const int64_t fee;
+	abstract const BTCValue inputValue @byValue;
+	abstract const BTCValue outputValue @byValue;
+	abstract const BTCValue fee @byValue;
 	abstract const double feeRate;
 }

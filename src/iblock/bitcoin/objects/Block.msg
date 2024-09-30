@@ -2,6 +2,7 @@ import iblock.bitcoin.objects.HeavyObject;
 import iblock.bitcoin.objects.BlockHeader;
 import iblock.bitcoin.objects.Transaction;
 import iblock.bitcoin.objects.TransactionOutput;
+import iblock.bitcoin.common.BTCValue;
 
 cplusplus {{
 	#include "HeavyObject.h"
@@ -17,7 +18,7 @@ class Block extends HeavyObject
 	@toString(.str());
 	BlockHeader* header @owned;
 	abstract const uint32_t height;
-	abstract const int64_t reward;
+	abstract const BTCValue reward @byValue;
 	abstract const unsigned long txnCount;
 	Transaction* txn[];
 	TransactionOutput* utxo[] @custom @opaque @readonly;

@@ -5,12 +5,14 @@ import iblock.bitcoin.apps.contract.IApp;
 simple Wallet like IApp
 {
 	parameters:
+		@wallet;
 		string dispatcherModule = default("^.packetDispatcher.dispatcher");
 		string peerTableModule = default("^.peerTable");
 		string connectionManagerModule = default("^.connectionManager");
 		string blockchainManagerModule = default("^.blockchainManager");
 		string mempoolManagerModule = default("^.mempoolManager");
 		string nodeManagerModule = default("nodeManager");
+		double startingBalance @btcUnit("BTC") = default(50);
 	gates:
 		input in;
 		output out;

@@ -44,6 +44,13 @@ Hash::Hash(const unsigned char* bytes)
 	compact = false;
 }
 
+Hash Hash::fromBigDouble(const double value)
+{
+	unsigned char exponent = static_cast<unsigned char>(std::round((std::log2(value) - 16) / 8));
+	uint32_t mantissa = static_cast<uint32_t>(value / std::pow(2, exponent*8));
+	return Hash(mantissa, exponent + 3);
+}
+
 Hash Hash::fromBytes(const unsigned char* bytes, size_t size)
 {
 	if (size > 0x20)

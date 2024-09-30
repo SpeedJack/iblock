@@ -2,9 +2,8 @@ package iblock.bitcoin.apps.contract;
 
 import iblock.bitcoin.apps.contract.IApp;
 
-moduleinterface IMiner extends IApp
+moduleinterface IBlockchainManager extends IApp
 {
-	parameters:
-		@miner;
-		double hashRate;
+	gates:
+		input dIn @directIn;
 }

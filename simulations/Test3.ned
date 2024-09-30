@@ -4,12 +4,18 @@ import iblock.bitcoin.node.UserNode;
 import iblock.bitcoin.node.CustomNode;
 import iblock.bitcoin.node.RelayNode;
 import iblock.bitcoin.global.NodeManager;
+import iblock.bitcoin.global.WalletManager;
+import iblock.bitcoin.global.GBM;
+import iblock.bitcoin.global.GMM;
 
 network Test3
 {
 	@display("bgb=1000,1000");
 	submodules:
 		nodeManager: NodeManager;
+		walletManager: WalletManager;
+		gbm: GBM;
+		gmm: GMM;
 		node0: MinerNode;
 		node1: MinerNode;
 		node2: MinerNode;
@@ -30,24 +36,14 @@ network Test3
 		node17: UserNode;
 		node18: UserNode;
 		node19: UserNode;
-		node20: CustomNode;
-		node21: CustomNode;
-		node22: CustomNode;
-		node23: CustomNode;
-		node24: CustomNode;
-		node25: CustomNode;
-		node26: CustomNode;
-		node27: CustomNode;
-		node28: CustomNode;
-		node29: CustomNode;
-		node30: UserNode;
-		node31: UserNode;
-		node32: UserNode;
-		node33: UserNode;
-		node34: UserNode;
-		node35: UserNode;
-		node36: UserNode;
-		node37: UserNode;
-		node38: UserNode;
-		node39: UserNode;
+		node20: UserNode;
+		node21: UserNode;
+		node22: UserNode;
+		node23: UserNode;
+		node24: UserNode;
+		node25: UserNode;
+		node26: UserNode;
+		node27: UserNode;
+		node28: UserNode;
+		node29: UserNode;
 }

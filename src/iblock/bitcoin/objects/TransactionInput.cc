@@ -12,15 +12,17 @@ Register_Class(TransactionInput)
 
 void TransactionInput::copy(const TransactionInput& other)
 {
-	this->prevOutput = other.prevOutput; // FIXME: ownership? delete?
-	//this->signatureScript = other.signatureScript; // FIXME: delete?
+	this->prevOutput = other.prevOutput;
+	//this->signatureScript = other.signatureScript;
 	this->sequence = other.sequence;
 }
 
 void TransactionInput::updateOutpoint()
 {
+	if (prevOutpoint)
+		delete prevOutpoint;
 	prevOutpoint = new Outpoint();
-	Transaction* tx = check_and_cast<Transaction*>(getOwner());
+	const Transaction* tx = getTransaction();
 	prevOutpoint->txHash = tx->getHash();
 	size_t count = tx->getTxOutCount();
 	for (size_t i = 0; i < count; ++i)
@@ -40,6 +42,12 @@ std::string TransactionInput::str() const
 	if (!baseStr.empty())
 		out << "; " << baseStr;
 	return out.str();
+}
+
+const Transaction* TransactionInput::getTransaction() const
+{
+	cObject* owner = getOwner();
+	return owner ? dynamic_cast<const Transaction*>(owner) : nullptr;
 }
 
 }

@@ -35,7 +35,7 @@ class IBLOCK_API Block : public Block_Base
 		virtual const Coinbase* getCoinbaseTx() const { return static_cast<const Coinbase*>(getTxn(0)); }
 
 		virtual uint32_t getHeight() const override { return ::omnetpp::check_and_cast<const Coinbase*>(getCoinbaseTx())->getHeight(); }
-		virtual int64_t getReward() const override { return getCoinbaseTx()->getReward(); }
+		virtual satoshi_t getReward() const override { return getCoinbaseTx()->getReward(); }
 
 		virtual std::string str() const override;
 

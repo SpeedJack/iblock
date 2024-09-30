@@ -90,11 +90,11 @@ void Block::addUtxo(const TransactionOutput* utxo)
 	Wallet* wallet = utxo->getAddress()->getWallet();
 	auto it = utxos.find(wallet);
 	if (it == utxos.end()) {
-		std::unordered_set<const TransactionOutput*>* newUtxos = new std::unordered_set<const TransactionOutput*>();
+		std::unordered_set<const TransactionOutput*>* newUtxos = new std::unordered_set<const TransactionOutput*>(); // FIXME: memory leak
 		newUtxos->insert(utxo);
 		utxos[wallet] = newUtxos;
 	} else {
-		it->second->insert(utxo);
+		it->second->insert(utxo); // FIXME: memory leak
 	}
 }
 
@@ -137,9 +137,9 @@ void Block::rebuildUtxos()
 		for (auto& it : prevBlock->utxos) {
 			Wallet* wallet = it.first;
 			std::unordered_set<const TransactionOutput*>* utxos = it.second;
-			std::unordered_set<const TransactionOutput*>* newUtxos = new std::unordered_set<const TransactionOutput*>();
+			std::unordered_set<const TransactionOutput*>* newUtxos = new std::unordered_set<const TransactionOutput*>(); // FIXME: memory leak
 			for (const TransactionOutput* utxo : *utxos)
-				newUtxos->insert(utxo);
+				newUtxos->insert(utxo); // FIXME: memory leak
 			this->utxos[wallet] = newUtxos;
 		}
 	for (size_t i = 0; i < getTxnCount(); i++)

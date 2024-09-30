@@ -1,6 +1,7 @@
 import iblock.bitcoin.objects.HeavyObject;
 import iblock.bitcoin.common.Hash;
 import iblock.bitcoin.common.BitcoinAddress;
+import iblock.bitcoin.common.BTCValue;
 
 cplusplus {{
 	#include "HeavyObject.h"
@@ -12,7 +13,7 @@ class TransactionOutput extends HeavyObject
 {
 	@customize;
 	@toString(.str());
-	int64_t value;
+	BTCValue value @byValue;
 	BitcoinAddress* address;
 	abstract const unsigned int pkScriptBytes;
 	abstract const string pkScript;

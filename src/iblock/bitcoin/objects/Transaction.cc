@@ -22,6 +22,10 @@ void Transaction::copy(const Transaction& other)
 	setTxOutArraySize(count);
 	for (unsigned long i = 0; i < count; i++)
 		appendTxOut(other.txOut[i]->dup());
+	this->outputValueCache = other.outputValueCache;
+	this->inputValueCache = other.inputValueCache;
+	this->fee = other.fee;
+	this->feeRate = other.feeRate;
 }
 
 std::string Transaction::str() const
@@ -35,24 +39,30 @@ std::string Transaction::str() const
 	return out.str();
 }
 
-int64_t Transaction::getInputValue() const
+satoshi_t Transaction::getInputValue() const
 {
-	int64_t value = 0;
+	if (inputValueCache > 0)
+		return inputValueCache;
+
+	unsigned long long value = 0;
 	unsigned long count = getTxInCount();
 	for (unsigned long i = 0; i < count; i++) {
 		const TransactionInput* txin = getTxIn(i);
-		value += txin->getValue();
+		value += txin->getValue().sat();
 	}
 	return value;
 }
 
-int64_t Transaction::getOutputValue() const
+satoshi_t Transaction::getOutputValue() const
 {
-	int64_t value = 0;
+	if (outputValueCache > 0)
+		return outputValueCache;
+
+	unsigned long long value = 0;
 	unsigned long count = getTxOutCount();
 	for (unsigned long i = 0; i < count; i++) {
 		const TransactionOutput* txout = getTxOut(i);
-		value += txout->getValue();
+		value += txout->getValue().sat();
 	}
 	return value;
 }
@@ -68,20 +78,25 @@ void Transaction::setTxInArraySize(size_t newSize)
 				subtractBitLength(txIn[i]->getBitLength());
 	}
 	Transaction_Base::setTxInArraySize(newSize);
+	invalidateCache();
 }
 
 void Transaction::setTxIn(size_t k, TransactionInput* txIn)
 {
 	Transaction_Base::setTxIn(k, txIn);
-	if (txIn)
+	if (txIn) {
 		addBitLength(txIn->getBitLength());
+		invalidateCache();
+	}
 }
 
 TransactionInput* Transaction::removeTxIn(size_t k)
 {
 	TransactionInput* txIn = Transaction_Base::removeTxIn(k);
-	if (txIn)
+	if (txIn) {
 		subtractBitLength(txIn->getBitLength());
+		invalidateCache();
+	}
 	return txIn;
 }
 
@@ -91,6 +106,7 @@ void Transaction::insertTxIn(size_t k, TransactionInput* txIn)
 	Transaction_Base::insertTxIn(k, txIn);
 	if (txIn)
 		addBitLength(txIn->getBitLength());
+	invalidateCache();
 }
 
 void Transaction::eraseTxIn(size_t k)
@@ -101,6 +117,7 @@ void Transaction::eraseTxIn(size_t k)
 		subtractBitLength(this->txIn[k]->getBitLength());
 	Transaction_Base::eraseTxIn(k);
 	subtractByteLength(COMPACT_SIZE(txIn_arraysize + 1) - COMPACT_SIZE(txIn_arraysize));
+	invalidateCache();
 }
 
 void Transaction::setTxOutArraySize(size_t newSize)
@@ -114,20 +131,25 @@ void Transaction::setTxOutArraySize(size_t newSize)
 				subtractBitLength(txOut[i]->getBitLength());
 	}
 	Transaction_Base::setTxOutArraySize(newSize);
+	invalidateCache();
 }
 
 void Transaction::setTxOut(size_t k, TransactionOutput* txOut)
 {
 	Transaction_Base::setTxOut(k, txOut);
-	if (txOut)
+	if (txOut) {
 		addBitLength(txOut->getBitLength());
+		invalidateCache();
+	}
 }
 
 TransactionOutput* Transaction::removeTxOut(size_t k)
 {
 	TransactionOutput* txOut = Transaction_Base::removeTxOut(k);
-	if (txOut)
+	if (txOut) {
 		subtractBitLength(txOut->getBitLength());
+		invalidateCache();
+	}
 	return txOut;
 }
 
@@ -137,6 +159,7 @@ void Transaction::insertTxOut(size_t k, TransactionOutput* txOut)
 	Transaction_Base::insertTxOut(k, txOut);
 	if (txOut)
 		addBitLength(txOut->getBitLength());
+	invalidateCache();
 }
 
 void Transaction::eraseTxOut(size_t k)
@@ -147,6 +170,7 @@ void Transaction::eraseTxOut(size_t k)
 		subtractBitLength(this->txOut[k]->getBitLength());
 	Transaction_Base::eraseTxOut(k);
 	subtractByteLength(COMPACT_SIZE(txOut_arraysize + 1) - COMPACT_SIZE(txOut_arraysize));
+	invalidateCache();
 }
 
 }

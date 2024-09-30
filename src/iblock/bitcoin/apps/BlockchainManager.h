@@ -2,6 +2,7 @@
 #define __IBLOCK_BITCOIN_BLOCKCHAINMANAGER_H_
 
 #include "iblock/bitcoin/apps/base/AppBase.h"
+#include "iblock/bitcoin/global/GBM.h"
 #include "iblock/bitcoin/objects/Block.h"
 #include "iblock/bitcoin/global/NodeManager.h"
 #include "iblock/bitcoin/apps/MempoolManager.h"
@@ -15,6 +16,7 @@ class IBLOCK_API BlockchainManager : public AppBase
 {
 	protected:
 		NodeManager* nodeManager;
+		GBM* gbm;
 		MempoolManager* mempoolManager;
 		std::unordered_set<const Block*> branches;
 		const Block* mainBranch;
@@ -37,7 +39,7 @@ class IBLOCK_API BlockchainManager : public AppBase
 		virtual const Block* findForkBlock(const Block* a, const Block* b) const;
 
 	public:
-		BlockchainManager() : AppBase() { nodeManager = nullptr; mempoolManager = nullptr; mainBranch = nullptr; }
+		BlockchainManager() : AppBase() { nodeManager = nullptr; gbm = nullptr; mempoolManager = nullptr; mainBranch = nullptr; }
 
 		virtual const Block* getCurrentBlock() const;
 		virtual uint32_t getCurrentHeight() const;
@@ -46,6 +48,8 @@ class IBLOCK_API BlockchainManager : public AppBase
 		virtual Hash getNextTargetNBits() const;
 		virtual void addBlock(Block* block);
 		void registerWallet(Wallet* wallet) { Enter_Method_Silent("registerWallet()"); wallets.push_back(wallet); }
+
+		virtual void addGenesisBlock(const Block *block) { Enter_Method_Silent("addGenesisBlock()"); if (mainBranch) throw std::runtime_error("Genesis block already set"); mainBranch = block; branches.insert(mainBranch); confirmWalletUtxos(block); }
 };
 
 }

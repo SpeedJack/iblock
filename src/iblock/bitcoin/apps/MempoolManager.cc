@@ -16,15 +16,16 @@ void MempoolManager::initialize()
 	AppBase::initialize();
 
 	nodeManager = check_and_cast<NodeManager*>(getModuleByPath(par("nodeManagerModule").stringValue()));
-	nodeManager->registerMempoolManager(this);
+	gmm = check_and_cast<GMM*>(getModuleByPath(par("gmmModule").stringValue()));
 
 	mempool.clear();
 }
 
 void MempoolManager::handleOtherMessage(cMessage* msg)
 {
-	EV_DETAIL << "Received a new transaction" << endl;
+	// size_t before = transactionsCount();
 	appendTransaction(check_and_cast<TxPl*>(msg)->getTransaction());
+	// EV_INFO << "Received a new transaction " << before << " --> "<< transactionsCount() << endl;
 	delete msg;
 }
 
@@ -55,6 +56,15 @@ void MempoolManager::appendTransaction(const Transaction* transaction)
 			if (wallet == txo->getAddress()->getWallet())
 				wallet->addUtxo(txo);
 		}
+		if (transaction->isCoinbase())
+			continue;
+		size_t txiCount = transaction->getTxInArraySize();
+		for (size_t i = 0; i < txiCount; i++) {
+			const TransactionInput* txi = transaction->getTxIn(i);
+			const TransactionOutput* txo = txi->getPrevOutput();
+			if (wallet == txo->getAddress()->getWallet())
+				wallet->removeUtxo(txo);
+		}
 	}
 }
 
@@ -62,14 +72,17 @@ void MempoolManager::addTransaction(Transaction* transaction)
 {
 	Enter_Method("addTransaction()");
 
+	gmm->addTransaction(transaction);
 	appendTransaction(transaction);
+	if (transaction->isCoinbase())
+		return;
 
-	std::vector<MempoolManager*> nodes = nodeManager->getMempoolManagers();
-	for (auto node : nodes) {
-		if (node->getId() == this->getId())
+	for (auto node : nodeManager->nodes()) {
+		if (node->getId() == this->getParentModule()->getId())
 			continue;
-		cGate* nodeGate = node->gate("dIn");
-		sendDirect(new TxPl(transaction), nodeGate);
+		cGate* nodeGate = node->gate("mempoolManagerIn");
+		// sendDirect(new TxPl(transaction), nodeGate);
+		sendDirect(new TxPl(transaction), exponential(5.1), transaction->getBitLength() / ((double)1000*1000), nodeGate);
 	}
 }
 

@@ -1,4 +1,5 @@
 import iblock.bitcoin.objects.Transaction;
+import iblock.bitcoin.common.BTCValue;
 
 cplusplus {{
 	#include "Transaction.h"
@@ -11,5 +12,5 @@ class Coinbase extends Transaction
 	@customize;
 	@toString(.str());
 	abstract const uint32_t height;
-	abstract const int64_t reward;
+	abstract const BTCValue reward @byValue;
 }

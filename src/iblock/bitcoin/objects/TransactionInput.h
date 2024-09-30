@@ -14,7 +14,7 @@ class IBLOCK_API TransactionInput : public TransactionInput_Base
 		void copy(const TransactionInput& other);
 
 	protected:
-		Outpoint* prevOutpoint;
+		Outpoint* prevOutpoint = nullptr;
 
 		virtual void updateOutpoint();
 
@@ -25,13 +25,18 @@ class IBLOCK_API TransactionInput : public TransactionInput_Base
 
 		virtual TransactionInput* dup() const override { return new TransactionInput(*this); }
 
+		virtual const Transaction* getTransaction() const;
+		virtual bool isCoinbase() const { return false; }
+
 		virtual const Outpoint& getPrevOutpoint() const override { return *prevOutpoint; }
 		virtual unsigned int getScriptBytes() const override { return strlen(getSignatureScript()); }
 		virtual const char* getSignatureScript() const override { return ""; }
 
-		virtual int64_t getValue() const override { if (prevOutput) return prevOutput->getValue(); return 0; }
+		virtual satoshi_t getValue() const override { if (prevOutput) return prevOutput->getValue(); return 0; }
 
 		virtual std::string str() const override;
+
+		virtual ~TransactionInput() { if (prevOutpoint) delete prevOutpoint; }
 };
 
 }

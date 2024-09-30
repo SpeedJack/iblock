@@ -20,12 +20,17 @@ Miner::Miner() : AppBase()
 
 void Miner::initialize(int stage)
 {
+	// StopSimulationListener* listener;
 	switch (stage) {
 	case 0:
 		AppBase::initialize(0);
+		blockMinedSignalId = registerSignal("blockMined");
+		processedTransactionsSignalId = registerSignal("processedTransactions");
+		// listener = new StopSimulationListener();
+		// subscribe("blockMined", listener);
+		// subscribe("processedTransactions", listener);
 		nextBlockMsg = new cMessage("nextBlockMsg");
-		hashRate = par("hashRate").doubleValue() * 1000000000;
-		//networkHashRate = par("networkHashRate").doubleValue();
+		hashRate = par("hashRate");
 		highestTarget = Hash(par("highestTarget").intValue());
 		blockchainManager = check_and_cast<BlockchainManager*>(getModuleByPath(par("blockchainStoreModule").stringValue()));
 		mempoolManager = check_and_cast<MempoolManager*>(getModuleByPath(par("mempoolManagerModule").stringValue()));
@@ -50,9 +55,9 @@ double Miner::getTimeToBlock()
 {
 	Hash target = blockchainManager->getCurrentTargetNBits();
 	unsigned int expDiff = (highestTarget.e() - target.e()) << 3;
-	double difficulty = std::ldexp(static_cast<double>(highestTarget.m()) / target.m(), expDiff);
-	double lambda = hashRate / ((1ULL << 32) * difficulty); // ~ 1/600
-	return exponential(1/lambda);
+	double difficulty = std::ldexp(highestTarget.m() / static_cast<double>(target.m()), expDiff);
+	double meanTime = difficulty * (1ULL << 32) / hashRate;
+	return exponential(meanTime);
 }
 
 void Miner::handleSelfMessage(cMessage* msg)
@@ -71,7 +76,7 @@ void Miner::mineBlock()
 	);
 
 	BlockHeader* header = new BlockHeader();
-	header->setVersion(70015); // TODO: get version
+	header->setVersion(70015);
 	header->setPrevBlockHeader(curHeader);
 	header->setMerkleRootHash(Hash(0, 0));
 	header->setNBits(blockchainManager->getNextTargetNBits());
@@ -79,33 +84,31 @@ void Miner::mineBlock()
 
 	Block* block = new Block(header);
 
-	uint32_t curBytes = block->getByteLength() + coinbaseTx->getByteLength();
-	int64_t fees = 0;
+	int32_t curBytes = block->getByteLength() + coinbaseTx->getByteLength();
+	satoshi_t fees = 0;
 	std::vector<const Transaction*> txns;
 	for (const Transaction* txn : mempoolManager->transactions()) {
-		uint32_t newBytes = curBytes + txn->getByteLength() + COMPACT_SIZE(txns.size() + 2) - COMPACT_SIZE(txns.size() + 1);
-		if (newBytes > 1000*1000*1000)
-			break; // or continue?
+		int32_t newBytes = curBytes + txn->getByteLength() + COMPACT_SIZE(txns.size() + 2) - COMPACT_SIZE(txns.size() + 1);
+		if (newBytes > 1000*1000)
+			continue;
 		txns.push_back(txn);
 		fees += txn->getFee();
 		curBytes = newBytes;
 	}
-	coinbaseTx->setOutputValue(getNextSubsidy() + fees);
+	coinbaseTx->getTxOutForUpdate(0)->setValue(getNextSubsidy() + fees);
 	txns.insert(txns.begin(), coinbaseTx);
 	block->setTxnArraySize(txns.size());
 	size_t i = 0;
 	for (const Transaction* txn : txns)
 		block->setTxn(i++, const_cast<Transaction*>(txn));
 
-	char text[13];
-	sprintf(text, "Block mined!");
-	bubble(text);
+	size_t mempoolBefore = mempoolManager->transactionsCount();
+	mempoolManager->addTransaction(coinbaseTx);
 	blockchainManager->addBlock(block);
-}
-
-Miner::~Miner()
-{
-	delete walletAddress;
+	emit(blockMinedSignalId, 1);
+	//emit(processedTransactionsSignalId, block->getTxnCount());
+	EV_INFO << "Mined block (height=" << block->getHeight() << "; txn=" << block->getTxnCount() << "; bytes=" << block->getByteLength() << ")" << endl;
+	EV_INFO << "Transactions in mempool: " << "before=" << mempoolBefore << "; after=" << mempoolManager->transactionsCount() << "; simtime=" << simTime() << endl;
 }
 
 }
