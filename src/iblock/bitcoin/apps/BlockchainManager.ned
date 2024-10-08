@@ -12,6 +12,7 @@ simple BlockchainManager like IBlockchainManager
 		string peerTableModule = default("^.peerTable");
 		string connectionManagerModule = default("^.connectionManager");
 		string mempoolManagerModule = default("^.mempoolManager");
+		int chainHistory = default(10);
 	gates:
 		input in;
 		input dIn @directIn;

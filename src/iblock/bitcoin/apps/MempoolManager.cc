@@ -1,5 +1,6 @@
 #include "MempoolManager.h"
 #include "Wallet.h"
+#include "iblock/bitcoin/messages/DirectTxMsg.h"
 
 using namespace omnetpp;
 using namespace iblock::bitcoin::payloads;
@@ -24,35 +25,35 @@ void MempoolManager::initialize()
 void MempoolManager::handleOtherMessage(cMessage* msg)
 {
 	// size_t before = transactionsCount();
-	appendTransaction(check_and_cast<TxPl*>(msg)->getTransaction());
+	appendTransaction(check_and_cast<DirectTxMsg*>(msg)->getTxSharedPtr());
 	// EV_INFO << "Received a new transaction " << before << " --> "<< transactionsCount() << endl;
 	delete msg;
 }
 
-void MempoolManager::removeBlockTransactions(const Block* block)
+void MempoolManager::removeBlockTransactions(std::shared_ptr<const Block> block)
 {
 	Enter_Method("removeBlockTransactions()");
 	size_t count = block->getTxnArraySize();
 	for (size_t i = 0; i < count; i++)
-		removeTransaction(block->getTxn(i));
+		removeTransaction(block->getTxnSharedPtr(i));
 
 }
 
-void MempoolManager::addBlockTransactions(const Block* block)
+void MempoolManager::addBlockTransactions(std::shared_ptr<const Block> block)
 {
 	Enter_Method("addBlockTransactions()");
 	size_t count = block->getTxnArraySize();
 	for (size_t i = 0; i < count; i++)
-		appendTransaction(block->getTxn(i));
+		appendTransaction(block->getTxnSharedPtr(i));
 }
 
-void MempoolManager::appendTransaction(const Transaction* transaction)
+void MempoolManager::appendTransaction(std::shared_ptr<const Transaction> transaction)
 {
 	mempool.insert(transaction);
 	for (Wallet* wallet : wallets) {
 		size_t txoCount = transaction->getTxOutArraySize();
 		for (size_t i = 0; i < txoCount; i++) {
-			const TransactionOutput* txo = transaction->getTxOut(i);
+			std::shared_ptr<const TransactionOutput> txo = transaction->getTxOutSharedPtr(i);
 			if (wallet == txo->getAddress()->getWallet())
 				wallet->addUtxo(txo);
 		}
@@ -61,19 +62,19 @@ void MempoolManager::appendTransaction(const Transaction* transaction)
 		size_t txiCount = transaction->getTxInArraySize();
 		for (size_t i = 0; i < txiCount; i++) {
 			const TransactionInput* txi = transaction->getTxIn(i);
-			const TransactionOutput* txo = txi->getPrevOutput();
+			std::shared_ptr<const TransactionOutput> txo = txi->getPrevOutputSharedPtr();
 			if (wallet == txo->getAddress()->getWallet())
 				wallet->removeUtxo(txo);
 		}
 	}
 }
 
-void MempoolManager::addTransaction(Transaction* transaction)
+void MempoolManager::addTransaction(std::shared_ptr<Transaction> transaction)
 {
 	Enter_Method("addTransaction()");
 
-	gmm->addTransaction(transaction);
-	appendTransaction(transaction);
+	// gmm->addTransaction(transaction);
+	appendTransaction(std::const_pointer_cast<const Transaction>(transaction));
 	if (transaction->isCoinbase())
 		return;
 
@@ -82,11 +83,11 @@ void MempoolManager::addTransaction(Transaction* transaction)
 			continue;
 		cGate* nodeGate = node->gate("mempoolManagerIn");
 		// sendDirect(new TxPl(transaction), nodeGate);
-		sendDirect(new TxPl(transaction), exponential(5.1), transaction->getBitLength() / ((double)1000*1000), nodeGate);
+		sendDirect(new DirectTxMsg(transaction), exponential(5.1), transaction->getBitLength() / ((double)1000*1000), nodeGate);
 	}
 }
 
-cppcoro::generator<const Transaction*> MempoolManager::transactions() const
+cppcoro::generator<std::shared_ptr<const Transaction>> MempoolManager::transactions() const
 {
 	Enter_Method("transactions()");
 

@@ -1,5 +1,6 @@
 #include "BlockchainManager.h"
 #include "Wallet.h"
+#include "iblock/bitcoin/messages/DirectBlockMsg.h"
 
 using namespace omnetpp;
 using namespace iblock::bitcoin::payloads;
@@ -19,6 +20,8 @@ void BlockchainManager::initialize(int stage)
 
 		nodeManager = check_and_cast<NodeManager* >(getModuleByPath(par("nodeManagerModule").stringValue()));
 		gbm = check_and_cast<GBM*>(getModuleByPath(par("gbmModule").stringValue()));
+
+		chainHistory = par("chainHistory").intValue();
 
 		mempoolManager = check_and_cast<MempoolManager* >(getModuleByPath(par("mempoolManagerModule").stringValue()));
 
@@ -59,18 +62,18 @@ void BlockchainManager::handleGetHeadersPacket(Peer* peer, GetHeadersPl* gethead
 
 void BlockchainManager::handleOtherMessage(cMessage* msg)
 {
-	const Block* block = check_and_cast<BlockPl*>(msg)->getBlock();
+	std::shared_ptr<const Block> block = check_and_cast<DirectBlockMsg*>(msg)->getBlockSharedPtr();
 	// EV_INFO << "Received a new block (" << block->getTxnCount() << " txns)" << endl;
 	appendBlock(block);
 	delete msg;
 }
 
-const Block *BlockchainManager::getCurrentBlock() const
+std::shared_ptr<const Block> BlockchainManager::getCurrentBlock() const
 {
 	return mainBranch;
 }
 
-const BlockHeader *BlockchainManager::getCurrentBlockHeader() const
+const BlockHeader* BlockchainManager::getCurrentBlockHeader() const
 {
 	return this->getCurrentBlock()->getHeader();
 }
@@ -90,7 +93,7 @@ Hash BlockchainManager::getNextTargetNBits() const
 	return this->getCurrentTargetNBits(); // TODO
 }
 
-const Block* BlockchainManager::findForkBlock(const Block* a, const Block* b) const
+std::shared_ptr<const Block> BlockchainManager::findForkBlock(std::shared_ptr<const Block> a, std::shared_ptr<const Block> b) const
 {
 	if (a == b)
 		return a;
@@ -101,31 +104,58 @@ const Block* BlockchainManager::findForkBlock(const Block* a, const Block* b) co
 	return findForkBlock(a->getPrevBlock(), b->getPrevBlock());
 }
 
-void BlockchainManager::unconfirmWalletUtxos(const Block* block) const
+void BlockchainManager::unconfirmWalletUtxos(std::shared_ptr<const Block> block) const
 {
 	for (Wallet* wallet : wallets) {
-		const std::unordered_set<const TransactionOutput*>* utxos = block->getUtxos(wallet);
+		const std::unordered_set<std::shared_ptr<const TransactionOutput>>* utxos = block->getUtxos(wallet);
 		if (!utxos)
 			continue;
-		for (const TransactionOutput* utxo : *utxos)
+		for (std::shared_ptr<const TransactionOutput> utxo : *utxos)
 			wallet->unconfirmUtxo(utxo);
 	}
 }
 
-void BlockchainManager::confirmWalletUtxos(const Block* block) const
+void BlockchainManager::confirmWalletUtxos(std::shared_ptr<const Block> block) const
 {
 	for (Wallet* wallet : wallets) {
-		const std::unordered_set<const TransactionOutput*>* utxos = block->getUtxos(wallet);
+		const std::unordered_set<std::shared_ptr<const TransactionOutput>>* utxos = block->getUtxos(wallet);
 		if (!utxos)
 			continue;
-		for (const TransactionOutput* utxo : *utxos)
+		for (std::shared_ptr<const TransactionOutput> utxo : *utxos)
 			wallet->confirmUtxo(utxo);
 	}
 }
 
-void BlockchainManager::appendBlock(const Block* block)
+void BlockchainManager::cleanup(uint32_t history)
 {
-	const Block* prevBlock = block->getPrevBlock();
+	uint32_t height = mainBranch->getHeight();
+	if (height <= history)
+		return;
+
+	for (auto it = branches.begin(); it != branches.end();) {
+		std::shared_ptr<const Block> b = *it;
+		if (b->getHeight() < height - history)
+			it = branches.erase(it);
+		else
+			++it;
+	}
+
+	for (auto it = orphans.begin(); it != orphans.end();)
+		if ((*it)->getHeight() < height - history)
+			it = orphans.erase(it);
+		else
+			++it;
+
+	std::shared_ptr<const Block> block = mainBranch;
+	for (uint32_t curHeight = height; curHeight >= height - history && block; curHeight--)
+		block = block->getPrevBlock();
+	if (block)
+		const_cast<BlockHeader*>(block->getHeader())->deletePrevBlock();
+}
+
+void BlockchainManager::appendBlock(std::shared_ptr<const Block> block)
+{
+	std::shared_ptr<const Block> prevBlock = block->getPrevBlock();
 	if (!prevBlock)
 		throw cRuntimeError("Block has no previous block");
 	const auto& it = branches.find(prevBlock);
@@ -142,30 +172,34 @@ void BlockchainManager::appendBlock(const Block* block)
 		switch (type) {
 		[[likely]] case 0x01: // block further extends the main branch
 			mainBranch = block;
-			mempoolManager->removeBlockTransactions(block);
-			confirmWalletUtxos(block);
+			mempoolManager->removeBlockTransactions(mainBranch);
+			confirmWalletUtxos(mainBranch);
+			onMainBranchAppend();
 			//relay
 			break;
 		case 0x02: // block extends a side branch but does not make it the new main branch
+			onSideBranchAppend(block);
 			break;
 		[[unlikely]] case 0x03: // block extends a side branch and makes it the new main branch
-			const Block* forkBlock = findForkBlock(block, mainBranch);
-			for (const Block* b = mainBranch; b != forkBlock; b = b->getPrevBlock()) {
+			std::shared_ptr<const Block> oldMainBranch = mainBranch;
+			std::shared_ptr<const Block> forkBlock = findForkBlock(block, mainBranch);
+			for (std::shared_ptr<const Block> b = mainBranch; b != forkBlock; b = b->getPrevBlock()) {
 				unconfirmWalletUtxos(b);
 				mempoolManager->addBlockTransactions(b);
 			}
 			mainBranch = forkBlock;
-			std::vector<const Block*> toAdd;
-			for (const Block* b = block; b != forkBlock; b = b->getPrevBlock())
+			std::vector<std::shared_ptr<const Block>> toAdd;
+			for (std::shared_ptr<const Block> b = block; b != forkBlock; b = b->getPrevBlock())
 				toAdd.push_back(b);
 			while (!toAdd.empty()) {
-				const Block* b = toAdd.back();
+				std::shared_ptr<const Block> b = toAdd.back();
 				mainBranch = b;
 				mempoolManager->removeBlockTransactions(b);
 				confirmWalletUtxos(b);
 				toAdd.pop_back();
 			}
 			mainBranch = block;
+			onNewMainBranch(oldMainBranch, forkBlock);
 			//relay
 			break;
 		}
@@ -173,6 +207,7 @@ void BlockchainManager::appendBlock(const Block* block)
 		for (const auto& orphan : orphans)
 			if (orphan->getPrevBlock() == block) {
 				auto o = orphans.extract(orphan);
+				onRemoveOrphan(o.value());
 				appendBlock(o.value());
 				return;
 			}
@@ -183,33 +218,43 @@ void BlockchainManager::appendBlock(const Block* block)
 		throw cRuntimeError("Genesis block already exists");
 
 	for (const auto& branch : branches)
-		for (const Block* cur = branch; cur->getHeight() >= height; cur = cur->getPrevBlock()) {
-			if (cur == block)
+		for (std::shared_ptr<const Block> cur = branch; cur->getHeight() >= height; cur = cur->getPrevBlock()) {
+			if (cur == block) {
+				onDuplicateBlock(block);
 				return; // duplicate block
+			}
 			if (cur->getPrevBlock() == block->getPrevBlock()) { // block creates a new branch
 				branches.insert(block);
+				onNewSideBranch(block);
 				return;
 			}
 		}
 
 	orphans.insert(block);
+	onNewOrphan(block);
 
 }
 
-void BlockchainManager::addBlock(Block* block)
+void BlockchainManager::onAfterMinedBlockAppend(std::shared_ptr<Block> block)
 {
-	Enter_Method("addBlock()");
-
-	gbm->addBlock(block);
-	appendBlock(block);
-
 	for (auto node : nodeManager->nodes()) {
 		if (node->getId() == this->getParentModule()->getId())
 			continue;
 		cGate* nodeGate = node->gate("blockchainManagerIn");
 		// sendDirect(new BlockPl(block), nodeGate);
-		sendDirect(new BlockPl(block), exponential(0.42), block->getBitLength() / ((double)1000*1000), nodeGate);
+		sendDirect(new DirectBlockMsg(block), exponential(0.42), block->getBitLength() / ((double)1000*1000), nodeGate);
 	}
+}
+
+void BlockchainManager::addBlock(std::shared_ptr<Block> block)
+{
+	Enter_Method("addBlock()");
+
+	onBeforeMinedBlockAppend(block);
+
+	appendBlock(std::const_pointer_cast<const Block>(block));
+
+	onAfterMinedBlockAppend(block);
 }
 
 }

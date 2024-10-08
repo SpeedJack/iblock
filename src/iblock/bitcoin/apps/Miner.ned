@@ -13,7 +13,7 @@ simple Miner like IMiner
 		string mempoolManagerModule = default("^.mempoolManager");
 		string walletModule = default("^.app[0]");
 		int highestTarget = default(0x1d00ffff);
-		double hashRate @hrUnit(Thps) = default(10);
+		double hashRate @hrUnit(Thps) = default(20);
 		@signal[blockMined](type=long);
 		@signal[processedTransactions](type=long);
 	gates:

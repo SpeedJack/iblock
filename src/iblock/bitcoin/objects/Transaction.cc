@@ -11,17 +11,10 @@ Register_Class(Transaction);
 
 void Transaction::copy(const Transaction& other)
 {
-	this->version = other.version;
-	unsigned long count = getTxInCount();
-	setTxInArraySize(0);
-	setTxInArraySize(count);
-	for (unsigned long i = 0; i < count; i++)
-		appendTxIn(other.txIn[i]->dup());
-	count = getTxOutCount();
-	setTxOutArraySize(0);
-	setTxOutArraySize(count);
-	for (unsigned long i = 0; i < count; i++)
-		appendTxOut(other.txOut[i]->dup());
+	txOut.clear();
+	txOut.reserve(other.txOut.size());
+	for (const auto& txOut : other.txOut)
+		this->txOut.push_back(txOut);
 	this->outputValueCache = other.outputValueCache;
 	this->inputValueCache = other.inputValueCache;
 	this->fee = other.fee;
@@ -122,41 +115,42 @@ void Transaction::eraseTxIn(size_t k)
 
 void Transaction::setTxOutArraySize(size_t newSize)
 {
-	if (newSize > txOut_arraysize) {
-		addByteLength(COMPACT_SIZE(newSize) - COMPACT_SIZE(txOut_arraysize));
-	} else if (newSize < txOut_arraysize) {
-		subtractByteLength(COMPACT_SIZE(txOut_arraysize) - COMPACT_SIZE(newSize));
-		for (size_t i = txOut_arraysize - 1; i >= newSize; i--)
+	if (newSize > txOut.size()) {
+		addByteLength(COMPACT_SIZE(newSize) - COMPACT_SIZE(txOut.size()));
+	} else if (newSize < txOut.size()) {
+		subtractByteLength(COMPACT_SIZE(txOut.size()) - COMPACT_SIZE(newSize));
+		for (size_t i = txOut.size() - 1; i >= newSize; i--)
 			if (txOut[i])
 				subtractBitLength(txOut[i]->getBitLength());
 	}
-	Transaction_Base::setTxOutArraySize(newSize);
+	txOut.resize(newSize);
 	invalidateCache();
 }
 
-void Transaction::setTxOut(size_t k, TransactionOutput* txOut)
+void Transaction::setTxOut(size_t k, std::shared_ptr<TransactionOutput> txOut)
 {
-	Transaction_Base::setTxOut(k, txOut);
+	if (k >= this->txOut.size())
+		throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)this->txOut.size(), (unsigned long)k);
+	if (this->txOut[k]) {
+		subtractBitLength(this->txOut[k]->getBitLength());
+		invalidateCache();
+	}
+	this->txOut[k] = txOut;
 	if (txOut) {
 		addBitLength(txOut->getBitLength());
 		invalidateCache();
 	}
 }
 
-TransactionOutput* Transaction::removeTxOut(size_t k)
+void Transaction::insertTxOut(size_t k, std::shared_ptr<TransactionOutput> txOut)
 {
-	TransactionOutput* txOut = Transaction_Base::removeTxOut(k);
-	if (txOut) {
-		subtractBitLength(txOut->getBitLength());
-		invalidateCache();
-	}
-	return txOut;
-}
-
-void Transaction::insertTxOut(size_t k, TransactionOutput* txOut)
-{
-	addByteLength(COMPACT_SIZE(txOut_arraysize + 1) - COMPACT_SIZE(txOut_arraysize));
-	Transaction_Base::insertTxOut(k, txOut);
+	addByteLength(COMPACT_SIZE(this->txOut.size() + 1) - COMPACT_SIZE(this->txOut.size()));
+	if (k > this->txOut.size())
+		throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)this->txOut.size(), (unsigned long)k);
+	if (k == this->txOut.size())
+		this->txOut.push_back(txOut);
+	else
+		this->txOut.insert(this->txOut.begin() + k, txOut);
 	if (txOut)
 		addBitLength(txOut->getBitLength());
 	invalidateCache();
@@ -164,12 +158,12 @@ void Transaction::insertTxOut(size_t k, TransactionOutput* txOut)
 
 void Transaction::eraseTxOut(size_t k)
 {
-	if (k >= txOut_arraysize)
-		throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)txOut_arraysize, (unsigned long)k);
+	if (k >= txOut.size())
+		throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)txOut.size(), (unsigned long)k);
 	if (this->txOut[k])
 		subtractBitLength(this->txOut[k]->getBitLength());
-	Transaction_Base::eraseTxOut(k);
-	subtractByteLength(COMPACT_SIZE(txOut_arraysize + 1) - COMPACT_SIZE(txOut_arraysize));
+	txOut.erase(txOut.begin() + k);
+	subtractByteLength(COMPACT_SIZE(txOut.size() + 1) - COMPACT_SIZE(txOut.size()));
 	invalidateCache();
 }
 

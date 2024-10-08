@@ -1,6 +1,6 @@
 namespace iblock::bitcoin;
 
-class HeavyObject extends cNamedObject
+class HeavyOwnedObject extends cOwnedObject
 {
 	@customize;
 	@abstract;

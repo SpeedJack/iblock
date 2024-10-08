@@ -9,7 +9,7 @@ namespace bitcoin
 namespace payloads
 {
 
-Register_Class(BlockPl)
+Register_Class(BlockPl);
 
 unsigned char* BlockPl::getRawBytes() const
 {

@@ -6,7 +6,7 @@ cplusplus {{
 
 namespace iblock::bitcoin;
 
-class BitcoinAddress extends cObject
+class BitcoinAddress extends cOwnedObject
 {
 	@existingClass;
 	@opaque;

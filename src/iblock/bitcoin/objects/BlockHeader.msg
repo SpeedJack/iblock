@@ -1,8 +1,8 @@
-import iblock.bitcoin.objects.ChainObject;
+import iblock.bitcoin.objects.ChainOwnedObject;
 import iblock.bitcoin.common.Hash;
 
 cplusplus {{
-	#include "ChainObject.h"
+	#include "ChainOwnedObject.h"
 }}
 
 cplusplus(cc) {{
@@ -11,13 +11,13 @@ cplusplus(cc) {{
 
 namespace iblock::bitcoin;
 
-class BlockHeader extends ChainObject
+class BlockHeader extends ChainOwnedObject
 {
 	@customize;
 	@toString(.str());
 	int32_t version = 70015;
 	abstract const Hash prevBlockHeaderHash;
-	const BlockHeader* prevBlockHeader;
+	abstract const BlockHeader* prevBlockHeader;
 	Hash merkleRootHash @byValue;
 	simtime_t time;
 	Hash nBits @byValue;

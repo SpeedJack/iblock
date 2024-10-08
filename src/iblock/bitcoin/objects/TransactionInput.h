@@ -1,6 +1,7 @@
 #ifndef __IBLOCK_BITCOIN_TRANSACTIONINPUT_H_
 #define __IBLOCK_BITCOIN_TRANSACTIONINPUT_H_
 
+#include <memory>
 #include "TransactionInput_m.h"
 
 namespace iblock
@@ -15,7 +16,9 @@ class IBLOCK_API TransactionInput : public TransactionInput_Base
 
 	protected:
 		Outpoint* prevOutpoint = nullptr;
+		std::shared_ptr<TransactionOutput> prevOutput;
 
+		virtual const Transaction* getTransaction() const;
 		virtual void updateOutpoint();
 
 	public:
@@ -25,8 +28,12 @@ class IBLOCK_API TransactionInput : public TransactionInput_Base
 
 		virtual TransactionInput* dup() const override { return new TransactionInput(*this); }
 
-		virtual const Transaction* getTransaction() const;
 		virtual bool isCoinbase() const { return false; }
+
+		virtual const TransactionOutput* getPrevOutput() const override { return prevOutput.get(); }
+		virtual void setPrevOutput(TransactionOutput* prevOutput) override { this->prevOutput.reset(prevOutput); }
+		virtual void setPrevOutput(std::shared_ptr<TransactionOutput> prevOutput) { this->prevOutput = prevOutput; }
+		virtual std::shared_ptr<TransactionOutput> getPrevOutputSharedPtr() const { return prevOutput; }
 
 		virtual const Outpoint& getPrevOutpoint() const override { return *prevOutpoint; }
 		virtual unsigned int getScriptBytes() const override { return strlen(getSignatureScript()); }

@@ -10,6 +10,19 @@ namespace bitcoin
 
 Register_Class(Block);
 
+void Block::copy(const Block& other)
+{
+	txn = other.txn;
+	for (auto& it : other.utxos) {
+		Wallet* wallet = it.first;
+		std::unordered_set<std::shared_ptr<const TransactionOutput>>* utxos = it.second;
+		std::unordered_set<std::shared_ptr<const TransactionOutput>>* newUtxos = new std::unordered_set<std::shared_ptr<const TransactionOutput>>(); // FIXME: memory leak
+		for (std::shared_ptr<const TransactionOutput> utxo : *utxos)
+			newUtxos->insert(utxo); // FIXME: memory leak
+		this->utxos[wallet] = newUtxos;
+	}
+}
+
 std::string Block::str() const
 {
 	std::stringstream out;
@@ -31,66 +44,66 @@ size_t Block::getUtxoArraySize() const
 	return total;
 }
 
-const TransactionOutput* Block::getUtxo(size_t k) const
-{
-	// size_t total = getUtxoArraySize();
-	// std::vector<const TransactionOutput*> sorted = std::vector<const TransactionOutput*>(total);
-	// for (auto& it : utxos)
-	// 	if (it.second)
-	// 		for (const TransactionOutput* utxo : *it.second)
-	// 			sorted.push_back(utxo);
-	// std::sort(sorted.begin(), sorted.end(), [](const TransactionOutput* a, const TransactionOutput* b) {
-	// 		int aId = a->getAddress()->getWallet()->getId();
-	// 		int bId = b->getAddress()->getWallet()->getId();
-	// 		if (aId != bId)
-	// 			return aId < bId;
-	// 		return a->getAddress()->getIndex() < b->getAddress()->getIndex();
-	// });
-	// return sorted[k];
-	for (auto& it : utxos)
-		if (it.second)
-			for (const TransactionOutput* utxo : *it.second)
-				if (k-- == 0)
-					return utxo;
-	throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)getUtxoArraySize(), (unsigned long)k);
-}
+// const TransactionOutput* Block::getUtxo(size_t k) const
+// {
+// 	// size_t total = getUtxoArraySize();
+// 	// std::vector<const TransactionOutput*> sorted = std::vector<const TransactionOutput*>(total);
+// 	// for (auto& it : utxos)
+// 	// 	if (it.second)
+// 	// 		for (const TransactionOutput* utxo : *it.second)
+// 	// 			sorted.push_back(utxo);
+// 	// std::sort(sorted.begin(), sorted.end(), [](const TransactionOutput* a, const TransactionOutput* b) {
+// 	// 		int aId = a->getAddress()->getWallet()->getId();
+// 	// 		int bId = b->getAddress()->getWallet()->getId();
+// 	// 		if (aId != bId)
+// 	// 			return aId < bId;
+// 	// 		return a->getAddress()->getIndex() < b->getAddress()->getIndex();
+// 	// });
+// 	// return sorted[k];
+// 	for (auto& it : utxos)
+// 		if (it.second)
+// 			for (std::shared_ptr<const TransactionOutput> utxo : *it.second)
+// 				if (k-- == 0)
+// 					return utxo;
+// 	throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)getUtxoArraySize(), (unsigned long)k);
+// }
 
-const std::unordered_set<const TransactionOutput*>* Block::getUtxos(Wallet *wallet) const
+const std::unordered_set<std::shared_ptr<const TransactionOutput>>* Block::getUtxos(Wallet *wallet) const
 {
 	auto it = utxos.find(wallet);
 	if (it == utxos.end())
 		return nullptr;
 	return it->second;
 }
-const std::unordered_set<const TransactionOutput*>* Block::getUtxos(BitcoinAddress *address) const
+const std::unordered_set<std::shared_ptr<const TransactionOutput>>* Block::getUtxos(BitcoinAddress *address) const
 {
-	std::unordered_set<const TransactionOutput*>* found = new std::unordered_set<const TransactionOutput*>();
-	const std::unordered_set<const TransactionOutput*>* utxos = getUtxos(address->getWallet());
+	std::unordered_set<std::shared_ptr<const TransactionOutput>>* found = new std::unordered_set<std::shared_ptr<const TransactionOutput>>();
+	const std::unordered_set<std::shared_ptr<const TransactionOutput>>* utxos = getUtxos(address->getWallet());
 	if (!utxos)
 		return nullptr;
 
-	std::copy_if(utxos->begin(), utxos->end(), std::inserter(*found, found->begin()), [&address](const TransactionOutput* output) {
+	std::copy_if(utxos->begin(), utxos->end(), std::inserter(*found, found->begin()), [&address](std::shared_ptr<const TransactionOutput> output) {
 		return output->getAddress()->getIndex() == address->getIndex();
 	});
 	return found;
 }
 
-bool Block::hasUtxo(const TransactionOutput *utxo) const
-{
-	if (!utxo)
-		return false;
-	const std::unordered_set<const TransactionOutput*>* utxos = getUtxos(utxo->getAddress()->getWallet());
-	return utxos->contains(utxo);
-}
+// bool Block::hasUtxo(const TransactionOutput *utxo) const
+// {
+// 	if (!utxo)
+// 		return false;
+// 	const std::unordered_set<const TransactionOutput*>* utxos = getUtxos(utxo->getAddress()->getWallet());
+// 	return utxos->contains(utxo);
+// }
 
-void Block::addUtxo(const TransactionOutput* utxo)
+void Block::addUtxo(std::shared_ptr<const TransactionOutput> utxo)
 {
 	if (!utxo)
 		return;
 	Wallet* wallet = utxo->getAddress()->getWallet();
 	auto it = utxos.find(wallet);
 	if (it == utxos.end()) {
-		std::unordered_set<const TransactionOutput*>* newUtxos = new std::unordered_set<const TransactionOutput*>(); // FIXME: memory leak
+		std::unordered_set<std::shared_ptr<const TransactionOutput>>* newUtxos = new std::unordered_set<std::shared_ptr<const TransactionOutput>>(); // FIXME: memory leak
 		newUtxos->insert(utxo);
 		utxos[wallet] = newUtxos;
 	} else {
@@ -98,7 +111,7 @@ void Block::addUtxo(const TransactionOutput* utxo)
 	}
 }
 
-void Block::removeUtxo(const TransactionOutput* utxo)
+void Block::removeUtxo(std::shared_ptr<const TransactionOutput> utxo)
 {
 	if (!utxo)
 		return;
@@ -109,36 +122,36 @@ void Block::removeUtxo(const TransactionOutput* utxo)
 	it->second->erase(utxo);
 }
 
-void Block::updateUtxosOnTransactionAdd(const Transaction* tx)
+void Block::updateUtxosOnTransactionAdd(std::shared_ptr<Transaction> tx)
 {
 	size_t txiCount = tx->getTxInCount();
 	for (size_t i = 0; i < txiCount; i++)
-		removeUtxo(tx->getTxIn(i)->getPrevOutput());
+		removeUtxo(std::const_pointer_cast<const TransactionOutput>(tx->getTxIn(i)->getPrevOutputSharedPtr()));
 	size_t txoCount = tx->getTxOutCount();
 	for (size_t i = 0; i < txoCount; i++)
-		addUtxo(tx->getTxOut(i));
+		addUtxo(std::const_pointer_cast<const TransactionOutput>(tx->getTxOutSharedPtr(i)));
 }
 
-void Block::updateUtxosOnTransactionRemove(const Transaction* tx)
+void Block::updateUtxosOnTransactionRemove(std::shared_ptr<Transaction> tx)
 {
 	size_t txoCount = tx->getTxOutCount();
 	for (size_t i = 0; i < txoCount; i++)
-		removeUtxo(tx->getTxOut(i));
+		removeUtxo(std::const_pointer_cast<const TransactionOutput>(tx->getTxOutSharedPtr(i)));
 	size_t txiCount = tx->getTxInCount();
 	for (size_t i = 0; i < txiCount; i++)
-		addUtxo(tx->getTxIn(i)->getPrevOutput());
+		addUtxo(std::const_pointer_cast<const TransactionOutput>(tx->getTxIn(i)->getPrevOutputSharedPtr()));
 }
 
 void Block::rebuildUtxos()
 {
 	eraseUtxos();
-	const Block* prevBlock = getPrevBlock();
+	std::shared_ptr<const Block> prevBlock = getPrevBlock();
 	if (prevBlock)
 		for (auto& it : prevBlock->utxos) {
 			Wallet* wallet = it.first;
-			std::unordered_set<const TransactionOutput*>* utxos = it.second;
-			std::unordered_set<const TransactionOutput*>* newUtxos = new std::unordered_set<const TransactionOutput*>(); // FIXME: memory leak
-			for (const TransactionOutput* utxo : *utxos)
+			std::unordered_set<std::shared_ptr<const TransactionOutput>>* utxos = it.second;
+			std::unordered_set<std::shared_ptr<const TransactionOutput>>* newUtxos = new std::unordered_set<std::shared_ptr<const TransactionOutput>>(); // FIXME: memory leak
+			for (std::shared_ptr<const TransactionOutput> utxo : *utxos)
 				newUtxos->insert(utxo); // FIXME: memory leak
 			this->utxos[wallet] = newUtxos;
 		}
@@ -156,24 +169,24 @@ void Block::eraseUtxos()
 
 void Block::setTxnArraySize(size_t newSize)
 {
-	if (newSize > txn_arraysize) {
-		addByteLength(COMPACT_SIZE(newSize) - COMPACT_SIZE(txn_arraysize));
-	} else if (newSize < txn_arraysize) {
-		subtractByteLength(COMPACT_SIZE(txn_arraysize) - COMPACT_SIZE(newSize));
-		for (size_t i = txn_arraysize - 1; i >= newSize; i--) {
+	if (newSize > txn.size()) {
+		addByteLength(COMPACT_SIZE(newSize) - COMPACT_SIZE(txn.size()));
+	} else if (newSize < txn.size()) {
+		subtractByteLength(COMPACT_SIZE(txn.size()) - COMPACT_SIZE(newSize));
+		for (size_t i = txn.size() - 1; i >= newSize; i--) {
 			if (!txn[i])
 				continue;
 			subtractBitLength(txn[i]->getBitLength());
 			updateUtxosOnTransactionRemove(txn[i]);
 		}
 	}
-	Block_Base::setTxnArraySize(newSize);
+	txn.resize(newSize);
 }
 
-void Block::setTxn(size_t k, Transaction* txn)
+void Block::setTxn(size_t k, std::shared_ptr<Transaction> txn)
 {
-	if (k > txn_arraysize)
-		throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)txn_arraysize, (unsigned long)k);
+	if (k >= this->txn.size())
+		throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)this->txn.size(), (unsigned long)k);
 	if (this->txn[k]) {
 		subtractBitLength(this->txn[k]->getBitLength());
 		updateUtxosOnTransactionRemove(this->txn[k]);
@@ -185,10 +198,15 @@ void Block::setTxn(size_t k, Transaction* txn)
 	}
 }
 
-void Block::insertTxn(size_t k, Transaction* txn)
+void Block::insertTxn(size_t k, std::shared_ptr<Transaction> txn)
 {
-	addByteLength(COMPACT_SIZE(txn_arraysize + 1) - COMPACT_SIZE(txn_arraysize));
-	Block_Base::insertTxn(k, txn);
+	addByteLength(COMPACT_SIZE(this->txn.size() + 1) - COMPACT_SIZE(this->txn.size()));
+	if (k > this->txn.size())
+		throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)this->txn.size(), (unsigned long)k);
+	if (k == this->txn.size())
+		this->txn.push_back(txn);
+	else
+		this->txn.insert(this->txn.begin() + k, txn);
 	if (txn) {
 		addBitLength(txn->getBitLength());
 		updateUtxosOnTransactionAdd(txn);
@@ -197,14 +215,14 @@ void Block::insertTxn(size_t k, Transaction* txn)
 
 void Block::eraseTxn(size_t k)
 {
-	if (k >= txn_arraysize)
-		throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)txn_arraysize, (unsigned long)k);
+	if (k >= txn.size())
+		throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)txn.size(), (unsigned long)k);
 	if (this->txn[k]) {
 		subtractBitLength(this->txn[k]->getBitLength());
 		updateUtxosOnTransactionRemove(this->txn[k]);
 	}
-	Block_Base::eraseTxn(k);
-	subtractByteLength(COMPACT_SIZE(txn_arraysize + 1) - COMPACT_SIZE(txn_arraysize));
+	txn.erase(txn.begin() + k);
+	subtractByteLength(COMPACT_SIZE(txn.size() + 1) - COMPACT_SIZE(txn.size()));
 }
 
 void Block::setHeader(BlockHeader* header)

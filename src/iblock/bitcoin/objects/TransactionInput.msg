@@ -1,10 +1,10 @@
-import iblock.bitcoin.objects.HeavyObject;
+import iblock.bitcoin.objects.HeavyOwnedObject;
 import iblock.bitcoin.common.Hash;
 import iblock.bitcoin.objects.TransactionOutput;
 import iblock.bitcoin.common.BTCValue;
 
 cplusplus {{
-	#include "HeavyObject.h"
+	#include "HeavyOwnedObject.h"
 	#include "TransactionOutput.h"
 }}
 
@@ -16,11 +16,11 @@ struct Outpoint
 	uint32_t index;
 }
 
-class TransactionInput extends HeavyObject
+class TransactionInput extends HeavyOwnedObject
 {
 	@customize;
 	@toString(.str());
-	TransactionOutput* prevOutput;
+	abstract TransactionOutput* prevOutput;
 	abstract const Outpoint prevOutpoint;
 	abstract const BTCValue value @byValue;
 	abstract const unsigned int scriptBytes;

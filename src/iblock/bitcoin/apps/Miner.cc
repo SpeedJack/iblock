@@ -68,26 +68,26 @@ void Miner::handleSelfMessage(cMessage* msg)
 
 void Miner::mineBlock()
 {
-	const BlockHeader* curHeader = blockchainManager->getCurrentBlockHeader();
-	Coinbase* coinbaseTx = new Coinbase(
+	std::shared_ptr<const Block> curBlock = blockchainManager->getCurrentBlock();
+	std::shared_ptr<Coinbase> coinbaseTx = std::make_shared<Coinbase>(
 		walletAddress,
 		0,
-		curHeader->getHeight() + 1
+		curBlock->getHeight() + 1
 	);
 
 	BlockHeader* header = new BlockHeader();
 	header->setVersion(70015);
-	header->setPrevBlockHeader(curHeader);
+	header->setPrevBlock(curBlock);
 	header->setMerkleRootHash(Hash(0, 0));
 	header->setNBits(blockchainManager->getNextTargetNBits());
 	header->setNonce(5678);
 
-	Block* block = new Block(header);
+	std::shared_ptr<Block> block = std::make_shared<Block>(header);
 
 	int32_t curBytes = block->getByteLength() + coinbaseTx->getByteLength();
 	satoshi_t fees = 0;
-	std::vector<const Transaction*> txns;
-	for (const Transaction* txn : mempoolManager->transactions()) {
+	std::vector<std::shared_ptr<const Transaction>> txns;
+	for (std::shared_ptr<const Transaction> txn : mempoolManager->transactions()) {
 		int32_t newBytes = curBytes + txn->getByteLength() + COMPACT_SIZE(txns.size() + 2) - COMPACT_SIZE(txns.size() + 1);
 		if (newBytes > 1000*1000)
 			continue;
@@ -99,8 +99,8 @@ void Miner::mineBlock()
 	txns.insert(txns.begin(), coinbaseTx);
 	block->setTxnArraySize(txns.size());
 	size_t i = 0;
-	for (const Transaction* txn : txns)
-		block->setTxn(i++, const_cast<Transaction*>(txn));
+	for (std::shared_ptr<const Transaction> txn : txns)
+		block->setTxn(i++, std::const_pointer_cast<Transaction>(txn));
 
 	size_t mempoolBefore = mempoolManager->transactionsCount();
 	mempoolManager->addTransaction(coinbaseTx);

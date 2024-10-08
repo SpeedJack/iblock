@@ -19,7 +19,7 @@ class Transaction extends ChainObject
 	abstract const unsigned long txInCount;
 	TransactionInput* txIn[] @owned;
 	abstract const unsigned long txOutCount;
-	TransactionOutput* txOut[] @owned;
+	abstract TransactionOutput* txOut[];
 	uint32_t lockTime = 0;
 	abstract const BTCValue inputValue @byValue;
 	abstract const BTCValue outputValue @byValue;

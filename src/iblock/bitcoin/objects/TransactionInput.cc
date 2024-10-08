@@ -13,8 +13,7 @@ Register_Class(TransactionInput)
 void TransactionInput::copy(const TransactionInput& other)
 {
 	this->prevOutput = other.prevOutput;
-	//this->signatureScript = other.signatureScript;
-	this->sequence = other.sequence;
+	this->prevOutpoint = other.prevOutpoint;
 }
 
 void TransactionInput::updateOutpoint()
@@ -26,7 +25,7 @@ void TransactionInput::updateOutpoint()
 	prevOutpoint->txHash = tx->getHash();
 	size_t count = tx->getTxOutCount();
 	for (size_t i = 0; i < count; ++i)
-		if (tx->getTxOut(i) == prevOutput) {
+		if (tx->getTxOut(i) == prevOutput.get()) {
 			prevOutpoint->index = i;
 			return;
 		}

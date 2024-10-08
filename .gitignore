@@ -1,3 +1,4 @@
+valgrind/
 *.drawio
 *.bkp
 # ccls

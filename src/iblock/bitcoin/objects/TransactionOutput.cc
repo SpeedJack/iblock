@@ -10,12 +10,6 @@ namespace bitcoin
 
 Register_Class(TransactionOutput)
 
-void TransactionOutput::copy(const TransactionOutput& other)
-{
-	this->value = other.value;
-	this->address = other.address;
-}
-
 std::string TransactionOutput::str() const
 {
 	std::ostringstream out;

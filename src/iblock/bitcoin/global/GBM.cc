@@ -38,14 +38,13 @@ void GBM::initialize(int stage)
 {
 	if (stage < 2)
 		return;
-	blocks = new cArray("blockchain", 1024, 256);
-	blocks->setTakeOwnership(true);
+	blocks.clear();
 
 	CoinbaseInput* txin = new CoinbaseInput();
 
 	cTopology topo;
 	topo.extractByProperty("wallet");
-	std::vector<TransactionOutput*> outputs;
+	std::vector<std::shared_ptr<TransactionOutput>> outputs;
 	for (int i = 0; i < topo.getNumNodes(); ++i) {
 		cTopology::Node* node = topo.getNode(i);
 		Wallet* wallet = check_and_cast<Wallet*>(node->getModule());
@@ -53,26 +52,26 @@ void GBM::initialize(int stage)
 		if (balance == 0)
 			continue;
 		BitcoinAddress* address = wallet->getNewAddress();
-		TransactionOutput* txout = new TransactionOutput(address, balance);
+		std::shared_ptr<TransactionOutput> txout = std::make_shared<TransactionOutput>(address, balance);
 		outputs.push_back(txout);
 	}
 
 	BlockHeader* header = new BlockHeader();
 	header->setVersion(1);
-	header->setPrevBlockHeader(nullptr);
+	header->setPrevBlock(nullptr);
 	header->setMerkleRootHash(Hash::fromHex("0x4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"));
 	header->setNBits(computeInitialNBits());
 	header->setNonce(2083236893);
 
-	coinbaseTx = new Coinbase(txin);
+	coinbaseTx = std::make_shared<Coinbase>(txin);
 	coinbaseTx->setTxOutArraySize(outputs.size());
 	size_t index = 0;
-	for (TransactionOutput* txout : outputs)
+	for (std::shared_ptr<TransactionOutput> txout : outputs)
 		coinbaseTx->setTxOut(index++, txout);
 
-	Block* genesisBlock = new Block(header);
+	std::shared_ptr<Block> genesisBlock = std::make_shared<Block>(header);
 	genesisBlock->appendTxn(coinbaseTx);
-	blocks->add(genesisBlock);
+	blocks.push_back(genesisBlock);
 
 	topo.clear();
 	topo.extractByProperty("blockchainManager");
@@ -82,12 +81,12 @@ void GBM::initialize(int stage)
 	}
 }
 
-void GBM::addBlock(Block* block)
+void GBM::addBlock(std::shared_ptr<Block> block)
 {
 	Enter_Method_Silent("addBlock()");
-	blocks->add(block);
+	blocks.push_back(block);
 	totalTx += block->getTxnCount();
-	if (totalTx > 1740600 && blocks->size() >= 967)
+	if (totalTx > 1740600 && blocks.size() >= 967)
 		throw cTerminationException(E_ENDSIM);
 }
 

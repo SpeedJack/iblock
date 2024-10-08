@@ -1,5 +1,4 @@
 import iblock.bitcoin.objects.HeavyObject;
-import iblock.bitcoin.common.Hash;
 import iblock.bitcoin.common.BitcoinAddress;
 import iblock.bitcoin.common.BTCValue;
 

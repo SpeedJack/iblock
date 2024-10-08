@@ -43,11 +43,11 @@ void TransactionGenerator::handleSelfMessage(cMessage *msg)
 void TransactionGenerator::createTransaction(satoshi_t transactionValue)
 {
 	satoshi_t foundValue = 0;
-	std::vector<const TransactionOutput*> allUtxos = wallet->unspentOutputs(minConfirmations);
-	std::vector<const TransactionOutput*> utxos;
-	std::vector<const TransactionOutput*>::const_iterator it = allUtxos.begin();
+	std::vector<std::shared_ptr<const TransactionOutput>> allUtxos = wallet->unspentOutputs(minConfirmations);
+	std::vector<std::shared_ptr<const TransactionOutput>> utxos;
+	std::vector<std::shared_ptr<const TransactionOutput>>::const_iterator it = allUtxos.begin();
 	while (foundValue < transactionValue && it != allUtxos.end()) {
-		const TransactionOutput* utxo = *it;
+		std::shared_ptr<const TransactionOutput> utxo = *it;
 		utxos.push_back(utxo);
 		foundValue += utxo->getValue();
 		++it;
@@ -55,14 +55,14 @@ void TransactionGenerator::createTransaction(satoshi_t transactionValue)
 	if (foundValue < transactionValue)
 		return;
 
-	Transaction* tx = new Transaction();
+	std::shared_ptr<Transaction> tx = std::make_shared<Transaction>();
 	tx->setVersion(70015);
 
 	tx->setTxInArraySize(utxos.size());
 	size_t index = 0;
-	for (const TransactionOutput* utxo : utxos) {
+	for (std::shared_ptr<const TransactionOutput> utxo : utxos) {
 		TransactionInput* input = new TransactionInput();
-		input->setPrevOutput(const_cast<TransactionOutput*>(utxo));
+		input->setPrevOutput(std::const_pointer_cast<TransactionOutput>(utxo));
 		tx->setTxIn(index++, input);
 	}
 
@@ -78,7 +78,7 @@ void TransactionGenerator::createTransaction(satoshi_t transactionValue)
 	tx->setTxOutArraySize(destCount);
 	index = 0;
 	for (int i = 0; i < destCount; ++i) {
-		TransactionOutput* output = new TransactionOutput();
+		std::shared_ptr<TransactionOutput> output = std::make_shared<TransactionOutput>();
 		output->setAddress(walletManager->getRandomBitcoinAddress());
 		satoshi_t curValue = transactionValue * splits[i];
 		output->setValue(curValue);
@@ -86,14 +86,14 @@ void TransactionGenerator::createTransaction(satoshi_t transactionValue)
 		tx->setTxOut(index++, output);
 	}
 
-	TransactionOutput* change = nullptr;
+	std::shared_ptr<TransactionOutput> change = nullptr;
 	while (true) {
 		long long remainingValue = foundValue.sat() - usedValue.sat();
 		double feeRate = par("feeRate").doubleValue();
 		satoshi_t fee = feeRate * tx->getByteLength();
 		if (fee < remainingValue) {
 			if (!change) {
-				change = new TransactionOutput();
+				change = std::make_shared<TransactionOutput>();
 				change->setAddress(wallet->getNewAddress());
 				change->setValue(remainingValue - fee.sat());
 				tx->appendTxOut(change);
@@ -103,11 +103,10 @@ void TransactionGenerator::createTransaction(satoshi_t transactionValue)
 			break;
 		}
 		if (fee > remainingValue) {
-			if (it == allUtxos.end()) {
-				delete tx;
+			if (it == allUtxos.end())
 				return;
-			}			
-			TransactionOutput* utxo = const_cast<TransactionOutput*>(*it);
+
+			std::shared_ptr<TransactionOutput> utxo = std::const_pointer_cast<TransactionOutput>(*it);
 			TransactionInput* input = new TransactionInput();
 			input->setPrevOutput(utxo);
 			tx->appendTxIn(input);

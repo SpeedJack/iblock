@@ -1,7 +1,6 @@
 import iblock.bitcoin.objects.HeavyObject;
 import iblock.bitcoin.objects.BlockHeader;
 import iblock.bitcoin.objects.Transaction;
-import iblock.bitcoin.objects.TransactionOutput;
 import iblock.bitcoin.common.BTCValue;
 
 cplusplus {{
@@ -20,22 +19,5 @@ class Block extends HeavyObject
 	abstract const uint32_t height;
 	abstract const BTCValue reward @byValue;
 	abstract const unsigned long txnCount;
-	Transaction* txn[];
-	TransactionOutput* utxo[] @custom @opaque @readonly;
+	abstract Transaction* txn[] @opaque;
 }
-
-cplusplus(Block) {{
-	protected:
-		std::unordered_map<Wallet*, std::unordered_set<const TransactionOutput*>*> utxos;
-	public:
-		virtual size_t getUtxoArraySize() const = 0;
-		virtual size_t getUtxoCount() const { return getUtxoArraySize(); }
-		virtual const TransactionOutput* getUtxo(size_t k) const = 0;
-		virtual const std::unordered_set<const TransactionOutput*>* getUtxos(BitcoinAddress* address) const = 0;
-		virtual const std::unordered_set<const TransactionOutput*>* getUtxos(Wallet* wallet) const = 0;
-		virtual bool hasUtxo(const TransactionOutput* utxo) const = 0;
-}}
-
-cplusplus(Block::copy) {{
-	utxos = other.utxos;
-}}

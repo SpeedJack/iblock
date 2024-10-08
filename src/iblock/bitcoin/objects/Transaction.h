@@ -18,6 +18,7 @@ class IBLOCK_API Transaction : public Transaction_Base
 		unsigned long long inputValueCache = 0;
 		unsigned long long fee = 0;
 		double feeRate = -1;
+		std::vector<std::shared_ptr<TransactionOutput>> txOut;
 
 	public:
 		Transaction(const char* name = "Transaction") : Transaction_Base(name) { setByteLength(4 + 1 + 0 + 1 + 0 + 4); }
@@ -40,9 +41,15 @@ class IBLOCK_API Transaction : public Transaction_Base
 		virtual void eraseTxIn(size_t k) override;
 
 		virtual void setTxOutArraySize(size_t size) override;
-		virtual void setTxOut(size_t k, TransactionOutput* txOut) override;
-		virtual TransactionOutput* removeTxOut(size_t k) override;
-		virtual void insertTxOut(size_t k, TransactionOutput* txOut) override;
+		virtual size_t getTxOutArraySize() const override { return txOut.size(); }
+		virtual const TransactionOutput* getTxOut(size_t k) const override { return txOut.at(k).get(); }
+		virtual std::shared_ptr<TransactionOutput> getTxOutSharedPtr(size_t k) const { return txOut.at(k); }
+		virtual void setTxOut(size_t k, std::shared_ptr<TransactionOutput> txOut);
+		virtual void setTxOut(size_t k, TransactionOutput* txOut) override { setTxOut(k, std::shared_ptr<TransactionOutput>(txOut)); }
+		virtual void insertTxOut(size_t k, std::shared_ptr<TransactionOutput> txOut);
+		virtual void insertTxOut(size_t k, TransactionOutput* txOut) override { insertTxOut(k, std::shared_ptr<TransactionOutput>(txOut)); }
+		virtual void appendTxOut(TransactionOutput* txOut) override { insertTxOut(getTxOutArraySize(), txOut); }
+		virtual void appendTxOut(std::shared_ptr<TransactionOutput> txOut) { insertTxOut(getTxOutArraySize(), txOut); }
 		virtual void eraseTxOut(size_t k) override;
 
 		virtual satoshi_t getOutputValue() const override;

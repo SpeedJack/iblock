@@ -8,12 +8,14 @@ import iblock.bitcoin.global.WalletManager;
 import iblock.bitcoin.global.GBM;
 import iblock.bitcoin.global.GMM;
 
-network Test3
+network SelfishMining
 {
 	parameters:
 		@display("bgb=1000,1000");
 		@statistic[minedBlocks](title="Mined Blocks"; source=blockMined; unit=blocks; record=sum);
 		@statistic[processedTxs](title="Processed Transactions"; source=processedTransactions; unit=txs; record=sum);
+		node0.blockchainManager.typename = "iblock.bitcoin.apps.SelfishBCManager";
+		node0.app[1].hashRate = 40;
 	submodules:
 		nodeManager: NodeManager;
 		walletManager: WalletManager;
@@ -24,11 +26,6 @@ network Test3
 		node2: MinerNode;
 		node3: MinerNode;
 		node4: MinerNode;
-		node5: MinerNode;
-		node6: MinerNode;
-		node7: MinerNode;
-		node8: MinerNode;
-		node9: MinerNode;
 		node10: UserNode;
 		node11: UserNode;
 		node12: UserNode;
@@ -39,14 +36,4 @@ network Test3
 		node17: UserNode;
 		node18: UserNode;
 		node19: UserNode;
-		node20: UserNode;
-		node21: UserNode;
-		node22: UserNode;
-		node23: UserNode;
-		node24: UserNode;
-		node25: UserNode;
-		node26: UserNode;
-		node27: UserNode;
-		node28: UserNode;
-		node29: UserNode;
 }

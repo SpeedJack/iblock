@@ -35,7 +35,7 @@ class IBLOCK_API Hash : public ::omnetpp::cObject
 		Hash() : Hash(0, 0) { }
 		Hash(const Hash& other) { copy(other); }
 
-		~Hash() { if (!compact) delete[] storedHash.bytes; }
+		virtual ~Hash() override { if (!compact) delete[] storedHash.bytes; }
 
 		static Hash fromBytes(const unsigned char* bytes, size_t size = 0x20);
 		static Hash fromBytes(const char* bytes, size_t size = 0x20) { return fromBytes(reinterpret_cast<const unsigned char*>(bytes)); }
@@ -54,7 +54,7 @@ class IBLOCK_API Hash : public ::omnetpp::cObject
 		uint32_t getCompact() const { return compactNBits(); }
 		uint32_t compactNBits() const;
 		std::string hex() const;
-		std::string str() const;
+		std::string str() const override;
 		bool isCompact() const { return compact; }
 		bool isCompactPrecise() const;
 		void makeCompact();

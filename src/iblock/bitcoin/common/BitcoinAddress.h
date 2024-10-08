@@ -11,7 +11,7 @@ namespace bitcoin
 class IBLOCK_API Wallet;
 class IBLOCK_API Hash;
 
-class IBLOCK_API BitcoinAddress : public ::omnetpp::cObject
+class IBLOCK_API BitcoinAddress : public ::omnetpp::cOwnedObject
 {
 	private:
 		void copy(const BitcoinAddress& other) { this->wallet = other.wallet; this->index = other.index; }

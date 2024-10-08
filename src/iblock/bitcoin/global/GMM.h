@@ -19,7 +19,7 @@ class IBLOCK_API GMM : public ::omnetpp::cSimpleModule
 
 	public:
 		GMM() : ::omnetpp::cSimpleModule() { transactions = nullptr; }
-		virtual void addTransaction(Transaction* tx) { Enter_Method_Silent("addBlock()"); transactions->add(tx); }
+		virtual void addTransaction(Transaction* tx) { Enter_Method_Silent("addTransaction()"); transactions->add(tx); }
 };
 
 }

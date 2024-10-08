@@ -16,6 +16,8 @@ void Wallet::initialize()
 	AppBase::initialize();
 
 	nextAddressIndex = 0;
+	addresses = new cArray("addresses", 32, 64);
+	addresses->setTakeOwnership(true);
 
 	mempoolManager = check_and_cast<MempoolManager*>(getModuleByPath(par("mempoolManagerModule").stringValue()));
 	mempoolManager->registerWallet(this);
@@ -29,16 +31,18 @@ void Wallet::initialize()
 BitcoinAddress* Wallet::getNewAddress()
 {
 	Enter_Method("getNewAddress()");
-	return new BitcoinAddress(this, nextAddressIndex++); // FIXME: memory leak
+	BitcoinAddress* addr = new BitcoinAddress(this, nextAddressIndex++);
+	addresses->add(addr);
+	return addr;
 }
 
-void Wallet::addUtxo(const TransactionOutput* utxo)
+void Wallet::addUtxo(std::shared_ptr<const TransactionOutput> utxo)
 {
 	utxos[utxo] = 0;
 	totalBalance += utxo->getValue().sat();
 }
 
-void Wallet::confirmUtxo(const TransactionOutput* utxo)
+void Wallet::confirmUtxo(std::shared_ptr<const TransactionOutput> utxo)
 {
 	auto it = utxos.find(utxo);
 	if (it == utxos.end()) {
@@ -52,7 +56,7 @@ void Wallet::confirmUtxo(const TransactionOutput* utxo)
 	}
 }
 
-void Wallet::unconfirmUtxo(const TransactionOutput* utxo)
+void Wallet::unconfirmUtxo(std::shared_ptr<const TransactionOutput> utxo)
 {
 	auto it = utxos.find(utxo);
 	if (it == utxos.end())
@@ -66,7 +70,7 @@ void Wallet::unconfirmUtxo(const TransactionOutput* utxo)
 	}
 }
 
-void Wallet::removeUtxo(const TransactionOutput* utxo)
+void Wallet::removeUtxo(std::shared_ptr<const TransactionOutput> utxo)
 {
 	auto it = utxos.find(utxo);
 	if (it == utxos.end())
@@ -76,15 +80,15 @@ void Wallet::removeUtxo(const TransactionOutput* utxo)
 	totalBalance -= utxo->getValue().sat();
 }
 
-std::vector<const TransactionOutput*> Wallet::unspentOutputs(uint32_t minConfirmations) const
+std::vector<std::shared_ptr<const TransactionOutput>> Wallet::unspentOutputs(uint32_t minConfirmations) const
 {
 	Enter_Method("unspentOutputs()");
 
-	std::vector<const TransactionOutput*> result;
+	std::vector<std::shared_ptr<const TransactionOutput>> result;
 	for (const auto& elem : utxos) {
 		if (elem.second < minConfirmations)
 			continue;
-		const TransactionOutput *utxo = elem.first;
+		std::shared_ptr<const TransactionOutput> utxo = elem.first;
 		result.push_back(utxo);
 	}
 	return result;
