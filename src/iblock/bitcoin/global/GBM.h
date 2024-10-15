@@ -1,7 +1,7 @@
 #ifndef __IBLOCK_BITCOIN_GBM_H_
 #define __IBLOCK_BITCOIN_GBM_H_
 
-#include "iblock/bitcoin/objects/Block.h"
+#include "iblock/bitcoin/objects/Coinbase.h"
 
 namespace iblock
 {
@@ -11,8 +11,6 @@ namespace bitcoin
 class IBLOCK_API GBM : public ::omnetpp::cSimpleModule
 {
 	protected:
-		std::vector<std::shared_ptr<Block>> blocks;
-		unsigned long long totalTx;
 		std::shared_ptr<Coinbase> coinbaseTx;
 
 		virtual void initialize(int stage) override;
@@ -22,7 +20,6 @@ class IBLOCK_API GBM : public ::omnetpp::cSimpleModule
 
 	public:
 		GBM() : ::omnetpp::cSimpleModule() { coinbaseTx = nullptr; }
-		virtual void addBlock(std::shared_ptr<Block> block);
 };
 
 }

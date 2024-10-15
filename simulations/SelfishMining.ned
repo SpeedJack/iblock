@@ -12,15 +12,17 @@ network SelfishMining
 {
 	parameters:
 		@display("bgb=1000,1000");
-		@statistic[minedBlocks](title="Mined Blocks"; source=blockMined; unit=blocks; record=sum);
-		@statistic[processedTxs](title="Processed Transactions"; source=processedTransactions; unit=txs; record=sum);
+		@statistic[circulatingSupply](source=sum(addUTXO)-sum(removeUTXO); record=vector?,stats?,last; unit=sat; interpolationmode=sample-hold; title="Circulating Supply");
+		@statistic[walletAddresses](source=count(createAddress); record=vector?,last; unit=addresses; interpolationmode=sample-hold; title="Network Wallet Addresses");
+		@statistic[transactions](source=count(txSize); record=vector?,last,stats?; unit=txs; interpolationmode=sample-hold; title="Transactions");
+		@statistic[fees](source=sum(txFee); record=vector?,last,stats?; unit=sat; interpolationmode=sample-hold; title="Fees");
+		@statistic[blocks](source=minedBlock; record=vector?,count,timeavg; unit=blocks; interpolationmode=sample-hold; title="Blocks");
+		@statistic[processedTransactions](source=processedTransactions; record=vector?,stats,sum,histogram?; unit=txs; interpolationmode=sample-hold; title="Processed Transactions");
 		node0.blockchainManager.typename = "iblock.bitcoin.apps.SelfishBCManager";
-		node0.app[1].hashRate = 40;
 	submodules:
 		nodeManager: NodeManager;
 		walletManager: WalletManager;
 		gbm: GBM;
-		gmm: GMM;
 		node0: MinerNode;
 		node1: MinerNode;
 		node2: MinerNode;

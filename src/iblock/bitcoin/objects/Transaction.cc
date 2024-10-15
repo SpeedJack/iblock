@@ -137,6 +137,7 @@ void Transaction::setTxOut(size_t k, std::shared_ptr<TransactionOutput> txOut)
 	}
 	this->txOut[k] = txOut;
 	if (txOut) {
+		txOut->setCoinbase(isCoinbase());
 		addBitLength(txOut->getBitLength());
 		invalidateCache();
 	}
@@ -151,8 +152,10 @@ void Transaction::insertTxOut(size_t k, std::shared_ptr<TransactionOutput> txOut
 		this->txOut.push_back(txOut);
 	else
 		this->txOut.insert(this->txOut.begin() + k, txOut);
-	if (txOut)
+	if (txOut) {
+		txOut->setCoinbase(isCoinbase());
 		addBitLength(txOut->getBitLength());
+	}
 	invalidateCache();
 }
 

@@ -15,7 +15,10 @@ class IBLOCK_API TransactionOutput : public TransactionOutput_Base
 	private:
 		void copy(const TransactionOutput& other) { }
 
-		virtual const Transaction* getTransaction() const;
+	protected:
+		bool coinbase = false;
+
+		// virtual const Transaction* getTransaction() const;
 
 	public:
 		TransactionOutput(const char* name = "TxOut") : TransactionOutput_Base(name) { setByteLength(8 + compactSize(getPkScriptBytes()) + getPkScriptBytes()); }
@@ -25,7 +28,8 @@ class IBLOCK_API TransactionOutput : public TransactionOutput_Base
 
 		virtual TransactionOutput* dup() const override { return new TransactionOutput(*this); }
 
-		virtual bool isCoinbase() const;
+		virtual bool isCoinbase() const { return coinbase; }
+		virtual void setCoinbase(bool coinbase = true) { this->coinbase = coinbase; }
 
 		virtual unsigned int getPkScriptBytes() const override { return strlen(getPkScript()); }
 

@@ -1,0 +1,35 @@
+Total circulating supply: step vector, last
+Blockchain size: step vector, sum
+Blockchain size (main branch): step vector, sum
+Blockchain blocks: step vector, sum
+Blockchain blocks (main branch): step vector, sum
+Side branch blocks: step vector, sum, average, hist, max
+Block size: vector, sum, average, hist
+Transaction size: vector, sum, average, hist
+Transaction per block: vector, sum, average, hist
+Confirmation time: vector, average, hist
+Mempool size: vector, average, last
+Confirmed transactions: vector, last
+Unconfirmed transactions: vector, last
+Mining reward: vector, sum, average, hist
+Lost reward (branch swap): vector, sum, average, hist
+Wallet balance: vector, sum, last
+Inputs per transaction: vector, average, hist
+Outputs per transaction: vector, average, hist
+Transaction fee: vector, sum, average, hist
+Transaction value: vector, sum, average, hist
+Transaction confirmation time: vector, average, hist
+Next block time: vector, average, hist
+Number of UTXO: vector, sum, last
+Network difficulty: step vector, max, last
+UTXO time to spent: vector, hist, average, max
+Created addresses: vector timestamped, sum
+UTXO size: vector, average, max, min, hist
+
+Block propagation time: vector, average, hist
+Transaction propagation time: vector, average, hist
+
+Protocol:
+Sent message count (by type): vector timestamped, sum
+Sent size (by type): vector timestamped, sum, hist
+Received """

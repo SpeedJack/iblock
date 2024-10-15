@@ -15,6 +15,12 @@ void Wallet::initialize()
 {
 	AppBase::initialize();
 
+	addUtxoSignal = registerSignal("addUTXO");
+	removeUtxoSignal = registerSignal("removeUTXO");
+	createAddressSignal = registerSignal("createAddress");
+	utxoBTLSignal = registerSignal("utxoBTL");
+	miningEarnSignal = registerSignal("miningEarn");
+
 	nextAddressIndex = 0;
 	addresses = new cArray("addresses", 32, 64);
 	addresses->setTakeOwnership(true);
@@ -25,7 +31,11 @@ void Wallet::initialize()
 	blockchainManager = check_and_cast<BlockchainManager*>(getModuleByPath(par("blockchainManagerModule").stringValue()));
 	blockchainManager->registerWallet(this);
 
+	coinbaseMaturity = par("coinbaseMaturity").intValue();
+
 	utxos.clear();
+	onConfirmedBalanceIncreaseCallbacks.clear();
+	onUnconfirmedBalanceIncreaseCallbacks.clear();
 }
 
 BitcoinAddress* Wallet::getNewAddress()
@@ -33,26 +43,49 @@ BitcoinAddress* Wallet::getNewAddress()
 	Enter_Method("getNewAddress()");
 	BitcoinAddress* addr = new BitcoinAddress(this, nextAddressIndex++);
 	addresses->add(addr);
+	emit(createAddressSignal, 1U);
 	return addr;
 }
 
 void Wallet::addUtxo(std::shared_ptr<const TransactionOutput> utxo)
 {
 	utxos[utxo] = 0;
-	totalBalance += utxo->getValue().sat();
+	emit(addUtxoSignal, utxo->getValue().sat());
+	if (!utxo->isCoinbase() || coinbaseMaturity == 0) {
+		if (utxo->isCoinbase())
+			emit(miningEarnSignal, utxo->getValue().sat());
+		notifyBalanceIncrease(false);
+	}
 }
 
-void Wallet::confirmUtxo(std::shared_ptr<const TransactionOutput> utxo)
+void Wallet::confirmUtxo(std::shared_ptr<const TransactionOutput> utxo, bool isGenesis)
 {
+	if (isGenesis) {
+		utxos[utxo] = coinbaseMaturity;
+		emit(addUtxoSignal, utxo->getValue().sat());
+		notifyBalanceIncrease(false);
+		notifyBalanceIncrease(true);
+		return;
+	}
 	auto it = utxos.find(utxo);
 	if (it == utxos.end()) {
 		utxos[utxo] = 1;
-		confirmedBalance += utxo->getValue().sat();
-		totalBalance += utxo->getValue().sat();
+		emit(addUtxoSignal, utxo->getValue().sat());
+		if (!utxo->isCoinbase() || coinbaseMaturity == 0)
+			notifyBalanceIncrease(false);
+		if (!utxo->isCoinbase() || coinbaseMaturity <= 1) {
+			if (utxo->isCoinbase())
+				emit(miningEarnSignal, utxo->getValue().sat());
+			notifyBalanceIncrease(true);
+		}
 	} else {
-		if (it->second == 0)
-			confirmedBalance += utxo->getValue().sat();
 		it->second++;
+		if (!utxo->isCoinbase() && it->second == 1) {
+			notifyBalanceIncrease(true);
+		} else if (utxo->isCoinbase() && it->second == coinbaseMaturity) {
+			emit(miningEarnSignal, utxo->getValue().sat());
+			notifyBalanceIncrease(true);
+		}
 	}
 }
 
@@ -63,8 +96,8 @@ void Wallet::unconfirmUtxo(std::shared_ptr<const TransactionOutput> utxo)
 		return;
 	if (it->second <= 1) {
 		utxos.erase(it);
-		confirmedBalance -= utxo->getValue().sat();
-		totalBalance -= utxo->getValue().sat();
+		emit(removeUtxoSignal, utxo->getValue().sat());
+		emit(utxoBTLSignal, it->second);
 	} else {
 		it->second--;
 	}
@@ -75,9 +108,9 @@ void Wallet::removeUtxo(std::shared_ptr<const TransactionOutput> utxo)
 	auto it = utxos.find(utxo);
 	if (it == utxos.end())
 		return;
+	emit(removeUtxoSignal, utxo->getValue().sat());
+	emit(utxoBTLSignal, it->second);
 	utxos.erase(it);
-	confirmedBalance -= utxo->getValue().sat();
-	totalBalance -= utxo->getValue().sat();
 }
 
 std::vector<std::shared_ptr<const TransactionOutput>> Wallet::unspentOutputs(uint32_t minConfirmations) const
@@ -88,6 +121,8 @@ std::vector<std::shared_ptr<const TransactionOutput>> Wallet::unspentOutputs(uin
 	for (const auto& elem : utxos) {
 		if (elem.second < minConfirmations)
 			continue;
+		if (elem.first->isCoinbase() && elem.second < coinbaseMaturity)
+			continue;
 		std::shared_ptr<const TransactionOutput> utxo = elem.first;
 		result.push_back(utxo);
 	}
@@ -97,18 +132,35 @@ std::vector<std::shared_ptr<const TransactionOutput>> Wallet::unspentOutputs(uin
 satoshi_t Wallet::balance(uint32_t minConfirmations) const
 {
 	Enter_Method("balance()");
-	if (minConfirmations == 0)
-		return totalBalance;
-	if (minConfirmations == 1)
-		return confirmedBalance;
-
 	satoshi_t result = 0;
 	for (const auto& utxo : utxos) {
 		if (utxo.second < minConfirmations)
 			continue;
+		if (utxo.first->isCoinbase() && utxo.second < coinbaseMaturity)
+			continue;
 		result += utxo.first->getValue();
 	}
 	return result;
+}
+
+void Wallet::notifyOnBalanceIncrease(std::function<void(void)> callback, bool confirmed)
+{
+	Enter_Method_Silent("notifyOnBalanceIncrease()");
+	if (confirmed)
+		onConfirmedBalanceIncreaseCallbacks.push_back(callback);
+	else
+		onUnconfirmedBalanceIncreaseCallbacks.push_back(callback);
+}
+
+void Wallet::notifyBalanceIncrease(bool confirmed)
+{
+	std::vector<std::function<void(void)>> callbacks(confirmed ? onConfirmedBalanceIncreaseCallbacks : onUnconfirmedBalanceIncreaseCallbacks);
+	if (confirmed)
+		onConfirmedBalanceIncreaseCallbacks.clear();
+	else
+		onUnconfirmedBalanceIncreaseCallbacks.clear();
+	for (const auto& callback : callbacks)
+		callback();
 }
 
 }

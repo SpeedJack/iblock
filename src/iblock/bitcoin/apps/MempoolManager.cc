@@ -16,8 +16,11 @@ void MempoolManager::initialize()
 {
 	AppBase::initialize();
 
+	addTransactionSignal = registerSignal("transactionAdded");
+	removeTransactionSignal = registerSignal("transactionRemoved");
+	mempoolSizeSignal = registerSignal("mempoolSize");
+
 	nodeManager = check_and_cast<NodeManager*>(getModuleByPath(par("nodeManagerModule").stringValue()));
-	gmm = check_and_cast<GMM*>(getModuleByPath(par("gmmModule").stringValue()));
 
 	mempool.clear();
 }
@@ -50,6 +53,8 @@ void MempoolManager::addBlockTransactions(std::shared_ptr<const Block> block)
 void MempoolManager::appendTransaction(std::shared_ptr<const Transaction> transaction)
 {
 	mempool.insert(transaction);
+	emit(addTransactionSignal, 1U);
+	emit(mempoolSizeSignal, transaction->getByteLength());
 	for (Wallet* wallet : wallets) {
 		size_t txoCount = transaction->getTxOutArraySize();
 		for (size_t i = 0; i < txoCount; i++) {
@@ -73,7 +78,6 @@ void MempoolManager::addTransaction(std::shared_ptr<Transaction> transaction)
 {
 	Enter_Method("addTransaction()");
 
-	// gmm->addTransaction(transaction);
 	appendTransaction(std::const_pointer_cast<const Transaction>(transaction));
 	if (transaction->isCoinbase())
 		return;
@@ -85,6 +89,15 @@ void MempoolManager::addTransaction(std::shared_ptr<Transaction> transaction)
 		// sendDirect(new TxPl(transaction), nodeGate);
 		sendDirect(new DirectTxMsg(transaction), exponential(5.1), transaction->getBitLength() / ((double)1000*1000), nodeGate);
 	}
+}
+
+void MempoolManager::removeTransaction(std::shared_ptr<const Transaction> transaction)
+{
+	if (!transaction)
+		return;
+	mempool.erase(transaction);
+	emit(removeTransactionSignal, 1U);
+	emit(mempoolSizeSignal, -transaction->getByteLength());
 }
 
 cppcoro::generator<std::shared_ptr<const Transaction>> MempoolManager::transactions() const

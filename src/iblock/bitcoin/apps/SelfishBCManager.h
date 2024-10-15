@@ -1,7 +1,7 @@
 #ifndef __IBLOCK_BITCOIN_SELFISHBCMANAGER_H_
 #define __IBLOCK_BITCOIN_SELFISHBCMANAGER_H_
 
-#include <stack>
+#include <deque>
 #include "iblock/bitcoin/apps/BlockchainManager.h"
 
 namespace iblock
@@ -13,14 +13,18 @@ class IBLOCK_API SelfishBCManager : public BlockchainManager
 {
 	protected:
 		unsigned int selfishChainDistance = 0;
-		std::stack<std::shared_ptr<Block>> selfishChain;
+		std::deque<std::shared_ptr<Block>> selfishChain;
 		unsigned int maxSelfishChainLength = 0;
+		::omnetpp::simsignal_t selfishChainLengthSignal;
+		::omnetpp::simsignal_t selfishChainDistanceSignal;
+		::omnetpp::simsignal_t attackResultSignal;
 
 		virtual void initialize(int stage) override;
 
 		virtual unsigned int computeDistance(std::shared_ptr<const Block> first, std::shared_ptr<const Block> second);
 
 		virtual void relaySelfishChain(std::shared_ptr<const Block> startBlock);
+		virtual void relaySelfishChainIfNeeded(std::shared_ptr<const Block> receivedBlock);
 
 		virtual void onNewSideBranch(std::shared_ptr<const Block> branch) override;
 		virtual void onSideBranchAppend(std::shared_ptr<const Block> newBlock) override;

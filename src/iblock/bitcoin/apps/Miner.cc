@@ -24,8 +24,11 @@ void Miner::initialize(int stage)
 	switch (stage) {
 	case 0:
 		AppBase::initialize(0);
-		blockMinedSignalId = registerSignal("blockMined");
-		processedTransactionsSignalId = registerSignal("processedTransactions");
+		minedBlockSignal = registerSignal("minedBlock");
+		blockSizeSignal = registerSignal("blockSize");
+		blockRewardSignal = registerSignal("blockReward");
+		processedTransactionsSignal = registerSignal("processedTransactions");
+		blockTimeSignal = registerSignal("blockTime");
 		// listener = new StopSimulationListener();
 		// subscribe("blockMined", listener);
 		// subscribe("processedTransactions", listener);
@@ -46,14 +49,14 @@ void Miner::initialize(int stage)
 		Wallet* wallet = check_and_cast<Wallet*>(getModuleByPath(par("walletModule").stringValue()));
 		walletAddress = wallet->getNewAddress();
 		double ttb = getTimeToBlock();
-		EV << "Time to block: " << ttb << endl;
+		EV_INFO << "Time to block: " << ttb << endl;
 		scheduleAt(simTime() + ttb, nextBlockMsg);
 	}
 }
 
 double Miner::getTimeToBlock()
 {
-	Hash target = blockchainManager->getCurrentTargetNBits();
+	Hash target = blockchainManager->getNextTargetNBits();
 	unsigned int expDiff = (highestTarget.e() - target.e()) << 3;
 	double difficulty = std::ldexp(highestTarget.m() / static_cast<double>(target.m()), expDiff);
 	double meanTime = difficulty * (1ULL << 32) / hashRate;
@@ -102,13 +105,22 @@ void Miner::mineBlock()
 	for (std::shared_ptr<const Transaction> txn : txns)
 		block->setTxn(i++, std::const_pointer_cast<Transaction>(txn));
 
+	emit(minedBlockSignal, 1U);
+	emit(blockSizeSignal, static_cast<unsigned int>(block->getByteLength()));
+	emit(blockRewardSignal, block->getReward().sat());
+	emit(processedTransactionsSignal, block->getTxnCount());
+	emit(blockTimeSignal, block->getHeader()->getTime() - curBlock->getHeader()->getTime());
+
 	size_t mempoolBefore = mempoolManager->transactionsCount();
 	mempoolManager->addTransaction(coinbaseTx);
 	blockchainManager->addBlock(block);
-	emit(blockMinedSignalId, 1);
-	//emit(processedTransactionsSignalId, block->getTxnCount());
 	EV_INFO << "Mined block (height=" << block->getHeight() << "; txn=" << block->getTxnCount() << "; bytes=" << block->getByteLength() << ")" << endl;
 	EV_INFO << "Transactions in mempool: " << "before=" << mempoolBefore << "; after=" << mempoolManager->transactionsCount() << "; simtime=" << simTime() << endl;
+}
+
+Miner::~Miner()
+{
+	cancelAndDelete(nextBlockMsg);
 }
 
 }

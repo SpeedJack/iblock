@@ -3,7 +3,6 @@
 
 #include "MempoolManager.h"
 #include "iblock/bitcoin/global/WalletManager.h"
-#include "iblock/bitcoin/messages/CreateTransactionMessage_m.h"
 
 namespace iblock
 {
@@ -16,9 +15,15 @@ class IBLOCK_API TransactionGenerator : public AppBase
 		MempoolManager* mempoolManager;
 		WalletManager* walletManager;
 		Wallet* wallet;
-		CreateTransactionMessage* createTransactionMsg;
+		::omnetpp::cMessage* createTransactionMsg;
 		unsigned int minConfirmations;
 		double waitTime;
+		::omnetpp::simsignal_t txInputValueSignal;
+		::omnetpp::simsignal_t txOutputValueSignal;
+		::omnetpp::simsignal_t txInputCountSignal;
+		::omnetpp::simsignal_t txOutputCountSignal;
+		::omnetpp::simsignal_t txFeeSignal;
+		::omnetpp::simsignal_t txSizeSignal;
 
 		virtual void initialize() override;
 		virtual void handleSelfMessage(::omnetpp::cMessage* msg) override;
@@ -26,6 +31,7 @@ class IBLOCK_API TransactionGenerator : public AppBase
 
 	public:
 		TransactionGenerator() : AppBase() { mempoolManager = nullptr; walletManager = nullptr; createTransactionMsg = nullptr; }
+		~TransactionGenerator() { if (createTransactionMsg && createTransactionMsg->isScheduled()) cancelAndDelete(createTransactionMsg); else if (createTransactionMsg) delete createTransactionMsg; }
 };
 
 }

@@ -16,15 +16,22 @@ void SelfishBCManager::initialize(int stage)
 {
 	BlockchainManager::initialize(stage);
 	if (stage == 0) {
-		selfishChain = std::stack<std::shared_ptr<Block>>();
+		selfishChain = std::deque<std::shared_ptr<Block>>();
 		maxSelfishChainLength = par("maxSelfishChainLength").intValue();
+
+		selfishChainLengthSignal = registerSignal("selfishChainLength");
+		selfishChainDistanceSignal = registerSignal("selfishChainDistance");
+		attackResultSignal = registerSignal("attackResult");
 	}
 }
 
 void SelfishBCManager::onBeforeMinedBlockAppend(std::shared_ptr<Block> block)
 {
+	BlockchainManager::onBeforeMinedBlockAppend(block);
 	selfishChainDistance++;
-	selfishChain.push(block);
+	selfishChain.push_back(block);
+	emit(selfishChainDistanceSignal, selfishChainDistance);
+	emit(selfishChainLengthSignal, selfishChain.size());
 }
 
 void SelfishBCManager::onAfterMinedBlockAppend(std::shared_ptr<Block> block)
@@ -33,9 +40,7 @@ void SelfishBCManager::onAfterMinedBlockAppend(std::shared_ptr<Block> block)
 		return; // we are selfish
 
 	// it's enough...
-	std::shared_ptr<Block> forkBlock = selfishChain.top();
-	for (unsigned int i = 0; i < selfishChain.size(); i++)
-		forkBlock = std::const_pointer_cast<Block>(forkBlock->getPrevBlock());
+	std::shared_ptr<const Block> forkBlock = selfishChain.front()->getPrevBlock();
 	relaySelfishChain(forkBlock);
 }
 
@@ -49,34 +54,50 @@ unsigned int SelfishBCManager::computeDistance(std::shared_ptr<const Block> firs
 		return secondHeight - firstHeight;
 }
 
-void SelfishBCManager::onNewSideBranch(std::shared_ptr<const Block> branch)
+void SelfishBCManager::relaySelfishChainIfNeeded(std::shared_ptr<const Block> receivedBlock)
 {
-	unsigned int distance = computeDistance(branch, mainBranch);
+	unsigned int distance = computeDistance(receivedBlock, mainBranch);
 	if (distance < selfishChainDistance) { // Good miners are approaching...
 		selfishChainDistance = distance;
+		emit(selfishChainDistanceSignal, selfishChainDistance);
 		if (selfishChainDistance == 1) // ...we will ruin their day!
-			relaySelfishChain(findForkBlock(mainBranch, branch));
+			relaySelfishChain(findForkBlock(mainBranch, receivedBlock));
 	}
+}
+
+void SelfishBCManager::onNewSideBranch(std::shared_ptr<const Block> branch)
+{
+	BlockchainManager::onNewSideBranch(branch);
+	relaySelfishChainIfNeeded(branch);
 }
 
 void SelfishBCManager::onSideBranchAppend(std::shared_ptr<const Block> newBlock)
 {
-	onNewSideBranch(newBlock);
+	BlockchainManager::onSideBranchAppend(newBlock);
+	relaySelfishChainIfNeeded(newBlock);
 }
 
 void SelfishBCManager::onNewMainBranch(std::shared_ptr<const Block> oldBranch, std::shared_ptr<const Block> forkBlock)
 {
+	if (selfishChainDistance > 0)
+		emit(attackResultSignal, false);
 	selfishChainDistance = 0; // Ugh! They won this battle...
+	selfishChain.clear();
+	emit(selfishChainDistanceSignal, 0U);
+	emit(selfishChainLengthSignal, 0U);
 	BlockchainManager::onNewMainBranch(oldBranch, forkBlock);
 }
 
 void SelfishBCManager::relaySelfishChain(std::shared_ptr<const Block> forkBlock)
 {
+	emit(attackResultSignal, true);
 	while (!selfishChain.empty()) {
-		std::shared_ptr<Block> block = selfishChain.top();
-		selfishChain.pop();
+		std::shared_ptr<Block> block = selfishChain.front();
+		selfishChain.pop_front();
 		BlockchainManager::onAfterMinedBlockAppend(block);
 	}
+	selfishChainDistance = 0;
+	emit(selfishChainLengthSignal, 0U);
 }
 
 }

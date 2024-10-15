@@ -21,8 +21,11 @@ class IBLOCK_API Miner : public AppBase
 		BlockchainManager* blockchainManager;
 		MempoolManager* mempoolManager;
 		::omnetpp::cMessage* nextBlockMsg;
-		::omnetpp::simsignal_t blockMinedSignalId;
-		::omnetpp::simsignal_t processedTransactionsSignalId;
+		::omnetpp::simsignal_t minedBlockSignal;
+		::omnetpp::simsignal_t blockSizeSignal;
+		::omnetpp::simsignal_t blockRewardSignal;
+		::omnetpp::simsignal_t processedTransactionsSignal;
+		::omnetpp::simsignal_t blockTimeSignal;
 
 		virtual void initialize(int stage) override;
 		virtual int numInitStages() const override { return 4; }
@@ -33,6 +36,7 @@ class IBLOCK_API Miner : public AppBase
 
 	public:
 		Miner();
+		~Miner();
 };
 
 }

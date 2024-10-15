@@ -15,28 +15,30 @@ namespace bitcoin
 void TransactionGenerator::initialize()
 {
 	AppBase::initialize();
+
+	txInputValueSignal = registerSignal("txInputValue");
+	txOutputValueSignal = registerSignal("txOutputValue");
+	txInputCountSignal = registerSignal("txInputCount");
+	txOutputCountSignal = registerSignal("txOutputCount");
+	txFeeSignal = registerSignal("txFee");
+	txSizeSignal = registerSignal("txSize");
+
 	mempoolManager = check_and_cast<MempoolManager*>(getModuleByPath(par("mempoolManagerModule").stringValue()));
 	walletManager = check_and_cast<WalletManager*>(getModuleByPath(par("walletManagerModule").stringValue()));
 	wallet = check_and_cast<Wallet*>(getModuleByPath(par("walletModule").stringValue()));
-	createTransactionMsg = new CreateTransactionMessage("createTransactionMsg");
+	createTransactionMsg = new cMessage("createTransactionMsg");
 	minConfirmations = par("minConfirmations").intValue();
-	waitTime = par("waitTime").doubleValue();
-	satoshi_t transactionValue = par("amount");
-	createTransactionMsg->setAmount(transactionValue);
 	scheduleAt(simTime() + par("interval").doubleValue(), createTransactionMsg);
 }
 
 void TransactionGenerator::handleSelfMessage(cMessage *msg)
 {
-	satoshi_t transactionValue = createTransactionMsg->getAmount();
-	if (wallet->mayHaveBalance(transactionValue, minConfirmations)) {
+	satoshi_t transactionValue = par("amount");
+	if (wallet->balance(minConfirmations) > transactionValue) {
 		createTransaction(transactionValue);
-		createTransactionMsg->setAmount(par("amount"));
-		scheduleAt(simTime() + par("interval").doubleValue(), createTransactionMsg);
-	} else if (waitTime > 0.0) {
-		scheduleAt(simTime() + waitTime, msg);
-	} else {
 		scheduleAt(simTime() + par("interval").doubleValue(), msg);
+	} else {
+		wallet->notifyOnBalanceIncrease([this, msg](){ Enter_Method_Silent("<callback>()"); this->handleSelfMessage(msg); });
 	}
 }
 
@@ -116,6 +118,12 @@ void TransactionGenerator::createTransaction(satoshi_t transactionValue)
 	}
 
 	tx->buildCache();
+	emit(txInputValueSignal, tx->getInputValue().sat());
+	emit(txOutputValueSignal, tx->getOutputValue().sat());
+	emit(txInputCountSignal, tx->getTxInCount());
+	emit(txOutputCountSignal, tx->getTxOutCount());
+	emit(txFeeSignal, tx->getFee().sat());
+	emit(txSizeSignal, static_cast<unsigned int>(tx->getByteLength()));
 	mempoolManager->addTransaction(tx);
 	// EV_INFO << "New transaction (inputvalue=" << tx->getInputValue().btc() << "; outputvalue=" << tx->getOutputValue().btc() << "; bytes=" << tx->getByteLength() << "; inputs=" << tx->getTxInArraySize() << "; outputs=" << tx->getTxOutArraySize() << "; fee=" << tx->getFee().btc() << ") - Now in mempool: " << mempoolManager->transactionsCount() << endl;
 }

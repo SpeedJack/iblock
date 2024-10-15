@@ -1,5 +1,4 @@
 #include "TransactionOutput.h"
-#include "Transaction.h"
 
 using namespace omnetpp;
 
@@ -21,17 +20,17 @@ std::string TransactionOutput::str() const
 	return out.str();
 }
 
-const Transaction* TransactionOutput::getTransaction() const
-{
-	const cObject* owner = getOwner();
-	return owner ? dynamic_cast<const Transaction*>(owner) : nullptr;
-}
+// const Transaction* TransactionOutput::getTransaction() const
+// {
+// 	const cObject* owner = getOwner();
+// 	return owner ? dynamic_cast<const Transaction*>(owner) : nullptr;
+// }
 
-bool TransactionOutput::isCoinbase() const
-{
-	const Transaction* tx = getTransaction();
-	return tx ? tx->isCoinbase() : false;
-}
+// bool TransactionOutput::isCoinbase() const
+// {
+// 	const Transaction* tx = getTransaction();
+// 	return tx ? tx->isCoinbase() : false;
+// }
 
 }
 }

@@ -38,7 +38,6 @@ void GBM::initialize(int stage)
 {
 	if (stage < 2)
 		return;
-	blocks.clear();
 
 	CoinbaseInput* txin = new CoinbaseInput();
 
@@ -71,7 +70,6 @@ void GBM::initialize(int stage)
 
 	std::shared_ptr<Block> genesisBlock = std::make_shared<Block>(header);
 	genesisBlock->appendTxn(coinbaseTx);
-	blocks.push_back(genesisBlock);
 
 	topo.clear();
 	topo.extractByProperty("blockchainManager");
@@ -79,15 +77,6 @@ void GBM::initialize(int stage)
 		BlockchainManager* bcm = check_and_cast<BlockchainManager*>(topo.getNode(i)->getModule());
 		bcm->addGenesisBlock(genesisBlock);
 	}
-}
-
-void GBM::addBlock(std::shared_ptr<Block> block)
-{
-	Enter_Method_Silent("addBlock()");
-	blocks.push_back(block);
-	totalTx += block->getTxnCount();
-	if (totalTx > 1740600 && blocks.size() >= 967)
-		throw cTerminationException(E_ENDSIM);
 }
 
 }
