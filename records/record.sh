@@ -1,6 +1,6 @@
 #!/bin/bash
 SEARCHQUERY="(python Main.py|opp_run.*IBLOCK)"
-SLEEP=0.05
+SLEEP=1
 FILENAME="result"
 FIELDS="pid,comm,stime,vsize,size,rss,etimes,cputimes"
 PREVPIDS=()

@@ -8,10 +8,10 @@ simple BlockchainManager like IBlockchainManager
 		@blockchainManager;
 		string dispatcherModule = default("^.packetDispatcher.dispatcher");
 		string nodeManagerModule = default("nodeManager");
+		string gbmModule = default("gbm");
 		string peerTableModule = default("^.peerTable");
 		string connectionManagerModule = default("^.connectionManager");
 		string mempoolManagerModule = default("^.mempoolManager");
-		int chainHistory = default(10);
 		@signal[networkDifficulty](type=double);
 		@signal[mainBranchAppend](type=unsigned long);
 		@signal[sideBranchAppend](type=unsigned long);
@@ -29,6 +29,7 @@ simple BlockchainManager like IBlockchainManager
 		@statistic[mainBranchTransactions](source=mainBranchTransactionCount; record=vector(sum)?,histogram?,last(sum); unit=transactions; interpolationmode=sample-hold; title="Main Branch Transactions");
 		@statistic[sideBranchLength](source=sideBranchLength; record=vector?,stats,histogram?,count; unit=blocks; interpolationmode=none; title="Side Branch Length");
 		@statistic[duplicateBlocks](source=duplicateBlock; record=vector?,count; unit=blocks; interpolationmode=none; title="Duplicate Blocks");
+		@statistic[mainBranchSwaps](source=mainBranchSwap; record=vector?,count; unit=blocks; interpolationmode=none; title="Main Branch Swaps");
 	gates:
 		input in;
 		input dIn @directIn;

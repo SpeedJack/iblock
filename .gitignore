@@ -1,6 +1,4 @@
 valgrind/
-*.drawio
-*.bkp
 # ccls
 .cache/
 .ccls-cache/

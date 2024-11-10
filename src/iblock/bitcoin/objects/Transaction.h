@@ -14,6 +14,8 @@ class IBLOCK_API Transaction : public Transaction_Base
 		void copy(const Transaction& other);
 
 	protected:
+		static unsigned long long nextId;
+		unsigned long long id;
 		unsigned long long outputValueCache = 0;
 		unsigned long long inputValueCache = 0;
 		unsigned long long fee = 0;
@@ -21,11 +23,13 @@ class IBLOCK_API Transaction : public Transaction_Base
 		std::vector<std::shared_ptr<TransactionOutput>> txOut;
 
 	public:
-		Transaction(const char* name = "Transaction") : Transaction_Base(name) { setByteLength(4 + 1 + 0 + 1 + 0 + 4); }
+		Transaction(const char* name = "Transaction") : Transaction_Base(name) { setByteLength(4 + 1 + 0 + 1 + 0 + 4); id = nextId++; }
 		Transaction(const Transaction& other) : Transaction_Base(other) { copy(other); }
 		Transaction& operator=(const Transaction& other) { if (this == &other) return *this; Transaction_Base::operator=(other); copy(other); return *this; }
 
 		virtual Transaction* dup() const override { return new Transaction(*this); }
+
+		virtual unsigned long long getId() const { return id; }
 
 		virtual ObjectType getType() const override { return ObjectType::MSG_TX; }
 

@@ -19,7 +19,7 @@ struct UTXOCmp
 		satoshi_t aValue = a->getValue();
 		satoshi_t bValue = b->getValue();
 		if (aValue == bValue)
-			return a < b;
+			return a->getId() < b->getId();
 		return aValue < bValue;
 	}
 };

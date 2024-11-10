@@ -9,6 +9,8 @@ namespace bitcoin
 
 Register_Class(Transaction);
 
+unsigned long long Transaction::nextId = 0;
+
 void Transaction::copy(const Transaction& other)
 {
 	txOut.clear();
@@ -19,6 +21,7 @@ void Transaction::copy(const Transaction& other)
 	this->inputValueCache = other.inputValueCache;
 	this->fee = other.fee;
 	this->feeRate = other.feeRate;
+	this->id = nextId++;
 }
 
 std::string Transaction::str() const

@@ -6,7 +6,6 @@ import iblock.bitcoin.node.RelayNode;
 import iblock.bitcoin.global.NodeManager;
 import iblock.bitcoin.global.WalletManager;
 import iblock.bitcoin.global.GBM;
-import iblock.bitcoin.global.GMM;
 
 network Test4
 {

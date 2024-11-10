@@ -97,6 +97,7 @@ void SelfishBCManager::relaySelfishChain(std::shared_ptr<const Block> forkBlock)
 		BlockchainManager::onAfterMinedBlockAppend(block);
 	}
 	selfishChainDistance = 0;
+	emit(selfishChainDistanceSignal, 0U);
 	emit(selfishChainLengthSignal, 0U);
 }
 

@@ -11,7 +11,7 @@ simple TransactionGenerator like IApp
 		string mempoolManagerModule = default("^.mempoolManager");
 		string walletManagerModule = default("walletManager");
 		string walletModule = default("^.app[0]");
-		volatile double interval @unit(s) = default(exponential(10s));
+		volatile double txGenInterval @unit(s) = default(exponential(10s));
 		int minConfirmations = default(0);
 		volatile double amount @btcUnit(BTC) = default(uniform(0.0001, 0.1));
 		volatile double feeRate @btcUnit(sat) @unit(sat) = default(exponential(5sat));

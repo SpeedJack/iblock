@@ -1,0 +1,57 @@
+\begin{filecontents*}[overwrite]{\jobname.xmpdata}
+\Title{iblock: An OMNeT++ Library for Bitcoin Simulation}
+\Author{Niccolò Scatena}
+\Language{en}
+\end{filecontents*}
+\documentclass[]{thesis}
+
+\department{Department of Information Engineering}
+\course{Master's Degree in Computer Engineering}
+\pretitle{Master Thesis}
+\title{iblock: An OMNeT++ Library for Bitcoin Simulation}
+\author{Niccolò Scatena}
+\supervisors{Prof.\quad{}Pericle Perazzo\\Prof.\quad{}Giovanni Nardini}
+\academicyear{2023/2024}
+
+\includeonly{%
+	abstract,
+	chapters/intro,
+	chapters/background,
+	chapters/implementation,
+	chapters/testing,
+	chapters/performance,
+	chapters/pocs,
+	chapters/next,
+	chapters/conclusions
+}
+
+\begin{document}
+
+\hypersetup{pageanchor=false}
+\maketitle
+\hypersetup{pageanchor=true}
+
+\singlespacing
+\include{abstract}
+\onehalfspacing
+\pagestyle{empty}
+
+\microtypesetup{protrusion=false}
+\tableofcontents
+\microtypesetup{protrusion=true}
+\newpage
+\pagestyle{fancy}
+
+\include{chapters/intro}
+\include{chapters/background}
+\include{chapters/implementation}
+\include{chapters/testing}
+\include{chapters/performance}
+\include{chapters/pocs}
+\include{chapters/next}
+\include{chapters/conclusions}
+
+\pagestyle{empty}
+\printbibliography
+
+\end{document}

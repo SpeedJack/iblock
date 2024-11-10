@@ -1,0 +1,48 @@
+<mxfile host="Electron" modified="2024-11-09T15:03:44.875Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.8 Chrome/114.0.5735.289 Electron/25.5.0 Safari/537.36" etag="GRoLFZ5W-triZuTwVxa8" version="21.6.8" type="device">
+  <diagram name="Page-1" id="pKmWXCwfdw7eTmfUIynu">
+    <mxGraphModel dx="2052" dy="1215" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="lRR5PbwRIzvuJrVB4NBK-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=classic;startFill=1;shape=flexArrow;fillColor=#000000;" parent="1" source="lRR5PbwRIzvuJrVB4NBK-1" target="lRR5PbwRIzvuJrVB4NBK-4" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lRR5PbwRIzvuJrVB4NBK-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;" parent="1" source="lRR5PbwRIzvuJrVB4NBK-1" target="lRR5PbwRIzvuJrVB4NBK-7" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lRR5PbwRIzvuJrVB4NBK-1" value="Simulation Model" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#000000;strokeColor=#6F0000;" parent="1" vertex="1">
+          <mxGeometry x="400" y="390" width="350" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lRR5PbwRIzvuJrVB4NBK-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;shape=flexArrow;startArrow=block;fillColor=#000000;" parent="1" source="lRR5PbwRIzvuJrVB4NBK-4" target="lRR5PbwRIzvuJrVB4NBK-5" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lRR5PbwRIzvuJrVB4NBK-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;shape=flexArrow;startArrow=block;fillColor=#000000;" parent="1" source="lRR5PbwRIzvuJrVB4NBK-4" target="lRR5PbwRIzvuJrVB4NBK-7" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lRR5PbwRIzvuJrVB4NBK-4" value="SIM&lt;br&gt;(simulation kernel)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fa6800;fontColor=#000000;strokeColor=#C73500;" parent="1" vertex="1">
+          <mxGeometry x="400" y="510" width="350" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lRR5PbwRIzvuJrVB4NBK-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=classic;startFill=1;shape=flexArrow;fillColor=#000000;" parent="1" source="lRR5PbwRIzvuJrVB4NBK-5" target="lRR5PbwRIzvuJrVB4NBK-6" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lRR5PbwRIzvuJrVB4NBK-5" value="ENVIR&lt;br&gt;(user interface common base)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#60a917;fontColor=#000000;strokeColor=#2D7600;" parent="1" vertex="1">
+          <mxGeometry x="400" y="630" width="350" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lRR5PbwRIzvuJrVB4NBK-6" value="CMDENV, QTENV, TKENV&lt;br&gt;(one of the concrete user interfaces)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#000000;strokeColor=#005700;" parent="1" vertex="1">
+          <mxGeometry x="400" y="750" width="350" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lRR5PbwRIzvuJrVB4NBK-7" value="Simulation Library" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1ba1e2;fontColor=#000000;strokeColor=#006EAF;" parent="1" vertex="1">
+          <mxGeometry x="830" y="510" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lRR5PbwRIzvuJrVB4NBK-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=classic;startFill=1;shape=flexArrow;fillColor=#000000;" parent="1" source="lRR5PbwRIzvuJrVB4NBK-1" target="lRR5PbwRIzvuJrVB4NBK-5" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="470" y="540" />
+              <mxPoint x="470" y="540" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

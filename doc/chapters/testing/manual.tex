@@ -1,0 +1,20 @@
+\section{Manual Verification}\label{sec:manual-verification}
+
+The \texttt{SimpleTest} configuration was used to conduct detailed manual
+checks on the model. This configuration features a small network of three
+nodes, including one miner node. Each node generates transactions at a rate of
+one transaction per minute, providing a simplified environment for focused
+inspection.
+
+A graphical test was performed within the \omnetpp{}'s QT environment, enabling
+a visual review of network behavior. This test allowed for real-time
+observation of interactions, confirming that nodes communicated and processed
+messages as expected. Additionally, the model was run step-by-step under a
+debugger to closely examine the logic and data flow, ensuring each component
+operated as intended and followed the correct sequence of operations.
+
+The \omnetpp's event trace log was generated and analyzed to verify the
+scheduling of events, confirming that they occurred in the expected order and
+timeline. This careful, multi-faceted approach provided a thorough assessment
+of the model's core workflow, confirming that fundamental functions and data
+pathways were correctly implemented.

@@ -1,0 +1,54 @@
+\section{Testing Determinism with OMNeT++
+Fingerprints}\label{sec:deterministic-tests}
+
+Deterministic tests involve multiple runs with identical configurations and
+random number generator seeds, verifying that each simulation run yields the
+\textit{exact} same results, a critical requirement for reproducibility in
+simulations.
+
+For this test, a configuration of 10 nodes was used, including three miners,
+with each node generating an average of one transaction every 10 seconds.
+
+This test leverages an \omnetpp{} feature that computes a simulation
+``fingerprint'', a hash updated throughout the simulation based on various
+event properties, and displayed at the simulation's conclusion. \omnetpp{} then
+compares the final fingerprint with a predefined expected value specified in
+the configuration file. Ingredients used in the fingerprint calculation can be
+set in the configuration file \cite[Section~15.4]{omnetpp-simulation-manual}.
+
+All statistics collection was enabled, and each run simulated 24 hours.
+
+In the initial run to generate the fingerprint, the following components were
+included for calculation:
+\begin{multicols}{2}
+	\begin{itemize}
+		\item The event number;
+		\item The simulation time;
+		\item The message/event full name;
+		\item The message (packet) bit length;
+		\item The module full path;
+		\item The random numbers drawn;
+		\item The scalar results;
+		\item The statistic results (histograms, etc.);
+		\item The vector results.
+	\end{itemize}
+\end{multicols}
+
+These components were selected to capture key properties of each simulation
+aspect and object. The last three items --- scalar results, statistical results,
+and vector results --- are especially critical for ensuring reproducibility.
+Anyway, also other ingredients were included in order to guarantee the
+simulation's trajectory is always \textit{exactly} the same.
+
+The generated fingerprint was:
+\begin{verbatim}
+5250-e519/etnlprszv
+\end{verbatim}
+
+With this fingerprint set in the configuration, the simulation was repeated 100
+times. All 100 runs successfully matched the expected fingerprint, with each
+output file containing the ``Fingerprint successfully verified'' message:
+\begin{verbatim}
+$ grep -c 'Fingerprint successfully verified' *.out | wc -l
+100
+\end{verbatim}

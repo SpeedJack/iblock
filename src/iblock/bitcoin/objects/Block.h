@@ -9,6 +9,14 @@ namespace iblock
 namespace bitcoin
 {
 
+struct UTXOIntCmp
+{
+	bool operator()(std::shared_ptr<const TransactionOutput> a, std::shared_ptr<const TransactionOutput> b) const
+	{
+		return a->getId() < b->getId();
+	}
+};
+
 class IBLOCK_API Block : public Block_Base
 {
 	private:
@@ -16,7 +24,7 @@ class IBLOCK_API Block : public Block_Base
 
 	protected:
 		std::vector<std::shared_ptr<Transaction>> txn;
-		std::unordered_map<Wallet*, std::unordered_set<std::shared_ptr<const TransactionOutput>>*> utxos;
+		std::unordered_map<Wallet*, std::set<std::shared_ptr<const TransactionOutput>, UTXOIntCmp>*> utxos;
 
 		virtual void addUtxo(std::shared_ptr<const TransactionOutput> utxo);
 		virtual void removeUtxo(std::shared_ptr<const TransactionOutput> utxo);
@@ -64,8 +72,8 @@ class IBLOCK_API Block : public Block_Base
 
 		virtual size_t getUtxoArraySize() const;
 		virtual size_t getUtxoCount() const { return getUtxoArraySize(); }
-		virtual const std::unordered_set<std::shared_ptr<const TransactionOutput>>* getUtxos(Wallet* wallet) const;
-		virtual const std::unordered_set<std::shared_ptr<const TransactionOutput>>* getUtxos(BitcoinAddress* address) const;
+		virtual const std::set<std::shared_ptr<const TransactionOutput>, UTXOIntCmp>* getUtxos(Wallet* wallet) const;
+		virtual const std::set<std::shared_ptr<const TransactionOutput>, UTXOIntCmp>* getUtxos(BitcoinAddress* address) const;
 };
 
 

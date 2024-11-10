@@ -15,10 +15,10 @@ void Block::copy(const Block& other)
 	txn = other.txn;
 	for (auto& it : other.utxos) {
 		Wallet* wallet = it.first;
-		std::unordered_set<std::shared_ptr<const TransactionOutput>>* utxos = it.second;
-		std::unordered_set<std::shared_ptr<const TransactionOutput>>* newUtxos = new std::unordered_set<std::shared_ptr<const TransactionOutput>>(); // FIXME: memory leak
+		std::set<std::shared_ptr<const TransactionOutput>, UTXOIntCmp>* utxos = it.second;
+		std::set<std::shared_ptr<const TransactionOutput>, UTXOIntCmp>* newUtxos = new std::set<std::shared_ptr<const TransactionOutput>, UTXOIntCmp>();
 		for (std::shared_ptr<const TransactionOutput> utxo : *utxos)
-			newUtxos->insert(utxo); // FIXME: memory leak
+			newUtxos->insert(utxo);
 		this->utxos[wallet] = newUtxos;
 	}
 }
@@ -68,17 +68,17 @@ size_t Block::getUtxoArraySize() const
 // 	throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)getUtxoArraySize(), (unsigned long)k);
 // }
 
-const std::unordered_set<std::shared_ptr<const TransactionOutput>>* Block::getUtxos(Wallet *wallet) const
+const std::set<std::shared_ptr<const TransactionOutput>, UTXOIntCmp>* Block::getUtxos(Wallet *wallet) const
 {
 	auto it = utxos.find(wallet);
 	if (it == utxos.end())
 		return nullptr;
 	return it->second;
 }
-const std::unordered_set<std::shared_ptr<const TransactionOutput>>* Block::getUtxos(BitcoinAddress *address) const
+const std::set<std::shared_ptr<const TransactionOutput>, UTXOIntCmp>* Block::getUtxos(BitcoinAddress *address) const
 {
-	std::unordered_set<std::shared_ptr<const TransactionOutput>>* found = new std::unordered_set<std::shared_ptr<const TransactionOutput>>();
-	const std::unordered_set<std::shared_ptr<const TransactionOutput>>* utxos = getUtxos(address->getWallet());
+	std::set<std::shared_ptr<const TransactionOutput>, UTXOIntCmp>* found = new std::set<std::shared_ptr<const TransactionOutput>, UTXOIntCmp>();
+	const std::set<std::shared_ptr<const TransactionOutput>, UTXOIntCmp>* utxos = getUtxos(address->getWallet());
 	if (!utxos)
 		return nullptr;
 
@@ -103,11 +103,11 @@ void Block::addUtxo(std::shared_ptr<const TransactionOutput> utxo)
 	Wallet* wallet = utxo->getAddress()->getWallet();
 	auto it = utxos.find(wallet);
 	if (it == utxos.end()) {
-		std::unordered_set<std::shared_ptr<const TransactionOutput>>* newUtxos = new std::unordered_set<std::shared_ptr<const TransactionOutput>>(); // FIXME: memory leak
+		std::set<std::shared_ptr<const TransactionOutput>, UTXOIntCmp>* newUtxos = new std::set<std::shared_ptr<const TransactionOutput>, UTXOIntCmp>();
 		newUtxos->insert(utxo);
 		utxos[wallet] = newUtxos;
 	} else {
-		it->second->insert(utxo); // FIXME: memory leak
+		it->second->insert(utxo);
 	}
 }
 
@@ -149,10 +149,10 @@ void Block::rebuildUtxos()
 	if (prevBlock)
 		for (auto& it : prevBlock->utxos) {
 			Wallet* wallet = it.first;
-			std::unordered_set<std::shared_ptr<const TransactionOutput>>* utxos = it.second;
-			std::unordered_set<std::shared_ptr<const TransactionOutput>>* newUtxos = new std::unordered_set<std::shared_ptr<const TransactionOutput>>(); // FIXME: memory leak
+			std::set<std::shared_ptr<const TransactionOutput>, UTXOIntCmp>* utxos = it.second;
+			std::set<std::shared_ptr<const TransactionOutput>, UTXOIntCmp>* newUtxos = new std::set<std::shared_ptr<const TransactionOutput>, UTXOIntCmp>();
 			for (std::shared_ptr<const TransactionOutput> utxo : *utxos)
-				newUtxos->insert(utxo); // FIXME: memory leak
+				newUtxos->insert(utxo);
 			this->utxos[wallet] = newUtxos;
 		}
 	for (size_t i = 0; i < getTxnCount(); i++)

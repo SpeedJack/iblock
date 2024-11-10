@@ -18,7 +18,7 @@ struct TransactionCmp
 		double lhsFeeRate = lhs->getFeeRate();
 		double rhsFeeRate = rhs->getFeeRate();
 		if (lhsFeeRate == rhsFeeRate)
-			return lhs > rhs;
+			return lhs->getId() < rhs->getId();
 		return lhsFeeRate > rhsFeeRate;
 	}
 };

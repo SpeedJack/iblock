@@ -7,7 +7,9 @@ namespace iblock
 namespace bitcoin
 {
 
-Register_Class(TransactionOutput)
+Register_Class(TransactionOutput);
+
+unsigned long long TransactionOutput::nextId = 0;
 
 std::string TransactionOutput::str() const
 {

@@ -1,0 +1,29 @@
+\section{Memory Leak Detection}\label{sec:memory-tests}
+
+The system was checked for memory leaks using the Memcheck tool \cite{memcheck}
+of the Valgrind suite \cite{valgrind}. A larger network of 50 nodes, 10 of
+which were miners, was tested, with all nodes generating transactions at a rate
+of one every 15 seconds. The model was run for one hour of simulated time.
+Valgrind significantly slows down execution (especially with debug mode
+enabled), limiting the run length, though one hour should be sufficient to
+detect memory leaks.
+
+Notably, \omnetpp{} also performs internal checks for potential memory leaks in
+any objects extending the \texttt{cOwnedObject} class, extensively used in the
+system's implementation.
+
+Both Valgrind and \omnetpp{} reported no memory leaks. Valgrind's output,
+displayed below, indicates only that some memory allocated by the standard C++
+library and \omnetpp{} remains unreleased. This memory is \textit{still
+reachable} and will be freed when the program exits. Also it is totaling only
+about 75 Kbytes --- an insignificant amount compared to the total memory usage
+of the software.
+
+\begin{verbatim}
+==20550== LEAK SUMMARY:
+==20550==    definitely lost: 0 bytes in 0 blocks
+==20550==    indirectly lost: 0 bytes in 0 blocks
+==20550==      possibly lost: 0 bytes in 0 blocks
+==20550==    still reachable: 75,218 bytes in 883 blocks
+==20550==         suppressed: 0 bytes in 0 blocks
+\end{verbatim}

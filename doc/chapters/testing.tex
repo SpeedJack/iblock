@@ -1,0 +1,56 @@
+\chapter{Testing the Simulation Model}\label{ch:testing}
+
+This chapter outlines the tests conducted to verify the simulation model.
+
+Two types of tests should be perfomed on every newly developed simulation
+model: verification and validation tests. Verification and validation are
+distinct but complementary processes critical to building confidence in the
+model's reliability and effectiveness. Verification confirms that the model
+accurately implements the conceptual design, while validation assesses the
+model's ability to represent real-world system behavior
+\cite[Chapter~15]{omnetpp-simulation-manual}.
+
+Verification is the process of ensuring that the simulation model has been
+correctly built in accordance with the conceptual model. This phase is focused
+on detecting and eliminating any discrepancies between the implemented model
+and its initial design, concentrating on accuracy in logic, consistency in data
+flows, and correctness of algorithms. In this project, verification tests were
+designed to catch issues such as programming errors, incorrect parameter
+settings, and unintended exceptions that might disrupt the simulation.
+
+Verification thus serves as an internal consistency check, confirming that the
+logic and processes coded in the model adhere strictly to the specifications of
+the conceptual model.
+
+On the other hand, validation is the process of determining whether the
+simulation model accurately represents the actual system it is meant to
+emulate. Unlike verification, which focuses on the internal consistency of the
+model with its design, validation is an external assessment that compares the
+model's outputs to real-world data or expected behavior patterns. In this
+phase, tests are conducted to evaluate whether the model produces results that
+are consistent with observed data or accepted theoretical outcomes of the real
+system.
+
+Validation tests are essential for ensuring that the simulation's predictions,
+trends, and responses accurately reflect what would be observed in the real
+environment. Methods used in validation can include comparing simulated outputs
+to empirical data, using statistical tests to check for significant deviations,
+and conducting sensitivity analyses to see if the model behaves consistently
+when variables are adjusted. Validation provides confidence that the simulation
+model is a reliable tool for making predictions and deriving insights about the
+real system.
+
+Validation of the model will be done using the experiments described in
+\chref{ch:pocs}, by checking that the results of the simulations are consistent
+with theoretical and empirical data drawn from the real Bitcoin network and
+from other related works. This chapter focuses on the verification tests
+conducted on \iblock{}.
+
+The configurations for the verification tests presented in this
+chapter are available in the \texttt{simulations/tests.ini} file of the
+repository.
+
+\input{testing/manual}
+\input{testing/smoke}
+\input{testing/leaks}
+\input{testing/fingerprints}

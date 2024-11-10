@@ -1,0 +1,22 @@
+\section{Smoke Tests}\label{sec:smoke-tests}
+
+Smoke tests are preliminary tests that ensure the software launches and runs
+for extended periods without crashing. Throughout the model's code, exceptions
+are programmed to trigger when the model deviates from expected states, causing
+a crash and subsequent smoke test failure. Additionally, \omnetpp{} may throw
+exceptions if the model is improperly implemented.
+
+This test utilized a network of 10 nodes, including three miners. All nodes,
+both miners and non-miners, generated transactions at a rate of one every five
+seconds per node. The model was run for a simulated period of 20 days, allowing
+for an evaluation of the network's difficulty adjustment occurring every 2016
+blocks.
+
+To conserve computational resources, statistics collection was disabled during
+this test. Statistics collection will be addressed in \chref{ch:pocs},
+demonstrating how \iblock{} can be used to execute simulations and gather
+statistical data.
+
+The test concluded successfully without any errors. Note also that every test
+or simulation conducted, including those detailed in this chapter and in
+\chref{ch:pocs}, can also be considered a smoke test.

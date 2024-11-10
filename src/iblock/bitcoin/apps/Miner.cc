@@ -33,6 +33,7 @@ void Miner::initialize(int stage)
 		// subscribe("blockMined", listener);
 		// subscribe("processedTransactions", listener);
 		nextBlockMsg = new cMessage("nextBlockMsg");
+		maxBlockSize = par("maxBlockSize").intValue();
 		hashRate = par("hashRate");
 		highestTarget = Hash(par("highestTarget").intValue());
 		blockchainManager = check_and_cast<BlockchainManager*>(getModuleByPath(par("blockchainStoreModule").stringValue()));
@@ -92,7 +93,7 @@ void Miner::mineBlock()
 	std::vector<std::shared_ptr<const Transaction>> txns;
 	for (std::shared_ptr<const Transaction> txn : mempoolManager->transactions()) {
 		int32_t newBytes = curBytes + txn->getByteLength() + COMPACT_SIZE(txns.size() + 2) - COMPACT_SIZE(txns.size() + 1);
-		if (newBytes > 1000*1000)
+		if (newBytes > maxBlockSize)
 			continue;
 		txns.push_back(txn);
 		fees += txn->getFee();
@@ -114,8 +115,8 @@ void Miner::mineBlock()
 	size_t mempoolBefore = mempoolManager->transactionsCount();
 	mempoolManager->addTransaction(coinbaseTx);
 	blockchainManager->addBlock(block);
-	EV_INFO << "Mined block (height=" << block->getHeight() << "; txn=" << block->getTxnCount() << "; bytes=" << block->getByteLength() << ")" << endl;
-	EV_INFO << "Transactions in mempool: " << "before=" << mempoolBefore << "; after=" << mempoolManager->transactionsCount() << "; simtime=" << simTime() << endl;
+	EV_DETAIL << "Mined block (height=" << block->getHeight() << "; txn=" << block->getTxnCount() << "; bytes=" << block->getByteLength() << ")" << endl;
+	EV_DETAIL << "Transactions in mempool: " << "before=" << mempoolBefore << "; after=" << mempoolManager->transactionsCount() << "; simtime=" << simTime() << endl;
 }
 
 Miner::~Miner()

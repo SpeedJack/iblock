@@ -38,6 +38,7 @@ void GBM::initialize(int stage)
 {
 	if (stage < 2)
 		return;
+	mainBranch.clear();
 
 	CoinbaseInput* txin = new CoinbaseInput();
 
@@ -62,7 +63,7 @@ void GBM::initialize(int stage)
 	header->setNBits(computeInitialNBits());
 	header->setNonce(2083236893);
 
-	coinbaseTx = std::make_shared<Coinbase>(txin);
+	std::shared_ptr<Coinbase> coinbaseTx = std::make_shared<Coinbase>(txin);
 	coinbaseTx->setTxOutArraySize(outputs.size());
 	size_t index = 0;
 	for (std::shared_ptr<TransactionOutput> txout : outputs)
@@ -76,7 +77,77 @@ void GBM::initialize(int stage)
 	for (int i = 0; i < topo.getNumNodes(); ++i) {
 		BlockchainManager* bcm = check_and_cast<BlockchainManager*>(topo.getNode(i)->getModule());
 		bcm->addGenesisBlock(genesisBlock);
+		mainBranch[bcm->getId()] = genesisBlock;
 	}
+
+	cleanupInterval = par("cleanupInterval").doubleValue();
+	cleanupMsg = new cMessage("cleanup");
+	scheduleAt(simTime() + cleanupInterval, cleanupMsg);
+}
+
+void GBM::handleMessage(cMessage* msg)
+{
+	if (msg != cleanupMsg) {
+		delete msg;
+		return;
+	}
+
+	uint32_t height = deleteOldBlocks();
+	if (height > 0) {
+		cTopology topo;
+		topo.extractByProperty("blockchainManager");
+		for (int i = 0; i < topo.getNumNodes(); ++i) {
+			BlockchainManager* bcm = check_and_cast<BlockchainManager*>(topo.getNode(i)->getModule());
+			bcm->cleanup(height);
+		}
+	}
+	scheduleAt(simTime() + cleanupInterval, cleanupMsg);
+}
+
+std::shared_ptr<const Block> GBM::findForkBlock(std::shared_ptr<const Block> a, std::shared_ptr<const Block> b) const
+{
+	if (!a || !b)
+		throw cRuntimeError("Fork block not resident in memory");
+	if (a == b)
+		return a;
+	if (a->getHeight() > b->getHeight())
+		return findForkBlock(a->getPrevBlock(), b);
+	if (a->getHeight() < b->getHeight())
+		return findForkBlock(a, b->getPrevBlock());
+	return findForkBlock(a->getPrevBlock(), b->getPrevBlock());
+}
+
+uint32_t GBM::deleteOldBlocks()
+{
+	std::vector<std::shared_ptr<const Block>> uniqueBranches;
+	std::transform(mainBranch.begin(), mainBranch.end(), std::back_inserter(uniqueBranches), [](const auto& kv) {
+		return kv.second;
+	});
+	std::sort(uniqueBranches.begin(), uniqueBranches.end());
+	std::vector<std::shared_ptr<const Block>>::iterator it;
+	it = std::unique(uniqueBranches.begin(), uniqueBranches.end());
+	uniqueBranches.resize(std::distance(uniqueBranches.begin(), it));
+
+	std::shared_ptr<const Block> forkBlock;
+	for (auto it = uniqueBranches.begin(); it != uniqueBranches.end(); ++it) {
+		if (it == uniqueBranches.begin()) {
+			forkBlock = *it;
+			continue;
+		}
+		forkBlock = findForkBlock(forkBlock, *it);
+	}
+	std::shared_ptr<const Block> parent = forkBlock->getPrevBlock();
+	if (!parent)
+		return 0;
+	uint32_t height = parent->getHeight();
+	EV_INFO << "Deleting blocks older than height " << height << endl;
+	const_cast<BlockHeader*>(parent->getHeader())->deletePrevBlock();
+	return height;
+}
+
+GBM::~GBM()
+{
+	cancelAndDelete(cleanupMsg);
 }
 
 }

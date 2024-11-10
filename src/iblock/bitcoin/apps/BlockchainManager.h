@@ -5,6 +5,7 @@
 #include "iblock/bitcoin/objects/Block.h"
 #include "iblock/bitcoin/global/NodeManager.h"
 #include "iblock/bitcoin/apps/MempoolManager.h"
+#include "iblock/bitcoin/global/GBM.h"
 
 namespace iblock
 {
@@ -16,12 +17,12 @@ class IBLOCK_API BlockchainManager : public AppBase
 	protected:
 		NodeManager* nodeManager;
 		MempoolManager* mempoolManager;
+		GBM* gbm;
 		std::unordered_set<std::shared_ptr<const Block>> branches;
 		std::shared_ptr<const Block> mainBranch;
 		::omnetpp::simtime_t adjustmentBlockTime;
-		std::unordered_set<std::shared_ptr<const Block>> orphans;
+		std::list<std::weak_ptr<const Block>> orphans;
 		std::vector<Wallet *> wallets = std::vector<Wallet *>();
-		unsigned int chainHistory = 10;
 		::omnetpp::simsignal_t networkDifficultySignal;
 		::omnetpp::simsignal_t mainBranchAppendSignal;
 		::omnetpp::simsignal_t sideBranchAppendSignal;
@@ -35,8 +36,6 @@ class IBLOCK_API BlockchainManager : public AppBase
 
 		virtual void initialize(int stage) override;
 		virtual int numInitStages() const override { return 4; }
-
-		virtual void finish() override;
 
 		virtual void handleBlockPacket(Peer* peer, payloads::BlockPl* block) override;
 		virtual void handleGetDataPacket(Peer* peer, payloads::GetDataPl* getdata) override;
@@ -63,8 +62,6 @@ class IBLOCK_API BlockchainManager : public AppBase
 		virtual double computeNewDifficulty() const;
 		virtual double getCurrentDifficulty() const;
 
-		virtual void cleanup(uint32_t history = 10);
-
 	public:
 		BlockchainManager() : AppBase() { nodeManager = nullptr; mempoolManager = nullptr; mainBranch = nullptr; }
 
@@ -77,6 +74,8 @@ class IBLOCK_API BlockchainManager : public AppBase
 		virtual void registerWallet(Wallet* wallet) { Enter_Method_Silent("registerWallet()"); wallets.push_back(wallet); }
 
 		virtual void addGenesisBlock(std::shared_ptr<const Block> block);
+
+		virtual void cleanup(uint32_t cutoffHeight);
 };
 
 }

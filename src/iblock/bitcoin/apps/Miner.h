@@ -20,6 +20,7 @@ class IBLOCK_API Miner : public AppBase
 		BitcoinAddress* walletAddress;
 		BlockchainManager* blockchainManager;
 		MempoolManager* mempoolManager;
+		unsigned int maxBlockSize = 1000*1000;
 		::omnetpp::cMessage* nextBlockMsg;
 		::omnetpp::simsignal_t minedBlockSignal;
 		::omnetpp::simsignal_t blockSizeSignal;

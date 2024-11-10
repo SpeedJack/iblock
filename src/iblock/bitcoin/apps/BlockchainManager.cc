@@ -30,8 +30,7 @@ void BlockchainManager::initialize(int stage)
 		duplicateBlockSignal = registerSignal("duplicateBlock");
 
 		nodeManager = check_and_cast<NodeManager* >(getModuleByPath(par("nodeManagerModule").stringValue()));
-
-		chainHistory = par("chainHistory").intValue();
+		gbm = check_and_cast<GBM*>(getModuleByPath(par("gbmModule").stringValue()));
 
 		mempoolManager = check_and_cast<MempoolManager* >(getModuleByPath(par("mempoolManagerModule").stringValue()));
 
@@ -73,7 +72,7 @@ void BlockchainManager::handleGetHeadersPacket(Peer* peer, GetHeadersPl* gethead
 void BlockchainManager::handleOtherMessage(cMessage* msg)
 {
 	std::shared_ptr<const Block> block = check_and_cast<DirectBlockMsg*>(msg)->getBlockSharedPtr();
-	// EV_INFO << "Received a new block (" << block->getTxnCount() << " txns)" << endl;
+	// EV_DETAIL << "Received a new block (" << block->getTxnCount() << " txns)" << endl;
 	appendBlock(block);
 	delete msg;
 }
@@ -130,10 +129,10 @@ Hash BlockchainManager::getNextTargetNBits() const
 
 std::shared_ptr<const Block> BlockchainManager::findForkBlock(std::shared_ptr<const Block> a, std::shared_ptr<const Block> b) const
 {
+	if (!a || !b)
+		throw cRuntimeError("Fork block not resident in memory");
 	if (a == b)
 		return a;
-	if (!a || !b)
-		return nullptr;
 	if (a->getHeight() > b->getHeight())
 		return findForkBlock(a->getPrevBlock(), b);
 	if (a->getHeight() < b->getHeight())
@@ -144,7 +143,7 @@ std::shared_ptr<const Block> BlockchainManager::findForkBlock(std::shared_ptr<co
 void BlockchainManager::unconfirmWalletUtxos(std::shared_ptr<const Block> block) const
 {
 	for (Wallet* wallet : wallets) {
-		const std::unordered_set<std::shared_ptr<const TransactionOutput>>* utxos = block->getUtxos(wallet);
+		const std::set<std::shared_ptr<const TransactionOutput>, UTXOIntCmp>* utxos = block->getUtxos(wallet);
 		if (!utxos)
 			continue;
 		for (std::shared_ptr<const TransactionOutput> utxo : *utxos)
@@ -156,7 +155,7 @@ void BlockchainManager::confirmWalletUtxos(std::shared_ptr<const Block> block) c
 {
 	bool genesis = block->getHeight() == 0;
 	for (Wallet* wallet : wallets) {
-		const std::unordered_set<std::shared_ptr<const TransactionOutput>>* utxos = block->getUtxos(wallet);
+		const std::set<std::shared_ptr<const TransactionOutput>, UTXOIntCmp>* utxos = block->getUtxos(wallet);
 		if (!utxos)
 			continue;
 		for (std::shared_ptr<const TransactionOutput> utxo : *utxos)
@@ -164,43 +163,23 @@ void BlockchainManager::confirmWalletUtxos(std::shared_ptr<const Block> block) c
 	}
 }
 
-void BlockchainManager::cleanup(uint32_t history)
+void BlockchainManager::cleanup(uint32_t cutoffHeight)
 {
-	uint32_t height = mainBranch->getHeight();
-	if (height <= history)
-		return;
+	Enter_Method_Silent("cleanup()");
 
 	for (auto it = branches.begin(); it != branches.end();) {
 		std::shared_ptr<const Block> b = *it;
-		if (b->getHeight() < height - history) {
-			std::shared_ptr<const Block> forkBlock = findForkBlock(b, mainBranch);
-			if (forkBlock)
-				emit(sideBranchLengthSignal, b->getHeight() - forkBlock->getHeight());
+		if (b->getHeight() < cutoffHeight)
 			it = branches.erase(it);
-		} else {
+		else
 			++it;
-		}
 	}
 
 	for (auto it = orphans.begin(); it != orphans.end();)
-		if ((*it)->getHeight() < height - history)
+		if (it->expired())
 			it = orphans.erase(it);
 		else
 			++it;
-
-	std::shared_ptr<const Block> block = mainBranch;
-	for (uint32_t curHeight = height; curHeight >= height - history && block; curHeight--)
-		block = block->getPrevBlock();
-	if (!block)
-		return;
-	for (auto it = branches.begin(); it != branches.end(); ++it) {
-		std::shared_ptr<const Block> b = *it;
-		if (b == mainBranch)
-			continue;
-		block = findForkBlock(b, block);
-	}
-	if (block)
-		const_cast<BlockHeader*>(block->getHeader())->deletePrevBlock();
 }
 
 void BlockchainManager::appendBlock(std::shared_ptr<const Block> block)
@@ -262,13 +241,19 @@ void BlockchainManager::appendBlock(std::shared_ptr<const Block> block)
 			break;
 		}
 
-		for (const auto& orphan : orphans)
+		for (auto it = orphans.begin(); it != orphans.end();) {
+			if (it->expired()) {
+				it = orphans.erase(it);
+				continue;
+			}
+			std::shared_ptr<const Block> orphan = it->lock();
 			if (orphan->getPrevBlock() == block) {
-				auto o = orphans.extract(orphan);
-				onRemoveOrphan(o.value());
-				appendBlock(o.value());
+				onRemoveOrphan(orphan);
+				appendBlock(orphan);
 				return;
 			}
+			++it;
+		}
 		return;
 	}
 
@@ -276,7 +261,7 @@ void BlockchainManager::appendBlock(std::shared_ptr<const Block> block)
 		throw cRuntimeError("Genesis block already exists");
 
 	for (const auto& branch : branches)
-		for (std::shared_ptr<const Block> cur = branch; cur && cur->getHeight() >= height; cur = cur->getPrevBlock()) {
+		for (std::shared_ptr<const Block> cur = branch; cur->getHeight() >= height; cur = cur->getPrevBlock()) {
 			if (cur == block) {
 				onDuplicateBlock(block);
 				return; // duplicate block
@@ -288,7 +273,7 @@ void BlockchainManager::appendBlock(std::shared_ptr<const Block> block)
 			}
 		}
 
-	orphans.insert(block);
+	orphans.push_back(block);
 	onNewOrphan(block);
 
 }
@@ -331,33 +316,21 @@ void BlockchainManager::addGenesisBlock(std::shared_ptr<const Block> block)
 
 void BlockchainManager::onNewMainBranch(std::shared_ptr<const Block> oldBranch, std::shared_ptr<const Block> forkBlock)
 {
+	gbm->adviseNewMainBranch(this->getId(), mainBranch);
 	emit(mainBranchSwapSignal, 1U);
 	emit(mainBranchHeightSignal, mainBranch->getHeight());
 	for (std::shared_ptr<const Block> b = oldBranch; b != forkBlock; b = b->getPrevBlock())
 		emit(mainBranchTransactionCountSignal, -static_cast<int>(b->getTxnCount()));
 	for (std::shared_ptr<const Block> b = mainBranch; b != forkBlock; b = b->getPrevBlock())
 		emit(mainBranchTransactionCountSignal, static_cast<int>(b->getTxnCount()));
-	cleanup(chainHistory);
 }
 
 void BlockchainManager::onMainBranchAppend()
 {
+	gbm->adviseNewMainBranch(this->getId(), mainBranch);
 	emit(mainBranchAppendSignal, 1U);
 	emit(mainBranchHeightSignal, mainBranch->getHeight());
 	emit(mainBranchTransactionCountSignal, static_cast<int>(mainBranch->getTxnCount()));
-	cleanup(chainHistory);
-}
-
-void BlockchainManager::finish()
-{
-	for (auto it = branches.begin(); it != branches.end(); ++it) {
-		std::shared_ptr<const Block> branch = *it;
-		if (branch == mainBranch)
-			continue;
-		std::shared_ptr<const Block> forkBlock = findForkBlock(branch, mainBranch);
-		if (forkBlock)
-			emit(sideBranchLengthSignal, branch->getHeight() - forkBlock->getHeight());
-	}
 }
 
 }
