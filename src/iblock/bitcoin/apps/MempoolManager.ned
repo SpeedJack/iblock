@@ -9,6 +9,8 @@ simple MempoolManager like IMempoolManager
 		string nodeManagerModule = default("nodeManager");
 		string peerTableModule = default("^.peerTable");
 		string connectionManagerModule = default("^.connectionManager");
+		volatile double bandwidth @unit(bps) = default(1Mbps);
+		volatile double propagationDelay @unit(s) = default(exponential(5.1s));
 		@signal[transactionAdded](type=unsigned long);
 		@signal[transactionRemoved](type=unsigned long);
 		@signal[mempoolSize](type=long);

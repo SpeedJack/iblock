@@ -1,0 +1,138 @@
+\chapter{Mathematical Background}\label{appendix:math}
+
+This appendix shows the mathematical foundations used to compute the time
+needed to mine a new block and to adjust the network's mining difficulty. All
+the mathematics presented here is based on informations extracted from the
+\citetitle{bitcoin-dev} \cite{bitcoin-dev} and the
+\citetitle{btcwiki-difficulty} \cite{btcwiki-difficulty}.
+
+\section{Mining Difficulty and Target}\label{appendix:difficulty-target}
+
+The current network difficulty is encoded in the \code{nBits} field of the last
+block's header. The field is a 4-byte integer that represent the maximum
+allowed hash for a block to be considered valid, and is usually called
+``target''. The hash is encoded in compact form, explained in
+\secref{subsec:impl-utility}.
+
+Difficulty is always computed as relative to the minimum difficulty of 1, for
+which corresponds the maximum target:
+\begin{verbatim}
+0x00000000ffff0000000000000000000000000000000000000000000000000000
+\end{verbatim}
+or \(\texttt{0x1d00ffff}_{c}\) in compact form (the subscript \code{c} denotes
+the compact form).
+
+So the current difficulty \(D\) can be computed from the current target \(T\)
+and the maximum target \(T_{\text{max}}\) using \eqref{eq:target2difficulty}:
+
+\begin{equation}\label{eq:target2difficulty}
+	D = \frac{T_{\text{max}}}{T}
+\end{equation}
+
+A faster way to compute the difficulty is to use directly the compact form of
+the target, by operating on the mantissa and exponent. Call \(m\) the mantissa
+of the target \(T\), and \(e\) its exponent. Call \(M\) the mantissa of the
+maximum target \(T_{\text{max}}\), and \(E\) its exponent. The difficulty can
+be computed as in \eqref{eq:nbits2difficulty}.
+
+\begin{equation}\label{eq:nbits2difficulty}
+	D = \frac{M}{m} \times 2^{2^{3}(E - e)} = \frac{M}{m} \times 256^{(E -
+	e)}
+\end{equation}
+
+The target can be computed from the difficulty using
+\eqref{eq:difficulty2target}, where the formula expansion for
+\(T_{\text{max}}\) has been derived from \eqref{eq:compact2hash} from page
+\pageref{eq:compact2hash} substituting \(M = \texttt{0xffff} = 2^{16} - 1\) and
+\(E = \texttt{0x1d} = 29\).
+
+\begin{equation}\label{eq:difficulty2target}
+	T = \frac{T_{\text{max}}}{D} = \frac{(2^{16} - 1) \times 256^{(29 -
+	3)}}{D}
+\end{equation}
+
+\section{Time to Mine a Block}\label{appendix:time-to-mine}
+
+The \code{Miner} application needs to schedule a timer to simulate the time
+needed to mine a block. So, it must know in advance how long it will take to
+mine the next block, based only on the current network difficulty and its hash
+rate.
+
+Given the hash rate of the miner \(h\) and the network difficulty \(D\), the
+average time to mine a block is given by \eqref{eq:time-to-mine}.
+
+\begin{equation}\label{eq:time-to-mine}
+	\overline{t} = \frac{D \times 2^{32}}{h}
+\end{equation}
+
+Method \code{getTimeToBlock()} in the \code{Miner} class computes the
+difficulty as in \eqref{eq:nbits2difficulty} and then computes mean time to
+mine the next block as in \eqref{eq:time-to-mine}. The computed value is then
+used as a mean for an exponential distribution\footnote{Mining is a process in
+which the miner insert different \emph{nonces} inside the block's header until
+it finds a hash that is lower than the target. The distribution of the time is
+then memory-less, as probability of success does not change after each trial,
+and the exponential distribution is the most suitable.} from which the time to
+mine the next block is drawn.
+
+\section{Initial Network Difficulty}\label{appendix:initial-difficulty}
+
+Before starting the simulation, the \code{GBM} module computes the initial
+difficulty from which derives the initial target and puts it in the genesis
+block's header in the \code{nBits} field. The work is done by the
+\code{computeInitialNBits()} method.
+
+First, the \code{GBM} gets the hash rate from all the miners in the network.
+Call the total hash rate of the network \(H\). We need to compute the
+difficulty \(D\) such that the network with \(H\) hash rate finds a block in
+\(600\) seconds (10 minutes). From \(D\), we then need to derive the target,
+which is the maximum allowed hash for a block to be considered valid.
+
+The time needed by the entire network to mine a block at minimum difficulty
+(\(D_{\text{min}} = 1\)) is given by \eqref{eq:time-to-mine} substituting the
+hash rate of the network \(H\) for the miner's hash rate \(h\) and \(D =
+D_{\text{min}} = 1\). The needed initial network difficulty \(D\) can be
+computed from the ratio \(R\) between the time needed to mine a block with the
+network hash rate and the expected time to mine a block (\(600\) seconds) as in
+\eqref{eq:next-difficulty}.
+
+\begin{equation}\label{eq:next-difficulty}
+	D = \frac{D_{\text{min}}}{R} = \frac{D_{\text{min}}}{t/600} =
+	\frac{1}{2^{32}/600H} = \frac{600 H}{2^{32}}
+\end{equation}
+
+From the difficulty \(D\) and the maximum target \(T_{\text{max}} =
+\texttt{0x1d00ffff}_{c}\), we can compute the needed target as in
+\eqref{eq:difficulty2target}. The target is computed as a big double number,
+then the \code{Hash::fromBigDouble()} method is used to convert the number to
+an instance of the \code{Hash} class which approximates the result in order to
+store it in compact form for the \code{nBits} field.
+
+\section{Network Difficulty Adjustment}\label{appendix:difficulty-adjustment}
+
+Every \(2016\) blocks, each \code{BlockchainManager} in the network
+indipendently adjust the network difficulty. The newly computed target is then
+added to the \code{nBits} field of the next block's header. Method
+\code{getNextTargetNBits()} does the job.
+
+First, the \code{BlockchainManager} gets the previous difficulty
+\(D_{\text{prev}}\) from the target store in the current block's header using
+\eqref{eq:nbits2difficulty}. Then, it gets the time difference between the last
+block and the block \(2015\)\footnote{\emph{Sic!} There is an \emph{off-by-one
+error} (also ``Time Warp Bug'')
+in the \citetitle{bitcoin-core} implementation that causes the difficulty to be
+calculated using timestamps from only \(2015\) blocks while still using the
+expected time for \(2016\) blocks \cite{bitcoin-core}. To avoid forks, the bug
+has never been fixed --- so \iblock{} does an off-by-one calculation as well!}
+blocks before --- call this difference \(\Delta T\). The expected time to mine
+\(2016\) blocks is \(T_{\text{expected}} = 2016 \times 600 = 1209600\) seconds.
+The ratio between the actual time and the expected time is \(R = \frac{\Delta
+T}{T_{\text{expected}}}\).
+
+As per the Bitcoin protocol specification, the ratio is then bounded between
+\(0.25\) and \(4\). The new difficulty is then computed as \(D =
+D_{\text{prev}} \times R\), where \(D_{\text{prev}}\) is the previous
+difficulty.
+
+The new difficulty is then converted to the new target using
+\eqref{eq:difficulty2target}.

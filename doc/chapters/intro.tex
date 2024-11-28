@@ -1,27 +1,96 @@
 \chapter{Introduction}\label{ch:intro}
 
-\ldots TODO \ldots
+Bitcoin, introduced by the pseudonymous Satoshi Nakamoto in 2008
+\cite{whitepaper}, is the first decentralized cryptocurrency. Its launch marked
+a revolutionary step in digital finance, enabling peer-to-peer transactions
+without the need for a trusted central authority. Over the years, Bitcoin and
+other blockchain-based technologies have gained widespread attention,
+influencing industries, governments, and academia alike.
 
-\chref{ch:background} provides a description of the Bitcoin system, an
-explanation of the \omnetpp{} simulation framework, and a review of the
-state-of-the-art in blockchain simulation presenting some available simulators.
+Blockchain technology has since evolved beyond cryptocurrencies, finding
+applications in supply chain management, voting systems, healthcare, and more.
+With this growing interest, understanding the behavior and performance of
+blockchain networks under various conditions has become crucial. Simulation
+tools play a key role in this regard, allowing researchers and developers to
+test blockchain networks in a controlled environment, optimizing their designs
+and analyzing their performance.
 
-\chref{ch:implementation} outlines the design and implementation of \iblock{}.
+\paragraph{Challenges in Blockchain Simulation}\label{par:intro-challenges}
 
-\chref{ch:testing} presents the test conducted to verify and validate the
-simulator.
+Numerous blockchain simulators have been developed in recent years, each
+attempting to address specific research or application needs. These tools are
+typically used to model various aspects of blockchain systems, such as
+transaction propagation, block creation, and consensus mechanisms, under
+diverse scenarios. However, as discussed in further detail in
+\secref{sec:simulators}, existing simulators face significant limitations:
+\begin{itemize}
+	\item \textbf{Incomplete Modeling}: No single simulator accurately
+		models all facets of a real-world Bitcoin (or other blockchain)
+		network. Key features like realistic network topology,
+		UTXO-based transaction accounting, or variable transaction fees
+		are often absent or oversimplified;
+	\item \textbf{Performance Bottlenecks}: Simulating large-scale networks
+		or long time periods requires high computational efficiency.
+		Most simulators, however, are built using high-level
+		interpreted languages (e.g., Python, Java, Go), which
+		inherently limit performance;
+	\item \textbf{Lack of Extensibility}: Many existing simulators lack
+		modular designs or are not based on established simulation
+		frameworks, making it challenging to extend them or integrate
+		new features;
+	\item \textbf{Limited Security Analysis}: Few simulators allow the
+		modeling of malicious behavior, such as selfish mining or other
+		attacks, restricting their use for studying blockchain
+		security.
+\end{itemize}
 
-\chref{ch:performance} illustrates the optimizations done on \iblock{} and an
-evaluation of his performance in terms of speed and memory usage, comparing it
-with another simulator.
+\paragraph{The Proposed Solution}\label{par:intro-solution}
 
-\chref{ch:pocs} showcases some proofs of concept implemented using \iblock{}
-and some examples of analyses that can be done using the simulator.
+This thesis proposes \iblock{}: a novel, extensible, and detailed Bitcoin
+network simulator. \iblock{} is designed to address the limitations of existing
+simulators and provide a comprehensive tool for blockchain simulation. It is a
+discrete-event simulation library implemented in C++ and built on top of
+\omnetpp{}, a widely used framework for simulating networks and systems. By
+leveraging \omnetpp{}'s capabilities, \iblock{} combines high performance with
+modularity, scalability, and extensibility.
 
-\chref{ch:next} discusses some limitations of the current implementation of
-\iblock{} and possible future work to improve it.
+Key features of \iblock{} include:
+\begin{itemize}
+	\item \textbf{Detailed Protocol Modeling}: \iblock{} implements a
+		realistic Bitcoin protocol, including components such as
+		blocks, transactions, mempools, and peers. The UTXO-based
+		transaction accounting model is fully supported, offering a
+		more accurate representation of Bitcoin's data layer. Although
+		the protocol is not fully implemented in its entirety, block
+		and transaction creation and propagation are modeled in detail
+		and \iblock{} provides a solid foundation for further
+		development aimed towards a complete Bitcoin protocol model;
+	\item \textbf{Scalability}: Designed to handle large-scale networks,
+		\iblock{} leverages C++'s performance advantages to simulate
+		longer timeframes and more extensive node networks compared to
+		existing simulators;
+	\item \textbf{Extensibility}: Built with modularity in mind, \iblock{}
+		allows researchers to easily add new features or modify
+		existing ones. For example, alternative consensus mechanisms or
+		nodes with malicious behaviors can be implemented with minimal
+		effort;
+	\item \textbf{Integration with \omnetpp{} Libraries}: By being part of
+		the \omnetpp{} ecosystem, \iblock{} may be in future integrated
+		with other libraries, such as INET, to simulate network-layer
+		effects like bandwidth constraints, latencies, and link
+		failures.
+\end{itemize}
 
-\chref{ch:conclusion} concludes the thesis with some final remarks.
-\appendixref{appendix:computations} contains the mathematical computations for
-the time needed to mine a new Bitcoin block and the network's difficulty
-adjustment.
+The primary goal of this thesis is to design and implement \iblock{} as a
+versatile tool for blockchain research. The work focuses on developing a
+high-fidelity simulation library that accurately models Bitcoin's core
+functionality, while providing good performance, modularity and extensibility.
+
+There is still some work that needs to be done before considering \iblock{} a
+complete simulator, such as adding support for \omnetpp{}'s channel and the
+Bitcoin's gossip protocol, but the current implementation provides a solid
+foundation for a generic Bitcoin simulator that does not watch only at specific
+aspects of the protocol, such as many existing simulators do, and tries to keep
+an eye on every aspect in detail.
+
+\input{intro/organization}

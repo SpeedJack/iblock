@@ -17,7 +17,6 @@ class IBLOCK_API TransactionGenerator : public AppBase
 		Wallet* wallet;
 		::omnetpp::cMessage* createTransactionMsg;
 		unsigned int minConfirmations;
-		double waitTime;
 		::omnetpp::simsignal_t txInputValueSignal;
 		::omnetpp::simsignal_t txOutputValueSignal;
 		::omnetpp::simsignal_t txInputCountSignal;

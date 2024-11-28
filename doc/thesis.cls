@@ -1,11 +1,12 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{thesis}[2024/10/24 Class for UNIPI theses]
+\ProvidesClass{thesis}[2024/11/18 Class for UNIPI theses]
 
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{report}}
 
 \ProcessOptions\relax
 
 \PassOptionsToClass{a4paper,12pt,twoside,openright,english}{report}
+% \PassOptionsToClass{a4paper,12pt,oneside,openany,english}{report}
 
 \LoadClass{report}
 
@@ -29,6 +30,7 @@
 \RequirePackage[%
 	a4paper,%
 	twoside=true,%
+	% twoside=false,%
 	top=2.5cm,%
 	bottom=2.5cm,%
 	right=2.5cm,%
@@ -45,7 +47,7 @@
 \RequirePackage{pdflscape}
 \RequirePackage{graphicx}
 \RequirePackage{float}
-%\RequirePackage{subfig}
+\RequirePackage{rotating}
 \RequirePackage{titlesec}
 \RequirePackage[font=small,labelfont=bf,textfont=it,position=bottom]{caption}
 \RequirePackage[justification=centering]{subcaption}
@@ -60,10 +62,10 @@
 \RequirePackage{booktabs}
 \RequirePackage[inline]{enumitem}
 \RequirePackage{multicol}
+\RequirePackage{multirow}
 \RequirePackage{listings}
 \RequirePackage{algorithm}
 \RequirePackage{algpseudocode}
-%\RequirePackage{minted}
 \RequirePackage{emptypage}
 \RequirePackage{nameref}
 \RequirePackage[english]{varioref}
@@ -77,7 +79,8 @@
 \RequirePackage{lipsum}
 \RequirePackage{datetime2}
 
-% maybe tabularx
+\RequirePackage{tabularx}
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
 
 \def\input@path{{./chapters/}}
 \graphicspath{{./img/}}
@@ -100,7 +103,7 @@
 
 \renewcommand{\maketitle}{%
 	\begin{titlepage}
-		\thispagestyle{titlepage}
+		\thispagestyle{empty}
 		\singlespacing
 		\begin{center}
 			\includegraphics[width=0.9\textwidth]{img/marchio_unipi_pant541}\\
@@ -161,7 +164,6 @@
 \definecolor{relayed}{rgb}{0,1,0}
 
 \titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hspace{20pt}\textcolor{gray75}{|}}{20pt}{}
-%\titlespacing{\chapter}{0pt}{5ex}{4em}
 \let\appendix@original\appendix
 \renewcommand{\appendix}{\appendix@original\titleformat{\chapter}[display]{\Huge\bfseries}{Appendix~\thechapter}{20pt}{}}
 
@@ -208,49 +210,6 @@
 \renewcommand\thealgorithm{\thechapter.\arabic{algorithm}}
 \@addtoreset{algorithm}{chapter}
 
-% \definecolor{codebg}{HTML}{FDF6E3}
-% \definecolor{codecomment}{HTML}{93A1A1}
-% \definecolor{codestring}{HTML}{2AA198}
-% \definecolor{codekeyword}{HTML}{859900}
-% \definecolor{codelinenum}{HTML}{808080}
-% \colorlet{codenumber}{magenta!60!black}
-
-% \lstdefinestyle{ccode}{
-% 	backgroundcolor=\color{codebg},
-% 	basicstyle=\footnotesize\ttfamily,
-% 	commentstyle=\color{codecomment},
-% 	stringstyle=\color{codestring},
-% 	keywordstyle=\color{codekeyword},
-% 	numberstyle=\tiny\color{codelinenum},
-% 	captionpos=b,
-% 	language=c,
-% 	numbers=left,
-% 	numbersep=5pt,
-% 	stepnumber=1,
-% 	tabsize=2,
-% 	otherkeywords={float64_t},
-% 	breaklines=true,
-% 	breakatwhitespace=false,
-% 	keepspaces=true,
-% 	showspaces=false,
-% 	showstringspaces=false,
-% 	showtabs=false,
-% 	%postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
-% 	literate=
-% 		*{0}{{{\color{codenumber}0}}}{1}
-% 		{1}{{{\color{codenumber}1}}}{1}
-% 		{2}{{{\color{codenumber}2}}}{1}
-% 		{3}{{{\color{codenumber}3}}}{1}
-% 		{4}{{{\color{codenumber}4}}}{1}
-% 		{5}{{{\color{codenumber}5}}}{1}
-% 		{6}{{{\color{codenumber}6}}}{1}
-% 		{7}{{{\color{codenumber}7}}}{1}
-% 		{8}{{{\color{codenumber}8}}}{1}
-% 		{9}{{{\color{codenumber}9}}}{1}
-% }
-%
-% \lstset{style=ccode}
-
 \setlength{\headheight}{14.49998pt}
 
 \renewcommand{\chaptermark}[1]{%
@@ -260,14 +219,29 @@
 \fancyfoot{}
 \fancyhead[LE]{\chaptername\ \thechapter\ --\ \leftmark}
 \fancyhead[RO]{\chaptername\ \thechapter\ --\ \leftmark}
+% \fancyhead[R]{\chaptername\ \thechapter\ --\ \leftmark}
 \fancyfoot[C]{\thepage}
 \pagestyle{fancy}
 
-\fancypagestyle{titlepage}{%
+\fancypagestyle{appendix}{%
 	\fancyhead{}%
 	\fancyfoot{}%
-	\fancyhead[L]{\texttt{DRAFT}}%
-	\fancyhead[R]{\texttt{\DTMnow}}%
+	\fancyhead[LE]{\appendixname\ \thechapter\ --\ \leftmark}%
+	\fancyhead[RO]{\appendixname\ \thechapter\ --\ \leftmark}%
+	% \fancyhead[R]{\appendixname\ \thechapter\ --\ \leftmark}%
+	\fancyfoot[C]{\thepage}%
+}
+\fancypagestyle{numberonly}{%
+	\fancyhead{}%
+	\fancyfoot{}%
+	\fancyfoot[C]{\thepage}%
+	\renewcommand{\headrulewidth}{0pt}%
+}
+
+\fancypagestyle{biblio}{%
+	\fancyhead{}%
+	\fancyfoot{}%
+	\fancyfoot[C]{\thepage}%
 	\renewcommand{\headrulewidth}{0pt}%
 }
 

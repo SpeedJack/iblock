@@ -1,22 +1,197 @@
 \section{Bitcoin}\label{sec:bitcoin}
 
-This section provides an overview of Bitcoin, the digital currency solution
+This section offers an overview of Bitcoin, the digital currency
 introduced by \citeauthor{whitepaper} in \citeyear{whitepaper} with his famous
-white paper \cite{whitepaper}. The description will focus on the aspects of the
-Bitcoin protocol that are relevant for the project developed for this master
-thesis. If the reader is already familiar with Bitcoin, they may feel free to
-skip this section.
+white paper \cite{whitepaper}. The focus here is on aspects of the Bitcoin
+protocol that are specifically relevant to this thesis project. Readers who are
+already well-acquainted with Bitcoin may choose to skip this section.
 
-All the information presented in this section are taken from the following
-sources, which the reader may consult for further details:
+The following sources provide the foundation for the information presented and
+may serve as additional references for readers interested in further details:
 \begin{itemize}
 	\item The original Bitcoin white paper \cite{whitepaper};
 	\item The \citetitle{bitcoin-wiki} \cite{bitcoin-wiki};
 	\item The \citetitle{bitcoin-dev} \cite{bitcoin-dev};
-	\item The excellent website maintained by \citeauthor{learnmeabitcoin},
+	\item The website maintained by \citeauthor{learnmeabitcoin},
 		\citetitle{learnmeabitcoin} \cite{learnmeabitcoin};
 	\item The reference implementation of Bitcoin, \citetitle{bitcoin-core}
 		\cite{bitcoin-core}.
 \end{itemize}
 
-\ldots TODO \ldots
+\subsection{The Blockchain}\label{subsec:blockchain}
+
+Bitcoin is a decentralized digital currency that operates on a peer-to-peer
+network of nodes. The foundation of Bitcoin is a public ledger called the
+blockchain, which records all transactions that have ever occurred on the
+network.
+
+The blockchain is a chain of blocks, where each block contains some metadata
+(the block header) and a list of transactions. Blocks are chained in
+chronological order, with each block header containing an hash to the previous
+block header. The header additionally contains the hash of all transactions in
+the block\footnote{Actually, it contains the root of a Merkle tree of all
+ordered transactions.}, thus any change to a transaction would require a change
+in the block header, which would in turn require a change in all subsequent
+block headers. This makes the blockchain tamper-evident and highly
+tamper-resilient, as computing block header hashes --- a job called ``mining''
+--- is computationally expensive.
+
+The block header fields are listed in Table~\ref{tab:block-header}. A block
+header is \(80\) bytes long, and the total block size, including transactions,
+is limited to \(1\) MB.
+
+\begin{table}[tbhp]
+	\centering
+	\begin{tabularx}{\linewidth}{|l|X|}
+		\toprule
+		\textbf{Field} & \textbf{Description} \\
+		\midrule
+		Version & The version of the block format. \\
+		\midrule
+		Previous block hash & The hash of the previous block header. \\
+		\midrule
+		Merkle root & The root of a Merkle tree of all transactions in
+		the block. \\
+		\midrule
+		Time & The time the block was created. \\
+		\midrule
+		nBits & The target value for the block hash. \\
+		\midrule
+		Nonce & A value that miners change to try to find a valid block
+		hash. \\
+		\bottomrule
+	\end{tabularx}
+	\caption{Block header fields.}\label{tab:block-header}
+\end{table}
+
+The blockchain is secured by a process called mining, in which nodes compete to
+solve a cryptographic puzzle. The puzzle consists of finding a block header
+hash that is below a certain target value, demonstrating \emph{Proof-Of-Work}
+(PoW). The target value is adjusted every \(2016\) blocks by the network and
+stored in the \code{nBits} field (see
+\appendixref{appendix:difficulty-adjustment}). Miners use the \code{Nonce}
+field to change the block header hash, and the first miner to find a valid hash
+is allowed to broadcast the block to the network and earn rewards. Since miners
+need to compute hashes to solve the puzzle, their speed is measured in hashes
+per second, called \emph{hash rate}.
+
+Nodes in the network propagate blocks to their peers, following a gossip
+protocol. When a node receives a block, it validates it by checking that the
+block respects the \emph{consensus rules} before adding it to its local copy of
+the blockchain.
+
+Sometimes two miners find a valid block more or less at the same time, creating
+a \emph{fork} in the blockchain\footnote{This may also happen due to slow data
+links between nodes or temporary network partitions.}. When this happens, the
+network follows the rule of the longest chain, which states that the chain with
+the most accumulated work \idest{the one with the highest \emph{height},
+meaning it has more blocks} is the valid chain (parities are broken in favor of
+the first received chain). The network eventually reaches a consensus on which
+chain to follow, and the other chain is not considered until it becomes the
+longest chain. When this happens, the network performs a \emph{chain
+reorganization} to switch to the longest chain.
+
+Also changing the consensus rules can create a fork. When the Bitcoin software
+is updated with new rules, the following situations may happen:
+\begin{enumerate}
+	\item Upgraded nodes reject blocks that do not respect the new rules,
+		while non-upgraded nodes accept both the old and the new blocks
+		(backward-compatible upgrade). This creates a fork in the
+		network. If upgraded nodes control the majority of the
+		network's hash rate, they will eventually create a longer
+		chain, since non-upgraded nodes will also accept the blocks
+		following the new rules, thus keeping the blockchain from
+		permanently diverging. This is called a \emph{soft fork};
+	\item Non-upgraded nodes reject blocks that respect the new rules. This
+		creates a fork in the network with two divergent chains --- one
+		for non-upgraded nodes and one for upgraded nodes --- that will
+		remain until all nodes in the network are upgraded. This is
+		called a \emph{hard fork} and usually produces a new currency.
+\end{enumerate}
+
+An example of a hard fork is the creation of \citetitle{bitcoin-cash} in
+\citeyear{bitcoin-cash}, which occurred due to a disagreement in the Bitcoin
+community about the block size and the scalability of the network
+\cite{bitcoin-cash}.
+
+\subsection{Transactions}\label{subsec:transactions}
+
+Transactions are used to transfer bitcoins between \emph{wallets}. A wallet is
+a software that generates and stores a pair of public and private keys. Coins
+can be sent to a wallet by means of \emph{wallet addresses}, which are derived
+from the public key. Wallets can have multiple addresses, and addresses can be
+used multiple times (although it is not recommended for privacy reasons).
+
+Transactions are composed of \emph{inputs} and \emph{outputs}. Inputs reference
+previous outputs and spend them, while outputs specify the amount to be sent
+and the new coins' owner. Until spent, the output of a transaction is called an
+\emph{Unspent Transaction Output} (UTXO).
+
+The difference between the sum of inputs and the sum of outputs is the
+\emph{transaction fee}, which is collected by the miner who includes the
+transaction in a block. When a miner successfully mines a block, it is allowed
+to include a special transaction called the \emph{coinbase transaction}, which
+has no inputs and generates new coins and collects the transaction fees from
+all the other transactions in the block. The total value of the outputs in a
+coinbase transaction is called the \emph{block reward} and is composed by the
+sum of the \emph{block subsidy} and the transaction fees. The block subsidy is
+a fixed amount of coins that halves every \(210,000\) blocks, or roughly every
+4 years, until it reaches zero --- these newly \emph{minted} coins are the only
+way bitcoins are created.
+
+Table~\ref{tab:tx-fields} lists the fields of a transaction. An input
+references a previous output by including the transaction's hash and the output
+index (together called ``outpoint''). The output index is used to select which
+output to spend when a transaction has multiple outputs. An output specifies
+the amount to be sent and a new owner, by the mean of a \emph{locking script}
+called \emph{pubkey script}. The locking script can be unlocked by the new
+owner with an input containing a \emph{signature script} that satisfies the
+conditions specified in the locking script. Those scripts are programs coded in
+a special language processed by a non-Turing-complete \emph{stack machine}.
+Additional details about these scripts are not provided here since they are not
+particularly relevant to this thesis project.
+
+\begin{table}[tbhp]
+	\centering
+	\begin{tabularx}{\linewidth}{|l|X|}
+		\toprule
+		\textbf{Field} & \textbf{Description} \\
+		\midrule
+		Version & The version of the transaction format. \\
+		\midrule
+		Input count & The number of inputs in the transaction. \\
+		\midrule
+		Inputs & A list of inputs, each referencing a previous output.
+		\\
+		\midrule
+		Output count & The number of outputs in the transaction. \\
+		\midrule
+		Outputs & A list of outputs, each specifying the amount to be
+		sent and the new owner. \\
+		\midrule
+		Locktime & A field that specifies when the transaction can be
+		included in a block. \\
+		\bottomrule
+	\end{tabularx}
+	\caption{Transaction fields.}\label{tab:tx-fields}
+\end{table}
+
+Transactions are broadcast to the network, and nodes validate them before
+adding them to their \emph{mempool}. The mempool is a pool of
+\emph{unconfirmed} transactions. ``Unconfirmed'' means that the transaction has
+not yet been included in a block. Miners select transactions from the mempool,
+usually by choosing those with the highest transaction fees, and include them
+in the blocks they mine. The number of confirmations of a transaction is the
+number of blocks that have been mined on top of the block that contains the
+transaction. If a chain reorganization happens, the transaction included in the
+old chain are returned to the mempool, unless they are included in the new
+chain as well. Thus, the number of confirmations is a measure of how improbable
+it is that a transaction will be reversed.
+
+If the same coins are spent in two different transactions
+(\emph{double-spending}), the network will eventually reach a consensus on a
+single transaction to include in the blockchain. The transaction that is not
+included will remain in the mempool, as the network will reject any block that
+includes a double-spending transaction. Since there is no pre-defined order of
+transactions, users should wait for some confirmations before considering a
+transaction settled.

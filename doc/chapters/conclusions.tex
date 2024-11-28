@@ -1,1 +1,41 @@
 \chapter{Conclusions}\label{ch:conclusions}
+
+In this work, we proposed \iblock{}, a model library for \omnetpp{} designed to
+simulate complex and large-scale Bitcoin networks with complete internal
+representation of blocks and transactions. The blockchain data structures in
+\iblock{} closely mirror the actual Bitcoin data structures, enabling
+high-fidelity network simulations. This level of detail is unique among
+existing Bitcoin simulators, as none currently support the UTXO model, which
+\iblock{} implements in the \code{Wallet} application \cite{simureview}.
+Furthermore, \iblock{} offers numerous features that set it apart, possibly
+making it a valuable tool for researchers and developers working on Bitcoin or
+other blockchain-based applications.
+
+A key advantage of \iblock{} lies in its foundation on \omnetpp{}. Unlike many
+Bitcoin simulators that lack a structured framework, extending \iblock{} is
+fast and straightforward. For example, we demonstrated how easily new
+behaviors, such as the selfish mining strategy, can be implemented by extending
+the base classes of \iblock{} and using the tools provided by \omnetpp{}.
+Leveraging \omnetpp{} also allows \iblock{} to integrate seamlessly with other
+libraries and models developed for the same framework, such as INET, which
+facilitates the simulation of complex scenarios and allows to study the
+behavior of the network from different perspectives.
+
+Performance-wise, \iblock{} benefits significantly from being developed in C++,
+which compiles to native code. This provides a considerable advantage over
+other simulators often built with higher-level, (semi-)interpreted languages
+such as Python, Java, Go, or Scala. As a result, \iblock{} is generally faster
+and more memory-efficient. When compared with BlockSim, one of the most widely
+used Bitcoin simulators, \iblock{} demonstrated superior performance against
+BlockSim's ``Full'' mode --- processing faster and consuming less memory ---
+while also providing a higher level of simulation detail and collecting more
+statistics.
+
+Despite its strengths, \iblock{} is not yet a fully complete Bitcoin simulator.
+It currently lacks support for \omnetpp{} links and channels, as well for
+certain aspects of the Bitcoin protocol. However, these limitations do not
+diminish its valua as a foundation for further development, and still it can be
+used to simulate creation and propagation of blocks and transactions in a
+Bitcoin network. We believe that \iblock{} also represents a strong starting
+point for building a comprehensive Bitcoin simulator capable of supporting
+every aspect of the Bitcoin protocol in detail.

@@ -1,4 +1,67 @@
 \chapter{Future Work}\label{ch:next}
 
-\input{next/gossip}
+While \iblock{} successfully simulates the construction and propagation of
+blocks and transactions in a Bitcoin network, the Bitcoin protocol encompasses
+far more than these basic operations. Expanding \iblock{} to incorporate
+additional protocol features would enhance its utility, enabling a broader
+range of experiments and deeper insights into Bitcoin and blockchain dynamics.
+
+The most critical feature currently absent in \iblock{} is the implementation
+of Bitcoin's \textbf{gossip protocol}. In a real Bitcoin network, each node
+connects to a limited number of peers. When a node receives a block or
+transaction, it notifies its peers via \emph{inventory messages}. These peers
+can then decide whether to request the data using a \code{GETDATA} message,
+depending on whether they already possess it or not. This propagation process
+continues until the entire network is updated. Incorporating this mechanism
+would provide a more accurate simulation of Bitcoin's peer-to-peer
+communication and its potential bottlenecks or inefficiencies. Furthermore,
+implementing the gossip protocol would enable the study of other types of
+attacks, such as the \emph{eclipse attack}, where an attacker isolates a node
+by controlling its connections and feeds it with false informations to perform,
+for example, a double-spending attack against the victim \cite{eclipse}.
+
+Beyond the gossip protocol, other key Bitcoin mechanisms remain to be
+implemented, including:
+\begin{description}
+	\item[Peer discovery] Nodes query peers for lists of other nodes to
+		expand their connections;
+	\item[Bloom filters] Utilized by Simplified Payment Verification (SPV)
+		nodes to query the blockchain for specific transactions while
+		maintaining user privacy;
+	\item[Segregated Witness (SegWit)] A protocol improvement that
+		separates transaction signatures from the transaction data to
+		optimize storage and reduce block sizes (and thus fees);
+	\item[Other Protocol Features] Elements like transaction malleability
+		prevention, multi-signature schemes, and advanced scripting
+		capabilities are essential for comprehensive protocol support.
+\end{description}
+A complete Bitcoin simulator would integrate these features, providing the
+capability to study nuanced protocol behaviors and optimizations.
+
+The next logical step in \iblock{}'s evolution is to implement support for
+\omnetpp{}'s links. This addition would enable the simulation of a more
+realistic network environment, where nodes communicate over channels with
+varying bandwidths and latencies. Such functionality is critical for modeling
+real-world network conditions and is a prerequisite for accurately simulating
+the gossip protocol. Although partial progress has been made in this area, as
+discussed in \secref{sec:partial-work}, completing this feature remains a
+priority.
+
+Looking forward, \iblock{} could be extended to simulate other blockchain
+systems, such as Ethereum \cite{ethereum}. Ethereum introduces unique concepts
+like Proof-of-Stake, smart contracts, gas mechanisms, and an account-based
+model, which differ significantly from Bitcoin's UTXO-based approach.
+Developing a more generic framework capable of supporting multiple blockchain
+systems would be a significant milestone. Such a framework could allow
+researchers and developers to simulate diverse blockchain ecosystems under a
+unified architecture, broadening \iblock{}'s applicability.
+
+By incorporating these enhancements, \iblock{} can evolve into a robust,
+versatile simulator for blockchain research. Features such as the gossip
+protocol, peer discovery, and SegWit, combined with support for \omnetpp{}
+links and channels, will deepen the simulation's fidelity. Furthermore,
+extending the framework to support systems like Ethereum would position
+\iblock{} as a universal tool for studying blockchain-based networks, unlocking
+new opportunities for research and development.
+
 \input{next/inet}

@@ -3,7 +3,7 @@ import iblock.bitcoin.node.PingerNode;
 import iblock.bitcoin.node.MinerNode;
 import iblock.bitcoin.global.NodeManager;
 
-channel Link extends ned.DatarateChannel
+channel TestLink extends ned.DatarateChannel
 {
 	delay = 10ms;
 	datarate = 10Mbps;
@@ -20,8 +20,8 @@ network Test2
 		nodeManager: NodeManager;
 	   
 	connections:
-		node0.port++ <--> Link <--> node1.port++;
-		node1.port++ <--> Link <--> node3.port++;
-		node2.port++ <--> Link <--> node3.port++;
-		node2.port++ <--> Link <--> node1.port++;
+		node0.port++ <--> TestLink <--> node1.port++;
+		node1.port++ <--> TestLink <--> node3.port++;
+		node2.port++ <--> TestLink <--> node3.port++;
+		node2.port++ <--> TestLink <--> node1.port++;
 }

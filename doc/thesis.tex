@@ -10,7 +10,7 @@
 \pretitle{Master Thesis}
 \title{iblock: An OMNeT++ Library for Bitcoin Simulation}
 \author{Niccolò Scatena}
-\supervisors{Prof.\quad{}Pericle Perazzo\\Prof.\quad{}Giovanni Nardini}
+\supervisors{Ing.\quad{}Pericle Perazzo\\Ing.\quad{}Giovanni Nardini}
 \academicyear{2023/2024}
 
 \includeonly{%
@@ -22,10 +22,12 @@
 	chapters/performance,
 	chapters/pocs,
 	chapters/next,
-	chapters/conclusions
+	chapters/conclusions,
+	chapters/math
 }
 
 \begin{document}
+\pagestyle{empty}
 
 \hypersetup{pageanchor=false}
 \maketitle
@@ -34,12 +36,12 @@
 \singlespacing
 \include{abstract}
 \onehalfspacing
-\pagestyle{empty}
 
 \microtypesetup{protrusion=false}
 \tableofcontents
+\thispagestyle{numberonly}
 \microtypesetup{protrusion=true}
-\newpage
+
 \pagestyle{fancy}
 
 \include{chapters/intro}
@@ -51,7 +53,13 @@
 \include{chapters/next}
 \include{chapters/conclusions}
 
-\pagestyle{empty}
-\printbibliography
+\appendix
+\pagestyle{appendix}
+\include{chapters/math}
 
+\pagestyle{biblio}
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Bibliography}
+\printbibliography
 \end{document}

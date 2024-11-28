@@ -1,1 +1,49 @@
 \section{Integration with INET}\label{sec:INET}
+
+One of the significant advantages of using the \omnetpp{} framework is its
+flexibility to integrate diverse simulation models. This enables the creation
+of complex scenarios that analyze system behavior across multiple levels of
+abstraction.
+
+The \textbf{INET Framework} is an open-source model library for the \omnetpp{}
+simulation environment. It provides protocols, agents, and other models for
+researchers and students working with communication networks. INET contains
+models for the Internet stack (TCP, UDP, IPv4, IPv6, OSPF, BGP, etc.), wired
+and wireless link-layer protocols (Ethernet, PPP, IEEE 802.11, etc.), support
+for mobility, MANET protocols, DiffServ, MPLS with LDP and RSVP-TE signaling,
+several application models, and many other protocols and components
+\cite{inet}.
+
+By integrating \iblock{} with INET, users could simulate the full TCP/IP stack
+while nodes exchange Bitcoin blocks and transactions. This would provide deeper
+insights into the interaction between Bitcoin's protocol and underlying network
+dynamics, such as congestion, packet loss, and latency, which are critical for
+studying real-world scenarios.
+
+\iblock{} has been designed with future INET integration in mind. In fact, the
+name \iblock{} itself is derived from ``INET'', emphasizing this planned
+synergy. Once the implementation of Bitcoin's full protocol, including support
+for \omnetpp{} links, is completed, INET is expected to work seamlessly with
+\iblock{}.
+
+The \code{MessageDispatcher} module developed in \secref{sec:partial-work} is
+central to this integration. This module is designed to be adaptable, capable
+of handling both \omnetpp{} links and INET-based communication. As such, it
+forms the foundation for using INET's advanced networking models alongside
+\iblock{}'s blockchain simulations.
+
+Combining \iblock{} and INET would unlock the ability to:
+\begin{enumerate}
+	\item Simulate Bitcoin transactions and block propagation with
+		detailed, realistic network environments;
+	\item Study the effects of bandwidth limitations, latency, and other
+		network parameters on blockchain performance;
+	\item Analyze packets as they traverse the TCP/IP stack, from the
+		application layer down to the physical layer;
+	\item Explore complex scenarios such as congestion attacks or the
+		impact of specific routing protocols on the Bitcoin network.
+\end{enumerate}
+
+This integration would significantly enhance the applicability of \iblock{},
+making it an invaluable tool for researchers examining the interplay between
+blockchain protocols and network infrastructures.

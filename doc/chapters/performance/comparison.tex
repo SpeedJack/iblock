@@ -7,13 +7,15 @@ the open-source Python simulator already discussed in \secref{subsec:blocksim}
 A fair comparison is impossible as \iblock{} is a more comprehensive Bitcoin
 simulator, while BlockSim only simulates basic block and transaction
 propagation with limited statistical reporting. BlockSim offers two modes:
-``Light'' and ``Full''. In ``Light'' mode, BlockSim prioritizes speed by bypassing
-network propagation of transactions, adding them directly to blocks. In
-``Full''
-mode, BlockSim includes a basic form of transaction propagation but it really
-is just a propagation delay randomly extracted from a predefined distribution.
-By contrast, \iblock{} utilizes \omnetpp's functionalities to really propagate
-transactions across the network.
+``Light'' and ``Full''. In ``Light'' mode, BlockSim prioritizes speed by
+bypassing network propagation of transactions, adding them directly to blocks.
+In ``Full'' mode, BlockSim includes a basic form of transaction propagation but
+it really is just a propagation delay randomly extracted from a predefined
+distribution. By contrast, \iblock{} utilizes \omnetpp's functionalities to
+propagate transactions across the network, which causes the receiving node to
+do some processing when receiving a transaction, such as verifying that the
+transaction is not already in the mempool or in the blockchain or updating the
+list of UTXOs in the wallet.
 
 BlockSim ``Full'' mode encounters limitations with larger simulations, as it
 fails to simulate beyond a few hours due to excessive memory usage. In a test

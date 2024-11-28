@@ -12,6 +12,8 @@ simple BlockchainManager like IBlockchainManager
 		string peerTableModule = default("^.peerTable");
 		string connectionManagerModule = default("^.connectionManager");
 		string mempoolManagerModule = default("^.mempoolManager");
+		volatile double bandwidth @unit(bps) = default(1Mbps);
+		volatile double propagationDelay @unit(s) = default(exponential(0.42s));
 		@signal[networkDifficulty](type=double);
 		@signal[mainBranchAppend](type=unsigned long);
 		@signal[sideBranchAppend](type=unsigned long);

@@ -1,16 +1,17 @@
 \chapter{Implementation}\label{ch:implementation}
 
-This chapter describes the design and implementation of \iblock{}, following a
-top-down approach. First, an overview of the system design is presented, then
-the implementation of the system components is described in detail. In
-\secref{sec:impl-objects}, a description of the data model used to represent
-Bitcoin blocks and transactions is provided. Finally, \secref{sec:impl-global}
-provides an overview of the global modules that are used to manage the system
-at the network level and \secref{sec:statistics} describes the statistics that
-are collected by the system.
+This chapter outlines the design and implementation of \iblock{}, following a
+top-down approach. First, an overview of the system architecture is provided,
+followed by detailed descriptions of the individual system components.
+\secref{sec:impl-objects} explains the data model used to represent Bitcoin
+blocks and transactions. \secref{sec:impl-global} presents an overview of the
+global modules responsible for managing the system at the network level, and
+\secref{sec:statistics} describes the statistical data collected by the system.
 
 \input{implementation/overview}
 \input{implementation/node}
 \input{implementation/objects}
 \input{implementation/global}
+\input{implementation/interactions}
 \input{implementation/statistics}
+\input{implementation/next}

@@ -10,6 +10,14 @@
 	abstract={A purely peer-to-peer version of electronic cash would allow online payments to be sent directly from one party to another without going through a financial institution. Digital signatures provide part of the solution, but the main benefits are lost if a trusted third party is still required to prevent double-spending. We propose a solution to the double-spending problem using a peer-to-peer network. The network timestamps transactions by hashing them into an ongoing chain of hash-based proof-of-work, forming a record that cannot be changed without redoing the proof-of-work. The longest chain not only serves as proof of the sequence of events witnessed, but proof that it came from the largest pool of CPU power. As long as a majority of CPU power is controlled by nodes that are not cooperating to attack the network, they'll generate the longest chain and outpace attackers. The network itself requires minimal structure. Messages are broadcast on a best effort basis, and nodes can leave and rejoin the network at will, accepting the longest proof-of-work chain as proof of what happened while they were gone.},
 }
 
+@article{ethereum,
+	title = {Ethereum: A Next-Generation Smart Contract and Decentralized Application Platform},
+	author = {Buterin, Vitalik},
+	url = {https://ethereum.org/content/whitepaper/whitepaper-pdf/Ethereum_Whitepaper_-_Buterin_2014.pdf},
+	year = {2014},
+	note = {The Ethereum white paper},
+}
+
 @inproceedings{intermittent-selfish-mining,
 	author = {Negy, Kevin Alarc{\'o}n and Rizun, Peter R. and Sirer, Emin G{\"u}n},
 	editor = {Bonneau, Joseph and Heninger, Nadia},
@@ -40,6 +48,19 @@
 	numpages = {17},
 }
 
+@inproceedings{eclipse,
+	author = {Ethan Heilman and Alison Kendler and Aviv Zohar and Sharon Goldberg},
+	title = {Eclipse Attacks on {Bitcoin{\textquoteright}s} {Peer-to-Peer} Network},
+	booktitle = {24th USENIX Security Symposium (USENIX Security 15)},
+	year = {2015},
+	isbn = {978-1-939133-11-3},
+	address = {Washington, D.C.},
+	pages = {129--144},
+	url = {https://www.usenix.org/conference/usenixsecurity15/technical-sessions/presentation/heilman},
+	publisher = {USENIX Association},
+	month = {08},
+}
+
 @inproceedings{omnetpp,
 	author = {Varga, Andr\'{a}s and Hornig, Rudolf},
 	title = {An overview of the OMNeT++ simulation environment},
@@ -62,6 +83,20 @@
 	title = {OMNeT++ Discrete Event Simulator},
 	url = {https://omnetpp.org},
 	urldate = {2024-11-08},
+}
+
+@online{ns3,
+	shorthand = {NS3},
+	title = {ns-3 Discrete Event Network Simulator},
+	url = {https://www.nsnam.org},
+	urldate = {2024-11-18},
+}
+
+@online{simpy,
+	shorthand = {SimPy},
+	title = {SimPy Discrete Event Python Simulation Framework},
+	url = {https://simpy.readthedocs.io},
+	urlate = {2024-11-18},
 }
 
 @manual{omnetpp-simulation-manual,
@@ -134,6 +169,77 @@
 	abstract = {Both in the design and deployment of blockchain solutions many performance-impacting configuration choices need to be made. We introduce BlockSim, a framework and software tool to build and simulate discrete-event dynamic systems models for blockchain systems. BlockSim is designed to support the analysis of a large variety of blockchains and blockchain deployments as well as a wide set of analysis questions. At the core of BlockSim is a Base Model, which contains the main model constructs common across various blockchain systems organized in three abstraction layers (network, consensus, and incentives layer). The Base Model is usable for a wide variety of blockchain systems and can be extended easily to include system or deployment particulars. The BlockSim software tool provides a simulator that implements the Base Model in Python. The paper describes the Base Model, the simulator implementation, and the application of BlockSim to Bitcoin, Ethereum and other consensus algorithms. We validate BlockSim simulation results by comparison with performance results from actual systems and from other studies in the literature. We close the paper by a BlockSim simulation study of the impact of uncle blocks rewards on mining decentralization, for a variety of blockchain configurations.},
 }
 
+@inproceedings{blocksim-faria,
+	author={Faria, Carlos and Correia, Miguel},
+	booktitle={2019 IEEE International Conference on Blockchain (Blockchain)}, 
+	title={BlockSim: Blockchain Simulator}, 
+	year={2019},
+	pages={439--446},
+	abstract={A blockchain is a distributed ledger in which participants that do not fully trust each other agree on the ledger's content by running a consensus algorithm. This technology is raising a lot of interest both in academia and industry, but the lack of tools to evaluate design and implementation decisions may hamper fast progress. To address this issue, this paper presents a discrete-event simulator that is flexible enough to evaluate different blockchain implementations. These blockchains can be rapidly modeled and simulated by extending existing models. Running Bitcoin and Ethereum simulations allowed us to change conditions and answer different questions about their performance. For example, we concluded that doubling the number of transactions per block has a low impact on the block propagation delay (10ms) and that encrypting communication has a high impact in that delay (more than 25\%).},
+	keywords={Blockchain;Bitcoin;Computational modeling;Production facilities;Tools;Probability distribution;Throughput;Blockchain;simulation;Ethereum;Bitcoin},
+	doi={10.1109/Blockchain.2019.00067},
+	month={07},
+}
+
+@inproceedings{simblock,
+	author={Aoki, Yusuke and Otsuki, Kai and Kaneko, Takeshi and Banno, Ryohei and Shudo, Kazuyuki},
+	booktitle={IEEE INFOCOM 2019 - IEEE Conference on Computer Communications Workshops (INFOCOM WKSHPS)}, 
+	title={SimBlock: A Blockchain Network Simulator}, 
+	year={2019},
+	pages={325--329},
+	abstract={Blockchain, which is a technology for distributedly managing ledger information over multiple nodes without a centralized system, has elicited increasing attention. Performing experiments on actual blockchains is difficult because a large number of nodes in wide areas are necessary. In this study, we developed a blockchain network simulator SimBlock for such experiments. Unlike the existing simulators, SimBlock can easily change behavior of nodes, so that it enables to investigate the influence of nodes' behavior on blockchains. We compared some simulation results with the measured values in actual blockchains to demonstrate the validity of this simulator. Furthermore, to show practical usage, we conducted two experiments which clarify the influence of neighbor node selection algorithms and relay networks on the block propagation time. The simulator could depict the effects of the two techniques on block propagation time. The simulator will be publicly available in a few months.},
+	keywords={Peer-to-peer computing;Blockchain;Bitcoin;Bandwidth;Propagation delay;Protocols;blockchain;simulator;peer-to-peer},
+	doi={10.1109/INFCOMW.2019.8845253},
+	month={04},
+}
+
+@inproceedings{simblock-improved,
+	author={Basile, Mariano and Nardini, Giovanni and Perazzo, Pericle and Dini, Gianluca},
+	booktitle={2021 IEEE Symposium on Computers and Communications (ISCC)}, 
+	title={On Improving SimBlock Blockchain Simulator}, 
+	year={2021},
+	pages={1--6},
+	abstract={Bitcoin-based smart city services are an ever increasing up-and-coming reality. For these services, simulating the Bitcoin blockchain is important to parametrize the system and tailor the costs and the economic incentives. In this regard, SimBlock simulator is the current state-of-the-art tool for blockchain simulations. Unfortunately, based on an up-to-date parametrization, SimBlock turns out not to simulate the mining of blocks. Furthermore, it does not simulate the incentive mechanism. These limitations strongly confine SimBlock's effective usage towards evaluating Bitcoin-based services relevant to many application contexts, including smart cities. To overcome these limitations, we propose an improved SimBlock's implementation. Upon it, we assess whether SimBlock can abstract the current Bitcoin blockchain. The experimental analysis shows that the proposed implementation can effectively simulate the current Bitcoin blockchain. Though, introducing relay network modelling in SimBlock should even improve the accuracy of the simulation.},
+	keywords={Computers;Analytical models;Costs;Smart cities;Computational modeling;Biological system modeling;Bitcoin;smart city;SimBlock;Bitcoin;blockchain;simulator;experimental analysis;validation},
+	doi={10.1109/ISCC53001.2021.9631470},
+	ISSN={2642-7389},
+	month={09},
+}
+
+@inproceedings{bitcoin-simulator,
+	author = {Gervais, Arthur and Karame, Ghassan O. and W\"{u}st, Karl and Glykantzis, Vasileios and Ritzdorf, Hubert and Capkun, Srdjan},
+	title = {On the Security and Performance of Proof of Work Blockchains},
+	year = {2016},
+	isbn = {9781450341394},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	doi = {10.1145/2976749.2978341},
+	abstract = {Proof of Work (PoW) powered blockchains currently account for more than 90\% of the total market capitalization of existing digital cryptocurrencies. Although the security provisions of Bitcoin have been thoroughly analysed, the security guarantees of variant (forked) PoW blockchains (which were instantiated with different parameters) have not received much attention in the literature. This opens the question whether existing security analysis of Bitcoin's PoW applies to other implementations which have been instantiated with different consensus and/or network parameters.In this paper, we introduce a novel quantitative framework to analyse the security and performance implications of various consensus and network parameters of PoW blockchains. Based on our framework, we devise optimal adversarial strategies for double-spending and selfish mining while taking into account real world constraints such as network propagation, different block sizes, block generation intervals, information propagation mechanism, and the impact of eclipse attacks. Our framework therefore allows us to capture existing PoW-based deployments as well as PoW blockchain variants that are instantiated with different parameters, and to objectively compare the tradeoffs between their performance and security provisions.},
+	booktitle = {Proceedings of the 2016 ACM SIGSAC Conference on Computer and Communications Security},
+	pages = {3--16},
+	numpages = {14},
+	keywords = {bitcoin, blockchain, performance, security},
+	location = {Vienna, Austria},
+	series = {CCS '16},
+}
+
+@inproceedings{vibes,
+	author = {Stoykov, Lyubomir and Zhang, Kaiwen and Jacobsen, Hans-Arno},
+	title = {VIBES: fast blockchain simulations for large-scale peer-to-peer networks: demo},
+	year = {2017},
+	isbn = {9781450352017},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	doi = {10.1145/3155016.3155020},
+	abstract = {Following the success of Bitcoin, Ethereum and Hyperledger, blockchains are now gaining widespread adoption in a wide variety of applications, using a diversity of distributed ledger systems with varying characteristics. Yet, beyond the original bitcoin protocol, the safety and reliability properties of such systems are not sufficiently analyzed. To better understand the behavior of these systems, we propose VIBES: a configurable blockchain simulator for large scale peer-to-peer networks. With VIBES, users can explore important characteristics and metrics of the network, reason about interactions between nodes, and compare different scenarios in an intuitive way. VIBES differentiates itself from previous works in its ability to simulate blockchain systems beyond bitcoin and its support for large-scale simulations with thousands of nodes.},
+	booktitle = {Proceedings of the 18th ACM/IFIP/USENIX Middleware Conference: Posters and Demos},
+	pages = {19--20},
+	numpages = {2},
+	keywords = {simulation, blockchain},
+	location = {Las Vegas, Nevada},
+	series = {Middleware '17}
+}
+
 @online{bip141,
 	shorthand = {BIP141},
 	author = {Lombrozo, Eric and Lau, Johnson and Wuille, Pieter},
@@ -174,9 +280,19 @@
 @online{bitcoin-core,
 	shorthand = {BCore},
 	title = {Bitcoin Core},
+	year = {2009},
 	url = {https://bitcoincore.org},
 	urldate = {2024-11-08},
 	note = {Reference implementation of the Bitcoin protocol},
+}
+
+@online{bitcoin-cash,
+	shorthand = {BCash},
+	title = {Bitcoin Cash},
+	year = {2017},
+	url = {https://bitcoincash.org},
+	urlate = {2024-11-15},
+	note = {Bitcoin hard fork},
 }
 
 @online{bitcoin-wiki,
@@ -188,8 +304,15 @@
 
 @online{btcwiki-scalability,
 	shorthand = {WikiScal},
-	title = {Scalability --- Bitcoin Wiki},
+	title = {Scalability page on the Bitcoin Wiki},
 	url = {https://en.bitcoin.it/wiki/Scalability},
+	urldate = {2024-11-07},
+}
+
+@online{btcwiki-difficulty,
+	shorthand = {WikiDiff},
+	title = {Difficulty page on the Bitcoin Wiki},
+	url = {https://en.bitcoin.it/wiki/Difficulty},
 	urldate = {2024-11-07},
 }
 
@@ -200,4 +323,24 @@
 	url = {https://www.blockchain.com/explorer/charts/transactions-per-second},
 	note = {Online, real-time chart},
 	urldate = {2024-11-07},
+}
+
+@online{inet,
+	shorthand = {INET},
+	title = {INET Framework --- Project Website},
+	url = {https://inet.omnetpp.org},
+	urldate = {2024-11-17},
+}
+
+@article{simureview,
+	author={Paulavičius, Remigijus and Grigaitis, Saulius and Filatovas, Ernestas},
+	journal={IEEE Access}, 
+	title={A Systematic Review and Empirical Analysis of Blockchain Simulators}, 
+	year={2021},
+	volume={9},
+	pages={38010--38028},
+	abstract={In recent years, distributed ledger technologies, and especially blockchain, have gained tremendous interest from academia, government, and industry. Although various blockchain-based solutions were created, the lack of tools to evaluate these complex distributed systems may hinder the development of the field. Many advantages of blockchain systems can be demonstrated only at large scales, e.g., using thousands of nodes. An investigation of different implementations and design choices is complicated and hardly feasible on real systems. Meanwhile, blockchain simulators give the possibility to repeat the complex real-world processes at a low cost. This work provides the first and an up-to-date systematic review and empirical analysis of blockchain simulators. Simulators are easily extensible and can test the performance of distributed ledgers using different settings and parameters on a single computer. The features and limitations of selected simulators are summarized and experimentally validated. Finally, recommendations for potential future research directions in the field are provided.},
+	keywords={Blockchain;Distributed ledger;Peer-to-peer computing;Mathematical model;Bitcoin;Systematics;Performance evaluation;Bitcoin;distributed ledger technology;blockchain;simulators;systematic review},
+	doi={10.1109/ACCESS.2021.3063324},
+	ISSN={2169-3536},
 }

@@ -285,7 +285,9 @@ void BlockchainManager::onAfterMinedBlockAppend(std::shared_ptr<Block> block)
 			continue;
 		cGate* nodeGate = node->gate("blockchainManagerIn");
 		// sendDirect(new BlockPl(block), nodeGate);
-		sendDirect(new DirectBlockMsg(block), exponential(0.42), block->getBitLength() / ((double)1000*1000), nodeGate);
+		double delay = par("propagationDelay").doubleValue();
+		double txDuration = block->getBitLength() / par("bandwidth").doubleValue();
+		sendDirect(new DirectBlockMsg(block), delay, txDuration, nodeGate);
 	}
 }
 

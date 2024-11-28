@@ -1,1 +1,81 @@
-\section{Global modules}\label{sec:impl-global}
+\section{Global Modules}\label{sec:impl-global}
+
+In \figref{fig:app-uml} on page \pageref{fig:app-uml}, the green-highlighted
+classes represent the global modules within the simulation. These modules,
+external to individual nodes, provide essential services across the network.
+
+Global modules identify nodes and applications in the network through
+\omnetpp{}'s topology discovery and NED properties. For example, each network
+node has a \code{@bitcoinNode} property, each wallet is tagged with
+\code{@wallet}, and each \code{BlockchainManager} is marked with
+\code{@blockchainManager} in their NED definitions.
+
+The \code{NodeManager} module serves as a directory of all nodes, maintaining
+an array of them accessible via the \code{nodes()} method, which allows for
+node iteration in loops. This module is used by \code{BlockchainManager} and
+\code{MempoolManager} for block and transaction propagation across the network.
+
+The \code{WalletManager} module supports the \code{TransactionGenerator}
+application by supplying new Bitcoin addresses (instances of the
+\code{BitcoinAddress} class) for random wallets throughout the network.
+
+The \code{GBM} module is slightly more complex and it is described in the
+following section.
+
+\subsection{The Global Blockchain Manager}\label{subsec:impl-global-gbm}
+
+The \code{GBM} (Global Blockchain Manager) module is responsible for creating
+the \emph{genesis block} and managing memory by cleaning out obsolete blocks.
+
+In a Bitcoin network, the genesis block is the initial block in the blockchain.
+Unlike regular blocks, it lacks standard transactions since there's no
+pre-existing Bitcoin in circulation; only the coinbase transaction generates
+the first coins. In the Bitcoin protocol, this coinbase transaction typically
+contains 50 bitcoins, but in \iblock{}, the genesis block's coin amount can be
+adjusted. Additionally, these initial funds can be distributed across multiple
+wallets in the network based on user-defined starting balances.
+
+When setting up the simulation, the user specifies each wallet's initial
+balance in the simulation configuration. The \code{GBM} then assigns these
+amounts within a single coinbase transaction in the genesis block, with each
+output directed to a designated wallet. The \code{GBM} then distributes the
+genesis block to all \code{BlockchainManager} instances in the network using
+the \code{addGenesisBlock()} method. In this way, when the simulation starts,
+each wallet will have its initial balance given by the genesis block.
+
+Once the genesis block is established in all network blockchains, the
+simulation begins. The \code{GBM} module periodically wakes to perform memory
+cleanup, freeing space from blocks (and transactions) that are no longer
+necessary.
+
+The cleanup process is as follows:
+\begin{enumerate}
+	\item Each time a \code{BlockchainManager} adds a new block to its main
+		blockchain branch, it notifies the \code{GBM}. The \code{GBM}
+		stores a reference to this block in a map tracking all main
+		branches across the network;
+	\item On each \code{GBM} wake (configurable interval), it identifies
+		the common ancestor of all main branches. The \code{GBM} then
+		retains this common ancestor and its parent, discarding all
+		older blocks. Deletion is managed by removing the parent
+		pointer from the earliest retained block. Thanks to smart
+		pointers, all blocks without remaining references are
+		automatically deleted;
+	\item The \code{GBM} then calls each \code{BlockchainManager}'s
+		\code{cleanup()} method, passing the height of the retained
+		common ancestor. Each \code{BlockchainManager} then removes any
+		branches whose head height is below this threshold.
+\end{enumerate}
+
+By using smart pointers, blocks are deleted simply by removing references, and
+transactions within blocks are also automatically removed once they are no
+longer referenced by any block or any mempool.
+
+The \code{GBM} module has a single configurable parameter:
+\code{cleanupInterval}, which defines the time between memory cleanup
+operations. By default, this interval is set to one hour (simulated time).
+
+This memory management approach allows \iblock{} to handle large-scale
+simulations efficiently, maintaining essential blocks and transactions without
+memory overflow. If an applications must ensure that a block or a transaction
+is retained in memory, it just need to keep a reference to it.

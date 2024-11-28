@@ -41,7 +41,7 @@ more-than-fair revenues in absolute terms, not only in a relative sense
 \cite{intermittent-selfish-mining}. Anyway this works only explores the
 original selfish mining strategy.
 
-\subsection{Selfish miner implementation}\label{subsec:selfish-impl}
+\subsection{Selfish Miner Implementation}\label{subsec:selfish-impl}
 
 The selfish miner implemented in \iblock{} diverges slightly from the
 one proposed by \citeauthor{selfish-mining}. Their original approach is
@@ -62,7 +62,7 @@ structured as follows:
 	\item[Progressive Publishing] If the lead exceeds two blocks and the
 		network discovers a new block, only the first unpublished block
 		is broadcast. This preserves the two-block lead while starting
-		to sequentially releasing the private chain.
+		to sequentially release the private chain.
 \end{description}
 
 There are some technical limitations on implementing the above strategy in the
@@ -133,7 +133,7 @@ of the selfish chain is the legitimate main branch of the blockchain.
 			single block}
 				\State selfish chain \(\gets\) public chain
 				\State \(selfishChainLen \gets 0\)
-			\ElsIf{\(\Delta = 0\)}\Comment{They win}
+			\ElsIf{\(\Delta = 0\)}\Comment{They won}
 				\State selfish chain \(\gets\) public chain
 				\State \(selfishChainLen \gets 0\)
 			\ElsIf{\(\Delta = 1\)}\Comment{Good guys are
@@ -149,7 +149,6 @@ of the selfish chain is the legitimate main branch of the blockchain.
 	\end{algorithmic}
 \end{algorithm}
 
-
 As this is a suboptimal implementation of the selfish miner, the attack
 outcomes here may be slightly less favorable to the attacker than those
 observed by \citeauthor{selfish-mining}. In their simulation, a selfish miner
@@ -162,7 +161,7 @@ some rewards would still be attainable by other miners, as the selfish miner
 cannot always ensure winning every block publication race.
 
 An example of this more practical approach of \iblock{} is, in fact, the
-precence of the coinbase maturity parameter and the computation of mining
+presence of the coinbase maturity parameter and the computation of mining
 rewards that occur when the maturity is reached by the mined block. This
 mirrors Bitcoin's protocol specification, where a \code{COINBASE\_MATURITY}
 parameter (currently set to \(100\) blocks) sets the minimum confirmations
@@ -181,7 +180,7 @@ For this analysis, two configurations were used. The first is named
 characteristics:
 \begin{itemize}
 	\item 45 user nodes generating a transaction approximately every 15
-		seconds;
+		seconds (per node);
 	\item 4 \emph{honest} miners each contributing 20 TH/s to the total
 		network's hash rate and creating transactions at the same rate;
 	\item 1 \emph{selfish} miner node, with varying hash rate, also
@@ -189,7 +188,10 @@ characteristics:
 \end{itemize}
 
 In total, the network consists of 50 nodes, producing about \(3.33\)
-transactions per second globally.
+transactions per second globally. The selfish miner is allowed to build a
+private chain of a maximum length of 10 blocks, while the coinbase maturity
+parameter is set to 12 blocks (this has been done to avoid memory exhaustion
+issues caused by the selfish miner's chain growth).
 
 The selfish miner is put in the configuration with six different level of
 hash rate relative to the total network hash rate: \(10\%\), \(20\%\),
@@ -235,10 +237,12 @@ impactful attacks.
 
 The second part of this analysis focuses on the rewards earned by the single
 miner with varying hash rate, operating either honestly or selfishly based on
-configuration.  \figref{fig:selfish-reward} illustrates the results, with the
+configuration. \figref{fig:selfish-reward} illustrates the results, with the
 x-axis representing the miner's relative hash rate and the y-axis depicting the
-miner's rewards as a percentage of total network rewards. Three lines are
-displayed:
+miner's rewards as a percentage of total network rewards.
+
+\newpage
+In \figref{fig:selfish-reward} four lines are displayed:
 \begin{description}
 	\item[Gray dashed line] shows the theoretical expected reward for
 		honest mining with each hash rate level. This is, basically,
@@ -249,10 +253,23 @@ displayed:
 		simulation;
 	\item[Red line] represents the average reward of the selfish miner,
 		with \(95\%\) confidence intervals, as obtained from the
-		simulation.
+		simulation;
+	\item[Green dashed line] shows the theoretical expected reward for
+		selfish mining with each hash rate level. This is the function
+		derived mathematically by \citeauthor{selfish-mining} in their
+		work and reported here in \eqref{eq:selfish-reward}, with
+		\(\gamma = 0\) and \(\alpha\) the relative hash rate of the
+		selfish miner.
+		\begin{equation}\label{eq:selfish-reward}
+			R_{\text{self}} =
+			\frac{r_{\text{self}}}{r_{\text{self}} +
+			r_{\text{others}}} = \ldots = \frac{\alpha(1 -
+			\alpha)^2(4\alpha + \gamma(1 - 2\alpha)) - \alpha^3}{1
+			- \alpha(1 + (2 - \alpha)\alpha)}
+		\end{equation}
 \end{description}
 
-\begin{figure}[tbhp]
+\begin{figure}[tbh]
 	\centering
 	\includegraphics[width=\textwidth,trim={2.95cm 1.85cm 3.3cm
 			2.5cm},clip]{selfish-mining-rewards}
@@ -273,15 +290,15 @@ earnings exceed those of the honest miner. This result aligns with findings
 reported by \citeauthor{selfish-mining}. The only difference, as anticipated
 before, is that the results are a little worse than those obtained by
 \citeauthor{selfish-mining}: with \(45\%\) of the hash rate, the selfish miner
-should earn about the \(65\%\) of the total rewards (as claimed by
-\citeauthor{selfish-mining}), while the results show a gain of ``only''
-\(53\%\) on average; with \(50\%\), the selfish miner should earn all the
-rewards, but it was able to gain only the \(61\%\) of the total rewards.
+should earn about \(65\%\) of the total rewards (as shown by the green dashed
+line), while the results show a gain of ``only'' \(53\%\) on average; with
+\(50\%\), the selfish miner should earn all the rewards, but it was able to
+gain only the \(61\%\) of the total rewards.
 
 Nevertheless, the results are consistent with the expectations and the most
 important result is confirmed: selfish mining becomes more profitable than
 honest mining once the miner controls over \(\frac{1}{3}\) of the network's
-hash rate. This align precisely with the outcomes obtained by
+hash rate. This aligns precisely with the outcomes obtained by
 \citeauthor{selfish-mining} for the \(\gamma = 0\) case --- the scenario most
 comparable to the \iblock{}'s setup, where a \emph{propagation factor}
 \(\gamma\) of zero implies that honest miners avoid supporting the selfish

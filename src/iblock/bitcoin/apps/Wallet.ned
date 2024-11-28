@@ -19,7 +19,7 @@ simple Wallet like IApp
 		@signal[createAddress](type=unsigned long);
 		@signal[utxoBTL](type=unsigned long);
 		@signal[miningEarn](type=unsigned long);
-		@statistic[utxoCount](source=count(addUTXO)-count(removeUTXO); record=vector?,max,last,stats?; unit=sat; interpolationmode=sample-hold; title="UTXO count");
+		@statistic[utxoCount](source=count(addUTXO)-count(removeUTXO); record=vector?,max,last,stats?; unit=utxos; interpolationmode=sample-hold; title="UTXO count");
 		@statistic[walletBalance](source=sum(addUTXO)-sum(removeUTXO); record=vector?,max,last,stats?; unit=sat; interpolationmode=sample-hold; title="Wallet balance");
 		@statistic[createdAddresses](source=count(createAddress); record=vector?,last; unit=addresses; interpolationmode=sample-hold; title="Created addresses");
 		@statistic[utxoDuration](source=utxoBTL; record=vector?,stats,histogram?; unit=blocks; interpolationmode=sample-hold; title="UTXO duration");

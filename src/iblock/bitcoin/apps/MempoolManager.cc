@@ -87,7 +87,9 @@ void MempoolManager::addTransaction(std::shared_ptr<Transaction> transaction)
 			continue;
 		cGate* nodeGate = node->gate("mempoolManagerIn");
 		// sendDirect(new TxPl(transaction), nodeGate);
-		sendDirect(new DirectTxMsg(transaction), exponential(5.1), transaction->getBitLength() / ((double)1000*1000), nodeGate);
+		double delay = par("propagationDelay").doubleValue();
+		double txDuration = transaction->getBitLength() / par("bandwidth").doubleValue();
+		sendDirect(new DirectTxMsg(transaction), delay, txDuration, nodeGate);
 	}
 }
 

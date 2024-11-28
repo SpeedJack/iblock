@@ -1,1 +1,135 @@
-\section{Collected statistics}\label{sec:statistics}
+\section{Collected Statistics}\label{sec:statistics}
+
+During simulation, \iblock{} collects a range of statistics using \omnetpp{}'s
+signal mechanism. In this approach, simulation modules emit signals, which
+\omnetpp{} collects according to the NED file specifications.
+
+Most statistics are gathered on a per-node basis, reflecting the decentralized
+nature of a Bitcoin network. This structure means that the number of potential
+statistics grows linearly with the number of nodes, though users can configure
+simulations to focus only on specific statistics of interest.
+
+Statistics can be collected as time series (vectors), aggregated values
+(scalars), or histograms, depending on the needs of the analysis.
+
+Table~\ref{tab:network-statistics} provides an overview of network-level
+statistics tracked by \iblock{}, while Table~\ref{tab:node-statistics} on
+page~\pageref{tab:node-statistics} details the node-level statistics collected.
+
+\begin{table}[tbhp]
+	\tiny
+	\centering
+	\begin{tabularx}{\linewidth}{|r|c|c|X|}
+		\toprule
+		Name & Unit & Recorders\footnotemark & Description \\
+		\midrule
+		\code{blocks} & int & vector, count, timeavg & Total number of
+		blocks mined.\\\midrule
+		\code{circulatingSupply} & satoshis & vector, stats, last &
+		Quantity of Bitcoins circulating in the entire
+		network.\\\midrule
+		\code{fees} & satoshis & vector, stats, last & Total fees paid
+		by nodes to create transactions.\\\midrule
+		\code{processedTransactions} & int & vector, stats, sum,
+		histogram & Total number of transactions included in
+		blocks.\\\midrule
+		\code{transactions} & int & vector, stats, last & Total number
+		of transactions created. \\\midrule
+		\code{walletAddresses} & int & vector, last & Total number of
+		Bitcoin addresses created.\\
+		\bottomrule
+	\end{tabularx}
+	\caption{Network-level statistics
+	collected.}\label{tab:network-statistics}
+\end{table}
+\footnotetext{See the \citetitle{omnetpp-simulation-manual} for the meaning of
+statistics filters and recorders reported in this column
+\cite{omnetpp-simulation-manual}.}
+
+\begin{table}[tbhp]
+	\tiny
+	\centering
+	\begin{tabularx}{\linewidth}{|c|r|c|c|X|}
+		\toprule
+		Application & Name & Unit & Recorders & Description \\\midrule
+		\code{BlockchainManager} & \code{duplicateBlocks} & int &
+		vector, count & Number of duplicate blocks received.\\\midrule
+		\code{BlockchainManager} & \code{forks} & int & vector(sum),
+		count & Number of side branches created.\\\midrule
+		\code{BlockchainManager} & \code{mainBranchLength} & int &
+		vector, stats, last & Height of the blockchain's main
+		branch.\\\midrule
+		\code{BlockchainManager} & \code{mainBranchSwaps} & int &
+		vector, count & Number of chain reorganizations
+		performed.\\\midrule
+		\code{BlockchainManager} & \code{mainBranchTransactions} & int
+		& vector(sum), histogram, last(sum) & Number of transactions
+		included in the blockchain's main branch.\\\midrule
+		\code{BlockchainManager} & \code{networkDifficulty} & double &
+		vector, stats, last & Current mining difficulty of the
+		network.\\\midrule
+		\code{BlockchainManager} & \code{orphans} & int & vector &
+		Number of orphan blocks stored with the blockchain.\\\midrule
+		\code{MempoolManager} & \code{mempoolSize} & bytes & vector,
+		stats, last & Size of the mempool, in bytes.\\\midrule
+		\code{MempoolManager} & \code{transactionCount} & int & vector,
+		stats, max, last & Number of transactions in the
+		mempool.\\\midrule
+		\code{Miner} & \code{blockMined} & int & vector, count, timeavg
+		& Number of blocks found by the miner.\\\midrule
+		\code{Miner} & \code{blockReward} & satoshis & vector,
+		histogram, stats, sum & Revenues from blocks mined, including
+		revenues that does not have reached \code{coinbaseMaturity} and
+		those from blocks added to side branches.\\\midrule
+		\code{Miner} & \code{blockRewardPerByte} & satoshis/byte &
+		vector, histogram, stats & Simply
+		\code{blockReward}/\code{blockSize}.\\\midrule
+		\code{Miner} & \code{blockSize} & bytes & vector, histogram,
+		stats, sum & Size of each block mined.\\\midrule
+		\code{Miner} & \code{blockTime} & time & vector, histogram,
+		stats & Time spent mining each block.\\\midrule
+		\code{Miner} & \code{transactionsProcessed} & int & vector,
+		histogram, stats, sum & Number of transaction processed by the
+		miner \idest{added to mined blocks}.\\\midrule
+		\code{TransactionGenerator} & \code{createdTransactions} & int
+		& vector, stats, last & Number of transactions
+		created.\\\midrule
+		\code{TransactionGenerator} & \code{transactionFee} & satoshis
+		& vector, histogram, sum & Paid fees for each
+		transaction.\\\midrule
+		\code{TransactionGenerator} & \code{transactionFeeRate} &
+		satoshis/byte & vector, histogram & Fee rate for each
+		transaction created. \\\midrule
+		\code{TransactionGenerator} & \code{transactionInputCount} &
+		int & vector, histogram & Number of inputs in each transaction
+		created.\\\midrule
+		\code{TransactionGenerator} & \code{transactionInputValue} &
+		satoshis & vector, histogram, sum & Total value of inputs in
+		each transaction.\\\midrule
+		\code{TransactionGenerator} & \code{transactionOutputCount} &
+		int & vector, histogram & Number of outputs in each transaction
+		created.\\\midrule
+		\code{TransactionGenerator} & \code{transactionOutputValue} &
+		satoshis & vector, histogram, sum & Total value of outputs in
+		each transaction.\\\midrule
+		\code{TransactionGenerator} & \code{transactionSize} & bytes &
+		vector, histogram, sum & Size of each transaction
+		created.\\\midrule
+		\code{Wallet} & \code{createdAddresses} & int & vector, last &
+		Number of addresses created by the wallet.\\\midrule
+		\code{Wallet} & \code{miningEarnings} & satoshis & vector,
+		histogram, last & Mining revenues, including block subsidies
+		and fees, counted only when \code{coinbaseMaturity} is reached
+		by the coinbase transaction.\\\midrule
+		\code{Wallet} & \code{utxoCount} & int & vector, stats, max,
+		last & Number of UTXOs in the wallet.\\\midrule
+		\code{Wallet} & \code{utxoDuration} & int (blocks) & vector,
+		stats, histogram & Time difference between the insertion of a
+		new UTXO in the wallet and when it is spent, measured in
+		blocks.\\\midrule
+		\code{Wallet} & \code{walletBalance} & satoshis & vector,
+		stats, max, last & Amount of Bitcoins in wallet.\\
+		\bottomrule
+	\end{tabularx}
+	\caption{Node-level statistics collected.}\label{tab:node-statistics}
+\end{table}

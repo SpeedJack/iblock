@@ -1,0 +1,154 @@
+\section{Blockchain Simulators}\label{sec:simulators}
+
+A wide range of blockchain simulators is available today, with most being free
+and open-source. These simulators aim to model different aspects of blockchain
+systems, including the network, consensus, and data layers. This section
+provides an overview of the most widely used blockchain simulators, their key
+features, and their limitations.
+
+\subsection{State of the Art}\label{subsec:state-of-the-art}
+
+The current landscape of blockchain simulators has been extensively reviewed in
+\cite{simureview}, which compares the features and capabilities of various
+tools. Among the most notable simulators discussed are:
+\begin{description}
+	\item[Bitcoin-Simulator] Developed in C++ in
+		\citeyear{bitcoin-simulator} for the ns-3 network simulator
+		\cite{ns3}. It supports realistic and geographically
+		distributed networks. It does not model transaction fee
+		distribution and dynamic difficulty adjustments
+		\cite{bitcoin-simulator};
+	\item[BlockSim (Faria's Version)] Developed in Python in
+		\citeyear{blocksim-faria} for the SimPy simulation framework
+		\cite{simpy}. One of the most complete simulators but does not
+		supports variable sized blocks and transactions, block interval
+		distribution, transaction fee distribution and dynamic
+		difficulty adjustments \cite{blocksim-faria};
+	\item[SimBlock] Developed in Java in \citeyear{simblock}, it lacks
+		support for block size distribution and transactions are not
+		supported altogether \cite{simblock};
+	\item[BlockSim (Alharby's Version)] Developed in Python in
+		\citeyear{blocksim} it does not model the network layer and
+		does not support dynamic difficulty adjustments and variable
+		block sizes \cite{blocksim};
+	\item[VIBES] Developed in Scala in \citeyear{vibes} does not model the
+		network altogether and block and transactions are supported
+		only at a basic level \cite{vibes}.
+\end{description}
+
+There is no simulator that supports the UTXO-based transaction accounting
+model.
+
+\subsubsection{Key Insights}\label{subsubsec:key-insights}
+
+\begin{description}
+	\item[Network Layer] Bitcoin-Simulator, BlockSim (Faria), and SimBlock
+		consider the geographical distribution of nodes, enabling more
+		realistic simulations of global networks. However, VIBES and
+		BlockSim (Alharby) lack this capability;
+	\item[Consensus Layer] Only SimBlock supports alternative consensus
+		mechanisms, such as Proof-of-Stake. However, some simulators,
+		such as BlockSim (Alharby) and SimBlock, assume all nodes act
+		honestly, making them unsuitable for analyzing scenarios
+		involving malicious actors;
+	\item[Data Layer] Several simulators --- BlockSim (Faria), VIBES,
+		BlockSim (Alharby) --- simulate transaction propagation across
+		the network. However, none implement the UTXO-based transaction
+		account modeling. BlockSim (Alharby) is the only simulator
+		supporting variable transaction fees.
+\end{description}
+
+\subsubsection{Limitations of Existing Simulators}\label{subsubsec:limitations}
+
+Despite their capabilities, most blockchain simulators share the following
+limitations:
+\begin{itemize}
+	\item \textbf{Lack of Realistic Network Modeling}: Few simulators
+		include detailed simulations of network, links, bandwidths, and
+		latencies; Those that do, have other limitations in the
+		consensus and data layers;
+	\item \textbf{No Support for UTXO Models}: None of the simulators
+		accurately model the UTXO structure and the UTXO-based
+		accounting model;
+	\item \textbf{Simplistic Data Representation}: Often, only essential
+		fields of blocks and transactions are modeled, limiting
+		realism and flexibility;
+	\item \textbf{Poor Extensibility}: Many simulators lack modular design
+		or are not based on established simulation frameworks, making
+		feature additions difficult;
+	\item \textbf{Limited Security Analysis}: Few simulators can model
+		malicious nodes or test network vulnerabilities; Most
+		simulators assume all nodes are honest;
+	\item \textbf{Performance Bottlenecks}: Many are slow and
+		memory-intensive, restricting scalability to larger networks or
+		longer simulations.
+\end{itemize}
+
+\iblock{} was developed as a direct response to these limitations, aiming to
+deliver a high-performance, extensible blockchain simulation framework.
+
+\subsection{BlockSim}\label{subsec:blocksim}
+
+BlockSim, developed by \citeauthor{blocksim} \cite{blocksim}, is widely
+regarded as one of the most comprehensive blockchain simulators. Its primary
+strength lies in its robust implementation of the consensus layer. However,
+BlockSim has several critical drawbacks that limit its usability and
+efficiency.
+
+\subsubsection{Features and Capabilities}\label{subsubsec:blocksim-features}
+
+\begin{itemize}
+	\item \textbf{Modes of Operation}: BlockSim supports two modes:
+		\begin{description}
+			\item[Light Mode] Transactions are simplified and not
+				propagated across the network; Transactions are
+				created during simulation when a new block is
+				mined and directly added to it. This mode
+				allows for fast speed and low memory usage;
+			\item[Full Mode] Transactions are propagated across the
+				network and modeled with more details (altough
+				no multiple-input multiple-output (MIMO)
+				transactions are supported and UTXO-based
+				accounting is not considered), providing a
+				higher level of detail but at the cost of
+				performance and memory consumption. In this
+				mode, transactions are all created at the start
+				of the simulation, causing the software to go
+				out of memory in big setups even before
+				starting the simulation.
+		\end{description}
+	\item \textbf{Consensus Layer}: BlockSim includes an extensive
+		implementation of consensum mechanism, though it does not model
+		UTXOs and MIMO transactions and it assumes honest behavior by
+		all nodes, making it unsuitable for security-focused
+		simulations;
+\end{itemize}
+
+\subsubsection{Limitations}\label{subsubsec:blocksim-limitations}
+
+\begin{description}
+	\item[Performance] In ``Full' mode, BlockSim is exceptionally slow and
+		resource-intensive. Simulating even small networks of a few
+		dozen nodes for several hours of simulated time can take days
+		and require significant memory;
+	\item[Simplified Data Layer] BlockSim does not implement a UTXO-based
+		accounting model: nodes can generate transactions without
+		verifying their available funds, reducing accuracy. Moreover,
+		transactions are limited to a single input and a single output;
+	\item[Limited Features] BlockSim lacks dynamic difficulty adjustments
+		and does not account for malicious behavior;
+	\item[Limited Statistics] The range of statistics collected by BlockSim
+		is narrow, limiting the depth of analysis possible. Most
+		statistics are also meaningless: for example, BlockSim creates
+		blocks of fixed size and collects the size of every block,
+		which is just a constant;
+	\item[Extensibility] BlockSim is developed in Python but does not
+		utilize a simulation framework like \omnetpp{}. This makes
+		extending the simulator challenging and time-consuming;
+	\item[Scalability] The simulator struggles to handle larger networks or
+		longer durations due to its inefficiencies in memory and
+		computational resource usage.
+\end{description}
+
+In \secref{sec:comparison}, \iblock{} will be compared with BlockSim in terms
+of performance.
